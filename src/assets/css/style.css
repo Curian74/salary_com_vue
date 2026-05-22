@@ -1,0 +1,12 @@
+@import url('./icon.css');
+@import url('./font.css');
+@import "tailwindcss";
+
+:root {
+    --font-sans: 'Inter', sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}

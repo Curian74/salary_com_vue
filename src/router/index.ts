@@ -1,0 +1,16 @@
+import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import { createRouter, createWebHistory } from 'vue-router'
+
+const routes = [
+  {
+    path: '/',
+    component: DefaultLayout,
+  },
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+})
+
+export default router
