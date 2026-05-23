@@ -8,8 +8,6 @@ const props = defineProps<{
 }>()
 
 const iconClasses: Record<string, string> = {
-  'app-launcher': 'icon-sprite icon-sprite-white all-app-icon',
-  'payroll-logo': 'icon-image payroll-logo-icon',
   settings: 'icon-sprite icon-sprite-white settings-icon',
   assistant: 'icon-image assistant-icon',
   megaphone: 'icon-sprite icon-sprite-white megaphone-icon',
@@ -18,7 +16,6 @@ const iconClasses: Record<string, string> = {
   help: 'icon-sprite icon-sprite-white help-icon',
   more: 'icon-sprite icon-sprite-white more-icon',
   guide: 'icon-image guide-icon',
-  'profile-p1': 'icon-image profile-p1-icon',
   search: 'icon-image search-icon',
 }
 </script>

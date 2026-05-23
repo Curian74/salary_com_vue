@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import AppIcon from '@/components/icons/AppIcon.vue'
 import HeaderIconButton from './header/HeaderIconButton.vue'
 import HeaderSearch from './header/HeaderSearch.vue'
 
@@ -21,11 +20,11 @@ const headerActions = [
       <button
         class="flex size-10 shrink-0 items-center justify-center rounded-lg transition hover:bg-on-primary-hover-bg focus:outline-none focus:ring-2 focus:ring-on-primary-ring"
         type="button" aria-label="Mở danh sách ứng dụng">
-        <AppIcon name="app-launcher" />
+        <span class="icon icon-sprite icon-sprite-white all-app-icon" aria-hidden="true"></span>
       </button>
 
       <div class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-on-primary-surface">
-        <AppIcon name="payroll-logo" class="size-8" />
+        <span class="icon icon-image payroll-logo-icon" aria-hidden="true"></span>
       </div>
 
       <h1 class="truncate text-[18px] font-bold leading-8 tracking-normal">Tiền lương</h1>
@@ -44,7 +43,7 @@ const headerActions = [
       <button
         class="relative flex size-10 items-center justify-center rounded-full transition hover:bg-on-primary-hover-bg focus:outline-none focus:ring-2 focus:ring-on-primary-ring"
         type="button" aria-label="Tài khoản">
-        <AppIcon name="profile-p1" class="size-10 rounded-full w-8 h-8" />
+        <span class="icon icon-image profile-p1-icon rounded-full w-8 h-8" aria-hidden="true"></span>
         <span
           class="absolute -right-0.5 -top-0.5 flex size-5 items-center justify-center rounded-full border-2 border-primary bg-notification text-[11px] font-bold leading-none">
           2

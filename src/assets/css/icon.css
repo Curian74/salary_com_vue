@@ -14,7 +14,7 @@
 }
 
 .icon-sprite-white {
-    filter: brightness(0) invert(1);
+    filter: brightness(0) invert(0.9);
 }
 
 .all-app-icon {
@@ -31,6 +31,8 @@
 
 .payroll-logo-icon {
     background-image: url('/src/assets/icons/header/icon-payroll-logo.svg');
+    width: 32px;
+    height: 32px;
 }
 
 .assistant-icon {
