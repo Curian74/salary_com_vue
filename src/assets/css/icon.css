@@ -78,3 +78,65 @@
 .search-icon {
     background-image: url('/src/assets/icons/header/search.svg');
 }
+
+.sidebar-home-icon {
+    background-position: 0 -777px;
+    width: 20px;
+    height: 20px;
+}
+
+.sidebar-database-icon {
+    background-position: -20px -777px;
+    width: 20px;
+    height: 20px;
+}
+
+.sidebar-math-icon {
+    background-position: -40px -777px;
+    width: 20px;
+    height: 20px;
+}
+
+.sidebar-moneybag-icon {
+    background-position: -60px -777px;
+    width: 20px;
+    height: 20px;
+}
+
+.sidebar-chart-icon {
+    background-position: -80px -777px;
+    width: 20px;
+    height: 20px;
+}
+
+.sidebar-template-icon {
+    background-position: -100px -777px;
+    width: 20px;
+    height: 20px;
+}
+
+.sidebar-comp-icon {
+    background-position: -120px -777px;
+    width: 20px;
+    height: 20px;
+}
+
+.sidebar-collapse-icon {
+    background-position: -160px -777px;
+    width: 20px;
+    height: 20px;
+}
+
+.sidebar-chevron-right {
+    background-position: -186px -781px;
+    width: 8px;
+    height: 12px;
+}
+
+.sidebar-menu-icon-default {
+    filter: brightness(0) saturate(100%) invert(44%) sepia(4%) saturate(346%) hue-rotate(179deg) brightness(91%) contrast(85%);
+}
+
+.sidebar-menu-icon-active {
+    filter: brightness(0) saturate(100%) invert(48%) sepia(67%) saturate(471%) hue-rotate(91deg) brightness(89%) contrast(87%);
+}

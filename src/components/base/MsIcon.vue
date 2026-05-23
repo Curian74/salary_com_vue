@@ -1,4 +1,5 @@
 <script setup lang="ts">
+
 defineOptions({
   inheritAttrs: false,
 })
@@ -17,9 +18,18 @@ const iconClasses: Record<string, string> = {
   more: 'icon-sprite icon-sprite-white more-icon',
   guide: 'icon-image guide-icon',
   search: 'icon-image search-icon',
+  'sidebar-home': 'icon-sprite sidebar-home-icon',
+  'sidebar-database': 'icon-sprite sidebar-database-icon',
+  'sidebar-math': 'icon-sprite sidebar-math-icon',
+  'sidebar-moneybag': 'icon-sprite sidebar-moneybag-icon',
+  'sidebar-chart': 'icon-sprite sidebar-chart-icon',
+  'sidebar-template': 'icon-sprite sidebar-template-icon',
+  'sidebar-comp': 'icon-sprite sidebar-comp-icon',
+  'sidebar-collapse': 'icon-sprite sidebar-collapse-icon',
+  'sidebar-chevron-right': 'icon-sprite sidebar-chevron-right',
 }
 </script>
 
 <template>
-  <span class="icon" :class="iconClasses[props.name]" v-bind="$attrs" aria-hidden="true"></span>
+  <span class="icon cursor-pointer" :class="iconClasses[props.name]" v-bind="$attrs" aria-hidden="true"></span>
 </template>

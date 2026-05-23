@@ -41,13 +41,15 @@ const headerActions = [
       </div>
 
       <button
-        class="relative flex size-10 items-center justify-center rounded-full transition hover:bg-on-primary-hover-bg focus:outline-none focus:ring-2 focus:ring-on-primary-ring"
+        class="relative flex size-10 items-center justify-center rounded-full transition
+         hover:bg-on-primary-hover-bg focus:outline-none focus:ring-2 focus:ring-on-primary-ring"
         type="button" aria-label="Tài khoản">
         <span class="icon icon-image profile-p1-icon rounded-full w-8 h-8" aria-hidden="true"></span>
-        <span
-          class="absolute -right-0.5 -top-0.5 flex size-5 items-center justify-center rounded-full border-2 border-primary bg-notification text-[11px] font-bold leading-none">
+        <!-- <span
+          class="absolute -right-0.5 -top-0.5 flex size-5 items-center justify-center
+           rounded-full border-2 border-primary bg-notification text-[11px] font-bold leading-none">
           2
-        </span>
+        </span> -->
       </button>
     </div>
   </header>
