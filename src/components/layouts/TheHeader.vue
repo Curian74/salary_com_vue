@@ -32,7 +32,7 @@ const headerActions = [
     </div>
 
     <div class="mr-2 flex shrink-0 items-center gap-3">
-      <div class="hidden flex-1 justify-center lg:flex">
+      <div class="hidden w-90 justify-center xl:w-107.5 2xl:w-75 lg:flex">
         <HeaderSearch />
       </div>
 
