@@ -4,6 +4,63 @@
 
 :root {
     --font-sans: 'Inter', sans-serif;
+    --app-color-primary: #0e9a62;
+    --app-color-text-primary: #212121;
+    --app-color-text-secondary: #666666;
+    --app-color-text-placeholder: #9E9E9E;
+    --app-color-bg: #F2F2F2;
+    --app-color-border: #E0E0E0;
+    --app-color-grid-header: #F6F6F6;
+    --app-color-focus: #EAF7EE;
+    --app-color-error: #E54848;
+    --app-color-warning: #FFDD00;
+    --app-color-pending: #FF9900;
+    --app-color-primary-hover: #02B936;
+    --app-color-primary-pressed: #198F3B;
+    --app-color-icon: #707070;
+    --app-color-icon-hover-bg: #F2F2F2;
+    --app-color-icon-pressed-bg: #EBEBEB;
+    --app-color-on-primary: #FFFFFF;
+    --app-color-on-primary-muted: rgba(255, 255, 255, 0.72);
+    --app-color-on-primary-surface: rgba(255, 255, 255, 0.16);
+    --app-color-on-primary-field: rgba(255, 255, 255, 0.20);
+    --app-color-on-primary-field-focus: rgba(255, 255, 255, 0.25);
+    --app-color-on-primary-border-focus: rgba(255, 255, 255, 0.35);
+    --app-color-on-primary-ring: rgba(255, 255, 255, 0.45);
+    --app-color-on-primary-ring-muted: rgba(255, 255, 255, 0.25);
+    --app-color-on-primary-hover-bg: rgba(255, 255, 255, 0.10);
+    --app-color-notification: #E54848;
+    --app-color-header-divider: rgba(0, 0, 0, 0.06);
+}
+
+@theme inline {
+    --color-primary: var(--app-color-primary);
+    --color-text-primary: var(--app-color-text-primary);
+    --color-text-secondary: var(--app-color-text-secondary);
+    --color-text-placeholder: var(--app-color-text-placeholder);
+    --color-background: var(--app-color-bg);
+    --color-border: var(--app-color-border);
+    --color-grid-header: var(--app-color-grid-header);
+    --color-focus: var(--app-color-focus);
+    --color-error: var(--app-color-error);
+    --color-warning: var(--app-color-warning);
+    --color-pending: var(--app-color-pending);
+    --color-primary-hover: var(--app-color-primary-hover);
+    --color-primary-pressed: var(--app-color-primary-pressed);
+    --color-icon: var(--app-color-icon);
+    --color-icon-hover-bg: var(--app-color-icon-hover-bg);
+    --color-icon-pressed-bg: var(--app-color-icon-pressed-bg);
+    --color-on-primary: var(--app-color-on-primary);
+    --color-on-primary-muted: var(--app-color-on-primary-muted);
+    --color-on-primary-surface: var(--app-color-on-primary-surface);
+    --color-on-primary-field: var(--app-color-on-primary-field);
+    --color-on-primary-field-focus: var(--app-color-on-primary-field-focus);
+    --color-on-primary-border-focus: var(--app-color-on-primary-border-focus);
+    --color-on-primary-ring: var(--app-color-on-primary-ring);
+    --color-on-primary-ring-muted: var(--app-color-on-primary-ring-muted);
+    --color-on-primary-hover-bg: var(--app-color-on-primary-hover-bg);
+    --color-notification: var(--app-color-notification);
+    --shadow-header-divider: 0 1px 0 var(--app-color-header-divider);
 }
 
 body {

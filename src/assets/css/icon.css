@@ -1,3 +1,9 @@
 .all-app-icon {
     background: url('/src/assets/icons/Icon.svg') no-repeat -28px -477px;
 }
+
+.settings-icon {
+    background: url('/src/assets/icons/Icon.svg') no-repeat -122px -475px;
+    width: 20px;
+    height: 20px;
+}
