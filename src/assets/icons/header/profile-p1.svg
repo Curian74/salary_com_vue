@@ -1,10 +1,5 @@
-<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="20" cy="20" r="19" fill="url(#paint0_linear)" stroke="#7EC6FF" stroke-width="2"/>
-  <text x="20" y="25" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="700" fill="white">P1</text>
-  <defs>
-    <linearGradient id="paint0_linear" x1="7" y1="5" x2="33" y2="35" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#E73B9C"/>
-      <stop offset="1" stop-color="#6467F2"/>
-    </linearGradient>
-  </defs>
+<?xml version="1.0" encoding="utf-8" ?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64" height="64">
+	<rect fill="#AA64E3" width="64" height="64"/>
+	<path fill="white" d="M13.1562 43.5L13.1562 20.5938L20.5781 20.5938Q24.7969 20.5938 26.0781 20.9375Q28.0469 21.4531 29.375 23.1797Q30.7031 24.9062 30.7031 27.6406Q30.7031 29.75 29.9375 31.1875Q29.1719 32.625 27.9922 33.4453Q26.8125 34.2656 25.5938 34.5312Q23.9375 34.8594 20.7969 34.8594L17.7812 34.8594L17.7812 43.5L13.1562 43.5ZM17.7812 24.4688L17.7812 30.9688L20.3125 30.9688Q23.0469 30.9688 23.9688 30.6094Q24.8906 30.25 25.4141 29.4844Q25.9375 28.7188 25.9375 27.7031Q25.9375 26.4531 25.2031 25.6406Q24.4688 24.8281 23.3438 24.625Q22.5156 24.4688 20.0156 24.4688L17.7812 24.4688ZM39.6562 43.5L39.6562 24.4688L32.8594 24.4688L32.8594 20.5938L51.0625 20.5938L51.0625 24.4688L44.2812 24.4688L44.2812 43.5L39.6562 43.5Z"/>
 </svg>

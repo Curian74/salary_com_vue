@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import AppIcon from '@/components/icons/AppIcon.vue'
+
 withDefaults(
   defineProps<{
-    src: string
+    icon: string
     label: string
     tone?: string
   }>(),
@@ -19,6 +21,6 @@ withDefaults(
     :aria-label="label"
     :title="label"
   >
-    <img class="size-6 transition group-hover:scale-105" :src="src" alt="" aria-hidden="true" />
+    <AppIcon :name="icon" class="size-6 transition group-hover:scale-105" />
   </button>
 </template>
