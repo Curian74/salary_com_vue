@@ -1,0 +1,12 @@
+<script setup lang='ts'>
+
+defineOptions({
+    name: "MsLoading"
+})
+
+</script>
+<template>
+    <span class="size-4 animate-spin rounded-full border-2 border-current border-r-transparent" aria-hidden="true">
+    </span>
+</template>
+<style scoped></style>
