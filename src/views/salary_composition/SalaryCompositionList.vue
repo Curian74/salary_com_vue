@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import MsButton from '@/components/base/MsButton.vue';
 import SalaryCompositionButtons from './SalaryCompositionButtons.vue';
+import SalaryCompositionSearch from './SalaryCompositionSearch.vue';
 
 const salaryComponents = [
     {
@@ -44,22 +45,9 @@ const columns = [
 
         <div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-white">
             <div class="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2">
-                <label class="relative h-9 min-w-[240px] flex-1 max-w-[376px]">
-                    <span class="sr-only">Tìm kiếm</span>
-                    <svg class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#7a828c]"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" aria-hidden="true">
-                        <circle cx="11" cy="11" r="8" />
-                        <path d="m21 21-4.3-4.3" />
-                    </svg>
-                    <input class="h-full w-full rounded-lg border border-[#d7dce1]
-                         pl-10 pr-3 text-[13px] font-normal text-text-primary
-                          outline-none transition placeholder:text-text-placeholder
-                           focus:border-primary focus:ring-2 focus:ring-primary/15" type="search"
-                        placeholder="Tìm kiếm">
-                </label>
+                <SalaryCompositionSearch />
 
-                <MsButton variant="secondary" class="!font-normal !text-[13px] !text-text-secondary">
+                <MsButton variant="secondary" class="!font-normal !text-[13px] text-text-secondary!">
                     <span>Trạng thái: <span class="font-semibold text-text-primary">Tất cả</span></span>
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -68,7 +56,7 @@ const columns = [
                 </MsButton>
 
                 <MsButton variant="secondary"
-                    class="min-w-[260px] flex-1 max-w-[438px] !justify-between !font-normal !text-[13px] !text-text-placeholder">
+                    class="min-w-[260px] flex-1 max-w-[438px] justify-between! !font-normal !text-[13px] !text-text-placeholder">
                     <span>Tất cả đơn vị</span>
                     <svg class="size-4 text-text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
