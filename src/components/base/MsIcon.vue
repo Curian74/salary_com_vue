@@ -27,6 +27,9 @@ const iconClasses: Record<string, string> = {
   'sidebar-comp': 'icon-sprite sidebar-comp-icon',
   'sidebar-collapse': 'icon-sprite sidebar-collapse-icon',
   'sidebar-chevron-right': 'icon-sprite sidebar-chevron-right',
+  'salary-filter': 'icon-sprite salary-composition-filter-icon',
+  'salary-system-category': 'icon-sprite salary-system-category-icon',
+  'salary-add': 'icon-sprite icon-sprite-white salary-add-icon',
 }
 </script>
 

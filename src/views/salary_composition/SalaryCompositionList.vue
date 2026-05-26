@@ -40,7 +40,6 @@ const columns = [
         <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h2 class="text-[20px] font-bold leading-8 text-text-primary">Thành phần lương</h2>
             <SalaryCompositionButtons />
-
         </div>
 
         <div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-white">
@@ -68,10 +67,8 @@ const columns = [
                     </svg>
                 </MsButton>
 
-                <MsButton
-                    variant="secondary"
-                    class="min-w-[260px] flex-1 max-w-[438px] !justify-between !font-normal !text-[13px] !text-text-placeholder"
-                >
+                <MsButton variant="secondary"
+                    class="min-w-[260px] flex-1 max-w-[438px] !justify-between !font-normal !text-[13px] !text-text-placeholder">
                     <span>Tất cả đơn vị</span>
                     <svg class="size-4 text-text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -80,17 +77,13 @@ const columns = [
                 </MsButton>
 
                 <div class="ml-auto flex items-center gap-2">
-                    <MsButton
-                        variant="icon"
-                        type="button" aria-label="Lọc">
+                    <MsButton variant="icon" type="button" aria-label="Lọc">
                         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M22 3H2l8 9.5V20l4-2v-5.5Z" />
                         </svg>
                     </MsButton>
-                    <MsButton
-                        variant="icon"
-                        type="button" aria-label="Thiết lập bảng">
+                    <MsButton variant="icon" type="button" aria-label="Thiết lập bảng">
                         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z" />
@@ -176,46 +169,34 @@ const columns = [
                     <strong class="whitespace-nowrap">1 - 2</strong>
 
                     <div class="flex items-center gap-4 text-[#cfd4da]">
-                        <MsButton
-                            variant="icon"
-                            size="sm"
+                        <MsButton variant="icon" size="sm"
                             class="!size-5 !border-0 !bg-transparent !p-0 !text-[#cfd4da] hover:!bg-transparent"
-                            aria-label="Trang đầu"
-                        >
+                            aria-label="Trang đầu">
                             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="m11 17-5-5 5-5" />
                                 <path d="M18 17V7" />
                             </svg>
                         </MsButton>
-                        <MsButton
-                            variant="icon"
-                            size="sm"
+                        <MsButton variant="icon" size="sm"
                             class="!size-5 !border-0 !bg-transparent !p-0 !text-[#cfd4da] hover:!bg-transparent"
-                            aria-label="Trang trước"
-                        >
+                            aria-label="Trang trước">
                             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="m15 18-6-6 6-6" />
                             </svg>
                         </MsButton>
-                        <MsButton
-                            variant="icon"
-                            size="sm"
+                        <MsButton variant="icon" size="sm"
                             class="!size-5 !border-0 !bg-transparent !p-0 !text-[#cfd4da] hover:!bg-transparent"
-                            aria-label="Trang sau"
-                        >
+                            aria-label="Trang sau">
                             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="m9 18 6-6-6-6" />
                             </svg>
                         </MsButton>
-                        <MsButton
-                            variant="icon"
-                            size="sm"
+                        <MsButton variant="icon" size="sm"
                             class="!size-5 !border-0 !bg-transparent !p-0 !text-[#cfd4da] hover:!bg-transparent"
-                            aria-label="Trang cuối"
-                        >
+                            aria-label="Trang cuối">
                             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="m13 17 5-5-5-5" />
