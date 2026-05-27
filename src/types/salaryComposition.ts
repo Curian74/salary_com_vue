@@ -6,7 +6,7 @@ import type { SourceType } from "@/enums/sourceType";
 import type { TrackingStatus } from "@/enums/trackingStatus";
 import type { ValueType } from "@/enums/valueType";
 
-export interface SalaryComposition {
+export interface GetSalaryCompositionsResponse {
     id: string;
     code: string;
     name: string;
@@ -29,4 +29,8 @@ export interface SalaryComposition {
     status: TrackingStatus;
     organizationUnitIds: string;
     organizationUnitNames: string;
+}
+
+export interface GetSalaryCompositionsRequest {
+
 }

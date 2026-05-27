@@ -4,22 +4,33 @@ import SalaryCompositionButtons from './SalaryCompositionButtons.vue';
 import SalaryCompositionSearch from './SalaryCompositionSearch.vue';
 import SalaryCompositionTable from './SalaryCompositionTable.vue';
 import type { GetGridConfigsResponse } from '@/types/gridConfig';
-import { onMounted, ref } from 'vue';
+import type { GetSalaryCompositionsResponse } from '@/types/salaryComposition.ts';
+import type { TableRow } from '@/types/tableRow';
+import { computed, onMounted, ref } from 'vue';
 import gridConfigApi from '@/apis/gridConfigApi';
+import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
 
 const columns = ref<GetGridConfigsResponse[]>([]);
+const salaryCompositions = ref<GetSalaryCompositionsResponse[]>([]);
+const totalCount = ref(0);
 const isTableLoading = ref(false);
 
-const rows = [
-    { id: '1', code: 'A001', name: 'Nguyễn Văn A', amount: 1200000 },
-    { id: '2', code: 'A002', name: 'Trần Thị B', amount: 850000 },
-];
+const rows = computed<TableRow[]>(() => {
+    return salaryCompositions.value.map(item => ({ ...item }))
+});
+
+const rangeText = computed(() => rows.value.length ? `1 - ${rows.value.length}` : '0 - 0');
 
 onMounted(async () => {
     try {
         isTableLoading.value = true;
-        const data = await gridConfigApi.fetchGridConfigs();
-        columns.value = data.value;
+        const gridData = await gridConfigApi.fetchGridConfigs();
+        columns.value = gridData.value;
+
+        const salData = await salaryCompositionApi.fetchSalaryCompositions();
+        salaryCompositions.value = salData.value.items;
+        totalCount.value = salData.value.totalCount;
+
     }
     catch (err) {
         console.log(err);
@@ -84,7 +95,7 @@ onMounted(async () => {
 
             <div
                 class="flex min-h-[50px] flex-wrap items-center justify-between gap-2 border-t border-border px-4 text-[14px] text-[#001b44]">
-                <div>Tổng số: <span class="font-bold">2</span></div>
+                <div>Tổng số: <span class="font-bold">{{ totalCount }}</span></div>
 
                 <div class="flex flex-wrap items-center gap-4">
                     <div class="flex items-center gap-2">
@@ -99,7 +110,7 @@ onMounted(async () => {
                         </MsButton>
                     </div>
 
-                    <strong class="whitespace-nowrap">1 - 2</strong>
+                    <strong class="whitespace-nowrap">{{ rangeText }}</strong>
 
                     <div class="flex items-center gap-4 text-[#cfd4da]">
                         <MsButton variant="icon" size="sm"
