@@ -3,50 +3,11 @@ import MsButton from '@/components/base/MsButton.vue';
 import SalaryCompositionButtons from './SalaryCompositionButtons.vue';
 import SalaryCompositionSearch from './SalaryCompositionSearch.vue';
 import SalaryCompositionTable from './SalaryCompositionTable.vue';
-import type { GridConfig } from '@/types/gridConfig.ts';
-import { onMounted } from 'vue';
-import gridConfigApi from '@/apis/gridConfigApi.ts';
+import type { GetGridConfigsResponse } from '@/types/gridConfig';
+import { onMounted, ref } from 'vue';
+import gridConfigApi from '@/apis/gridConfigApi';
 
-const salaryComponents = [
-    {
-        code: 'TEST',
-        name: 'test',
-        unit: 'cong ty tuyet voi',
-        type: 'Thông tin nhân viên',
-        property: 'Thu nhập',
-        valueType: 'Tiền tệ',
-        formula: '-',
-    },
-    {
-        code: 'BAC',
-        name: 'Bậc',
-        unit: 'cong ty tuyet voi',
-        type: 'Thông tin nhân viên',
-        property: 'Khác',
-        valueType: 'Chữ',
-        formula: '-',
-    },
-]
-
-// const columns: GridConfig[] = [
-//     { fieldKey: 'code', columnName: 'Mã thành phần', width: '220px', pinned: true },
-//     { key: 'name', label: 'Tên thành phần', width: '220px' },
-//     { key: 'unit', label: 'Đơn vị áp dụng', width: '220px' },
-//     { key: 'type', label: 'Loại thành phần', width: '220px' },
-//     { key: 'property', label: 'Tính chất', width: '220px' },
-//     { key: 'valueType', label: 'Kiểu giá trị', width: '220px' },
-//     { key: 'formula', label: 'Công thức', width: '150px' },
-// ]
-
-const columns: GridConfig[] = [
-    { fieldKey: 'code', columnName: 'Mã thành phần', isDisplayed: true, isPinned: false },
-    { fieldKey: 'name', columnName: 'Tên thành phần', isDisplayed: true, isPinned: false },
-    { fieldKey: 'unit', columnName: 'Đơn vị áp dụng', isDisplayed: true, isPinned: false },
-    { fieldKey: 'type', columnName: 'Loại thành phần', isDisplayed: true, isPinned: false },
-    { fieldKey: 'property', columnName: 'Tính chất', isDisplayed: true, isPinned: false },
-    { fieldKey: 'valueType', columnName: 'Kiểu giá trị', isDisplayed: true, isPinned: false },
-    { fieldKey: 'formula', columnName: 'Công thức', isDisplayed: true, isPinned: false },
-]
+const columns = ref<GetGridConfigsResponse[]>([]);
 
 const rows = [
     { id: '1', code: 'A001', name: 'Nguyễn Văn A', amount: 1200000 },
@@ -55,8 +16,8 @@ const rows = [
 
 onMounted(async () => {
     const data = await gridConfigApi.fetchGridConfigs();
-    console.log(data.value);
-})
+    columns.value = data.value;
+});
 
 </script>
 
@@ -107,58 +68,6 @@ onMounted(async () => {
             </div>
 
             <div class="relative min-h-0 flex-1 overflow-auto">
-                <!-- <table class="min-w-372.5 border-separate border-spacing-0 text-left text-[14px]">
-                    <thead class="sticky top-0 z-10 bg-grid-header">
-                        <tr>
-                            <th class="h-9 w-12 border-b border-border px-4 text-center align-middle">
-                                <input class="size-4 rounded border-[#cfd4da] text-primary focus:ring-primary/20"
-                                    type="checkbox" aria-label="Chọn tất cả">
-                            </th>
-                            <th v-for="column in columns" :key="column.key"
-                                class="h-9 border-b border-r border-border px-3 text-[13px] font-semibold text-[#001b44]"
-                                :style="{ width: column.width }">
-                                <span class="inline-flex items-center gap-2">
-                                    <svg v-if="column.pinned" class="size-4 text-[#6b7280]" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" aria-hidden="true">
-                                        <path d="M12 17v5" />
-                                        <path d="M9 3h6l1 7 3 3H5l3-3Z" />
-                                    </svg>
-                                    {{ column.label }}
-                                </span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="row in salaryComponents" :key="row.code" class="bg-white hover:bg-[#f8faf9]">
-                            <td class="h-9 border-b border-border px-4 text-center">
-                                <input class="size-4 rounded border-[#cfd4da] text-primary focus:ring-primary/20"
-                                    type="checkbox" :aria-label="`Chọn ${row.code}`">
-                            </td>
-                            <td class="h-9 border-b border-border px-3 text-[#001b44]">
-                                {{ row.code }}
-                            </td>
-                            <td class="h-9 border-b border-border px-3 text-[#001b44]">
-                                {{ row.name }}
-                            </td>
-                            <td class="h-9 border-b border-border px-3 text-[#001b44]">
-                                {{ row.unit }}
-                            </td>
-                            <td class="h-9 border-b border-border px-3 text-[#001b44]">
-                                {{ row.type }}
-                            </td>
-                            <td class="h-9 border-b border-border px-3 text-[#001b44]">
-                                {{ row.property }}
-                            </td>
-                            <td class="h-9 border-b border-border px-3 text-[#001b44]">
-                                {{ row.valueType }}
-                            </td>
-                            <td class="h-9 border-b border-border px-3 text-[#001b44]">
-                                {{ row.formula }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table> -->
                 <SalaryCompositionTable :rows="rows" :columns="columns" />
             </div>
 
