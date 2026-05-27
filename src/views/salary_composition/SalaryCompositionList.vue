@@ -4,6 +4,8 @@ import SalaryCompositionButtons from './SalaryCompositionButtons.vue';
 import SalaryCompositionSearch from './SalaryCompositionSearch.vue';
 import SalaryCompositionTable from './SalaryCompositionTable.vue';
 import type { GridConfig } from '@/types/gridConfig.ts';
+import { onMounted } from 'vue';
+import gridConfigApi from '@/apis/gridConfigApi.ts';
 
 const salaryComponents = [
     {
@@ -50,6 +52,11 @@ const rows = [
     { id: '1', code: 'A001', name: 'Nguyễn Văn A', amount: 1200000 },
     { id: '2', code: 'A002', name: 'Trần Thị B', amount: 850000 },
 ];
+
+onMounted(async () => {
+    const data = await gridConfigApi.fetchGridConfigs();
+    console.log(data.value);
+})
 
 </script>
 
