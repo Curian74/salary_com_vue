@@ -8,6 +8,7 @@ import { onMounted, ref } from 'vue';
 import gridConfigApi from '@/apis/gridConfigApi';
 
 const columns = ref<GetGridConfigsResponse[]>([]);
+const isTableLoading = ref(false);
 
 const rows = [
     { id: '1', code: 'A001', name: 'Nguyễn Văn A', amount: 1200000 },
@@ -15,8 +16,18 @@ const rows = [
 ];
 
 onMounted(async () => {
-    const data = await gridConfigApi.fetchGridConfigs();
-    columns.value = data.value;
+    try {
+        isTableLoading.value = true;
+        const data = await gridConfigApi.fetchGridConfigs();
+        columns.value = data.value;
+    }
+    catch (err) {
+        console.log(err);
+    }
+
+    finally {
+        isTableLoading.value = false;
+    }
 });
 
 </script>
@@ -68,7 +79,7 @@ onMounted(async () => {
             </div>
 
             <div class="relative min-h-0 flex-1 overflow-auto">
-                <SalaryCompositionTable :rows="rows" :columns="columns" />
+                <SalaryCompositionTable :is-loading="isTableLoading" :rows="rows" :columns="columns" />
             </div>
 
             <div
@@ -130,44 +141,4 @@ onMounted(async () => {
             </div>
         </div>
     </section>
-
-    <button
-        class="absolute right-0 top-1/2 z-20 flex h-10 w-5 -translate-y-1/2 items-center justify-center rounded-l bg-[#0b84ff] text-white shadow"
-        type="button" aria-label="Mở tiện ích bên phải">
-        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="m9 18 6-6-6-6" />
-        </svg>
-    </button>
-
-    <div
-        class="absolute right-0 top-[390px] z-20 flex w-[70px] flex-col items-center gap-3 rounded-l-lg bg-white py-3 shadow-[0_2px_16px_rgba(0,0,0,0.16)]">
-        <button class="flex size-12 items-center justify-center rounded-full bg-[#0cc584] text-white" type="button"
-            aria-label="Trợ lý">
-            <svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path
-                    d="M12 3a8 8 0 0 0-8 8v5a3 3 0 0 0 3 3h1v-6H5v-2a7 7 0 0 1 14 0v2h-3v6h1a3 3 0 0 0 3-3v-5a8 8 0 0 0-8-8Z" />
-                <circle cx="9" cy="12" r="1" />
-                <circle cx="15" cy="12" r="1" />
-            </svg>
-        </button>
-        <button class="flex size-12 items-center justify-center rounded-full bg-[#ff594a] text-white" type="button"
-            aria-label="Tính năng nổi bật">
-            <svg class="size-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path
-                    d="M13.5 2.8 15 8.3l5.2 1.9-5.2 1.9-1.5 5.5-1.5-5.5-5.2-1.9L12 8.3l1.5-5.5ZM5.8 13.7l.8 3 2.8.9-2.8 1-.8 3-.9-3-2.8-1 2.8-.9.9-3Z" />
-            </svg>
-        </button>
-        <button class="flex size-12 items-center justify-center rounded-full bg-[#496bff] text-white" type="button"
-            aria-label="Tin nhắn">
-            <svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M21 12a8 8 0 0 1-8 8H7l-4 3 1.3-5.2A8 8 0 1 1 21 12Z" />
-                <path d="M8 12h.01" />
-                <path d="M12 12h.01" />
-                <path d="M16 12h.01" />
-            </svg>
-        </button>
-    </div>
 </template>

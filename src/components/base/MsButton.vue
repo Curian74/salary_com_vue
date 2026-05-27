@@ -70,8 +70,9 @@ function handleClick(event: MouseEvent) {
 </script>
 
 <template>
-    <button v-bind="$attrs" :type="type" :disabled="isDisabled" :class="buttonClasses" @click="handleClick">
-        <ms-loading v-if="loading" />
+    <button v-bind="$attrs" :type="type" :disabled="isDisabled" :aria-busy="loading" :class="buttonClasses"
+        @click="handleClick">
+        <ms-loading v-if="loading" size="sm" class="shrink-0" />
         <slot v-else name="prepend"></slot>
         <slot></slot>
         <slot name="append"></slot>

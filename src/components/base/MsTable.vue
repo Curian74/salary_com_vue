@@ -2,10 +2,12 @@
 import type { GridConfig } from '@/types/gridConfig'
 import type { TableRow } from '@/types/tableRow'
 import { computed } from 'vue';
+import MsLoading from './MsLoading.vue';
 
 interface MsTableProps {
     columns: GridConfig[];
     rows: TableRow[];
+    isLoading?: boolean;
 }
 
 const props = defineProps<MsTableProps>();
@@ -13,6 +15,8 @@ const props = defineProps<MsTableProps>();
 const visibleColumns = computed(() => {
     return props.columns.filter(x => x.isDisplayed);
 })
+
+const tableColspan = computed(() => visibleColumns.value.length + 1)
 
 </script>
 <template>
@@ -37,7 +41,18 @@ const visibleColumns = computed(() => {
             </tr>
         </thead>
 
-        <tbody>
+        <tbody v-if="isLoading">
+            <tr>
+                <td :colspan="tableColspan" class="h-40 border-b border-border text-center text-primary">
+                    <div class="flex items-center justify-center gap-3 text-[14px] font-medium">
+                        <ms-loading size="lg" />
+                        <span class="text-text-secondary">Đang tải dữ liệu</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+
+        <tbody v-else>
             <tr v-for="row in rows" :key="row.code" class="bg-white hover:bg-[#f8faf9]">
                 <td class="h-9 border-b border-border px-4 text-center">
                     <input class="size-4 rounded border-[#cfd4da] 
