@@ -37,14 +37,19 @@ const salaryComponents = [
 // ]
 
 const columns: GridConfig[] = [
-    { fieldKey: 'code', columnName: 'Mã thành phần' },
-    { fieldKey: 'name', columnName: 'Tên thành phần', },
-    { fieldKey: 'unit', columnName: 'Đơn vị áp dụng', },
-    { fieldKey: 'type', columnName: 'Loại thành phần', },
-    { fieldKey: 'property', columnName: 'Tính chất', },
-    { fieldKey: 'valueType', columnName: 'Kiểu giá trị', },
-    { fieldKey: 'formula', columnName: 'Công thức', },
+    { fieldKey: 'code', columnName: 'Mã thành phần', isDisplayed: true, isPinned: false },
+    { fieldKey: 'name', columnName: 'Tên thành phần', isDisplayed: true, isPinned: false },
+    { fieldKey: 'unit', columnName: 'Đơn vị áp dụng', isDisplayed: true, isPinned: false },
+    { fieldKey: 'type', columnName: 'Loại thành phần', isDisplayed: true, isPinned: false },
+    { fieldKey: 'property', columnName: 'Tính chất', isDisplayed: true, isPinned: false },
+    { fieldKey: 'valueType', columnName: 'Kiểu giá trị', isDisplayed: true, isPinned: false },
+    { fieldKey: 'formula', columnName: 'Công thức', isDisplayed: true, isPinned: false },
 ]
+
+const rows = [
+    { id: '1', code: 'A001', name: 'Nguyễn Văn A', amount: 1200000 },
+    { id: '2', code: 'A002', name: 'Trần Thị B', amount: 850000 },
+];
 
 </script>
 
@@ -147,7 +152,7 @@ const columns: GridConfig[] = [
                         </tr>
                     </tbody>
                 </table> -->
-                <SalaryCompositionTable :columns="columns" />
+                <SalaryCompositionTable :rows="rows" :columns="columns" />
             </div>
 
             <div

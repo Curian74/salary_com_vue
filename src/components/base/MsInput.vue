@@ -2,19 +2,19 @@
 
 interface MsInputProps {
     placeholder?: string;
-    value: string;
-    disabled: boolean,
+    value?: string;
+    disabled?: boolean,
 }
 
 const props = defineProps<MsInputProps>();
 
 const emit = defineEmits([
-  'update:modelValue'
+    'update:modelValue'
 ])
 
 const handleInput = (event: Event) => {
-   const target = event.target as HTMLInputElement;
-   emit('update:modelValue', target.value);
+    const target = event.target as HTMLInputElement;
+    emit('update:modelValue', target.value);
 }
 
 </script>
