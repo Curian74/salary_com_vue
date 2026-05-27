@@ -2,6 +2,8 @@
 import MsButton from '@/components/base/MsButton.vue';
 import SalaryCompositionButtons from './SalaryCompositionButtons.vue';
 import SalaryCompositionSearch from './SalaryCompositionSearch.vue';
+import SalaryCompositionTable from './SalaryCompositionTable.vue';
+import type { GridConfig } from '@/types/gridConfig.ts';
 
 const salaryComponents = [
     {
@@ -24,14 +26,24 @@ const salaryComponents = [
     },
 ]
 
-const columns = [
-    { key: 'code', label: 'Mã thành phần', width: '220px', pinned: true },
-    { key: 'name', label: 'Tên thành phần', width: '220px' },
-    { key: 'unit', label: 'Đơn vị áp dụng', width: '220px' },
-    { key: 'type', label: 'Loại thành phần', width: '220px' },
-    { key: 'property', label: 'Tính chất', width: '220px' },
-    { key: 'valueType', label: 'Kiểu giá trị', width: '220px' },
-    { key: 'formula', label: 'Công thức', width: '150px' },
+// const columns: GridConfig[] = [
+//     { fieldKey: 'code', columnName: 'Mã thành phần', width: '220px', pinned: true },
+//     { key: 'name', label: 'Tên thành phần', width: '220px' },
+//     { key: 'unit', label: 'Đơn vị áp dụng', width: '220px' },
+//     { key: 'type', label: 'Loại thành phần', width: '220px' },
+//     { key: 'property', label: 'Tính chất', width: '220px' },
+//     { key: 'valueType', label: 'Kiểu giá trị', width: '220px' },
+//     { key: 'formula', label: 'Công thức', width: '150px' },
+// ]
+
+const columns: GridConfig[] = [
+    { fieldKey: 'code', columnName: 'Mã thành phần' },
+    { fieldKey: 'name', columnName: 'Tên thành phần', },
+    { fieldKey: 'unit', columnName: 'Đơn vị áp dụng', },
+    { fieldKey: 'type', columnName: 'Loại thành phần', },
+    { fieldKey: 'property', columnName: 'Tính chất', },
+    { fieldKey: 'valueType', columnName: 'Kiểu giá trị', },
+    { fieldKey: 'formula', columnName: 'Công thức', },
 ]
 
 </script>
@@ -83,7 +95,7 @@ const columns = [
             </div>
 
             <div class="relative min-h-0 flex-1 overflow-auto">
-                <table class="min-w-372.5 border-separate border-spacing-0 text-left text-[14px]">
+                <!-- <table class="min-w-372.5 border-separate border-spacing-0 text-left text-[14px]">
                     <thead class="sticky top-0 z-10 bg-grid-header">
                         <tr>
                             <th class="h-9 w-12 border-b border-border px-4 text-center align-middle">
@@ -134,7 +146,8 @@ const columns = [
                             </td>
                         </tr>
                     </tbody>
-                </table>
+                </table> -->
+                <SalaryCompositionTable :columns="columns" />
             </div>
 
             <div
