@@ -1,12 +1,11 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends Record<string, any>">
 import type { GridConfig } from '@/types/gridConfig'
-import type { TableRow } from '@/types/tableRow'
 import { computed } from 'vue';
 import MsLoading from './MsLoading.vue';
 
 interface MsTableProps {
     columns: GridConfig[];
-    rows: TableRow[];
+    rows: T[];
     isLoading?: boolean;
 }
 
@@ -60,7 +59,7 @@ const tableColspan = computed(() => visibleColumns.value.length + 1)
                 </td>
                 <td v-for="column in visibleColumns" :key="column.fieldKey"
                     class="h-9 border-b border-border px-3 text-[#001b44]">
-                    <slot name="cell" :row="row" :column="column">
+                    <slot :name="column.fieldKey" :row="row" :column="column">
                         {{ row[column.fieldKey] || '--' }}
                     </slot>
                 </td>

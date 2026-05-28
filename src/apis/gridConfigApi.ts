@@ -1,6 +1,6 @@
 import type { GetGridConfigsRequest, GetGridConfigsResponse } from "@/types/gridConfig";
 import { axiosClient } from "./axiosClient";
-import type { ApiResponse, PagedResult } from "@/types/apiResponse";
+import type { ApiResponse } from "@/types/apiResponse";
 
 const fetchGridConfigs = async (params?: GetGridConfigsRequest)
     : Promise<ApiResponse<GetGridConfigsResponse[]>> => {

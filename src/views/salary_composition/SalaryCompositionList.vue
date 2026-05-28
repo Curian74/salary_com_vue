@@ -5,7 +5,6 @@ import SalaryCompositionSearch from './SalaryCompositionSearch.vue';
 import SalaryCompositionTable from './SalaryCompositionTable.vue';
 import type { GetGridConfigsResponse } from '@/types/gridConfig';
 import type { GetSalaryCompositionsResponse } from '@/types/salaryComposition.ts';
-import type { TableRow } from '@/types/tableRow';
 import { computed, onMounted, ref } from 'vue';
 import gridConfigApi from '@/apis/gridConfigApi';
 import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
@@ -15,8 +14,8 @@ const salaryCompositions = ref<GetSalaryCompositionsResponse[]>([]);
 const totalCount = ref(0);
 const isTableLoading = ref(false);
 
-const rows = computed<TableRow[]>(() => {
-    return salaryCompositions.value.map(item => ({ ...item }))
+const rows = computed(() => {
+    return salaryCompositions.value;
 });
 
 const rangeText = computed(() => rows.value.length ? `1 - ${rows.value.length}` : '0 - 0');
@@ -54,7 +53,7 @@ onMounted(async () => {
             <div class="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2">
                 <SalaryCompositionSearch />
 
-                <MsButton variant="secondary" class="!font-normal !text-[13px] text-text-secondary!">
+                <MsButton variant="secondary" class="font-normal text-[13px] text-text-secondary!">
                     <span>Trạng thái: <span class="font-semibold text-text-primary">Tất cả</span></span>
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -63,7 +62,7 @@ onMounted(async () => {
                 </MsButton>
 
                 <MsButton variant="secondary"
-                    class="min-w-[260px] flex-1 max-w-[438px] justify-between! !font-normal !text-[13px] !text-text-placeholder">
+                    class="min-w-65 flex-1 max-w-109.5 justify-between! font-normal text-[13px] text-text-placeholder">
                     <span>Tất cả đơn vị</span>
                     <svg class="size-4 text-text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -94,13 +93,13 @@ onMounted(async () => {
             </div>
 
             <div
-                class="flex min-h-[50px] flex-wrap items-center justify-between gap-2 border-t border-border px-4 text-[14px] text-[#001b44]">
+                class="flex min-h-12.5 flex-wrap items-center justify-between gap-2 border-t border-border px-4 text-[14px] text-[#001b44]">
                 <div>Tổng số: <span class="font-bold">{{ totalCount }}</span></div>
 
                 <div class="flex flex-wrap items-center gap-4">
                     <div class="flex items-center gap-2">
                         <span>Số dòng/trang</span>
-                        <MsButton variant="secondary" class="min-w-[92px] !justify-between !font-normal">
+                        <MsButton variant="secondary" class="min-w-23 justify-between font-normal">
                             <span>25</span>
                             <svg class="size-4 text-text-secondary" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -114,7 +113,7 @@ onMounted(async () => {
 
                     <div class="flex items-center gap-4 text-[#cfd4da]">
                         <MsButton variant="icon" size="sm"
-                            class="!size-5 !border-0 !bg-transparent !p-0 !text-[#cfd4da] hover:!bg-transparent"
+                            class="size-5 border-0 bg-transparent p-0 text-[#cfd4da] hover:bg-transparent"
                             aria-label="Trang đầu">
                             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -123,7 +122,7 @@ onMounted(async () => {
                             </svg>
                         </MsButton>
                         <MsButton variant="icon" size="sm"
-                            class="!size-5 !border-0 !bg-transparent !p-0 !text-[#cfd4da] hover:!bg-transparent"
+                            class="size-5 border-0 bg-transparent p-0 text-[#cfd4da] hover:bg-transparent"
                             aria-label="Trang trước">
                             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -131,7 +130,7 @@ onMounted(async () => {
                             </svg>
                         </MsButton>
                         <MsButton variant="icon" size="sm"
-                            class="!size-5 !border-0 !bg-transparent !p-0 !text-[#cfd4da] hover:!bg-transparent"
+                            class="size-5 border-0 bg-transparent p-0 text-[#cfd4da] hover:bg-transparent"
                             aria-label="Trang sau">
                             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -139,7 +138,7 @@ onMounted(async () => {
                             </svg>
                         </MsButton>
                         <MsButton variant="icon" size="sm"
-                            class="!size-5 !border-0 !bg-transparent !p-0 !text-[#cfd4da] hover:!bg-transparent"
+                            class="size-5 border-0 bg-transparent p-0 text-[#cfd4da] hover:bg-transparent"
                             aria-label="Trang cuối">
                             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
