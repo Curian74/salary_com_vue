@@ -1,10 +1,13 @@
-import type { AutoSumEmployeeType } from "@/enums/autoSumEmployeeType";
-import type { CompositionType } from "@/enums/compositionType";
-import type { DeductionType } from "@/enums/deductionType";
-import type { IncomeTaxType } from "@/enums/incomeTaxType";
-import type { SourceType } from "@/enums/sourceType";
-import type { TrackingStatus } from "@/enums/trackingStatus";
-import type { ValueType } from "@/enums/valueType";
+import type {
+    AutoSumEmployeeType,
+    CompositionNature,
+    CompositionType,
+    DeductionType,
+    IncomeTaxType,
+    SourceType,
+    TrackingStatus,
+    ValueType
+} from "@/enums/salaryCompositionEnums";
 
 export interface GetSalaryCompositionsResponse {
     id: string;
@@ -13,7 +16,7 @@ export interface GetSalaryCompositionsResponse {
     description: string;
     systemCompositionId: string;
     compositionType: CompositionType;
-    compositionNature: number;
+    compositionNature: CompositionNature;
     incomeTaxType: IncomeTaxType;
     deductionType: DeductionType;
     quotaFormula: string | null;

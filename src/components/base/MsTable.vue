@@ -7,6 +7,7 @@ interface MsTableProps {
     columns: GridConfig[];
     rows: T[];
     isLoading?: boolean;
+    formatters?: Record<string, (value: any, row: T) => string>
 }
 
 const props = defineProps<MsTableProps>();
@@ -60,7 +61,7 @@ const tableColspan = computed(() => visibleColumns.value.length + 1)
                 <td v-for="column in visibleColumns" :key="column.fieldKey"
                     class="h-9 border-b border-border px-3 text-[#001b44]">
                     <slot :name="column.fieldKey" :row="row" :column="column">
-                        {{ row[column.fieldKey] || '--' }}
+                        {{ formatters?.[column.fieldKey]?.(row[column.fieldKey], row) ?? row[column.fieldKey] ?? '--' }}
                     </slot>
                 </td>
             </tr>
