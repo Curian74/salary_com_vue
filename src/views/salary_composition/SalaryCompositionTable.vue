@@ -1,5 +1,11 @@
 <script setup lang='ts'>
+import MsStatus from '@/components/base/MsStatus.vue';
 import MsTable from '@/components/base/MsTable.vue';
+import {
+    AutoSumEmployeeType, CompositionNature, CompositionType, DeductionType,
+    IncomeTaxType, SourceType, TrackingStatus, ValueType
+}
+    from '@/enums/salaryCompositionEnums';
 import {
     autoSumEmployeeTypeText,
     compositionNatureText,
@@ -10,16 +16,7 @@ import {
     trackingStatusText,
     valueTypeText
 } from '@/constants/salaryCompositionLabels';
-import type {
-    AutoSumEmployeeType,
-    CompositionNature,
-    CompositionType,
-    DeductionType,
-    IncomeTaxType,
-    SourceType,
-    TrackingStatus,
-    ValueType
-} from '@/enums/salaryCompositionEnums';
+
 import type { GridConfig } from '@/types/gridConfig'
 import type { GetSalaryCompositionsResponse }
     from '@/types/salaryComposition'
@@ -46,6 +43,13 @@ const props = defineProps<SalaryCompositionTableProps>();
 </script>
 <template>
     <MsTable class="min-w-372.5 border-separate border-spacing-0 text-left text-[14px]" :is-loading="isLoading"
-        :columns="columns" :rows="rows" :formatters="formatters" />
+        :columns="columns" :rows="rows" :formatters="formatters">
+
+        <template #status="{ row }">
+            <MsStatus :text="trackingStatusText[row.status] ?? '--'"
+                :variant="row.status === TrackingStatus.Active ? 'success' : 'neutral'" />
+        </template>
+
+    </MsTable>
 </template>
 <style scoped></style>

@@ -42,8 +42,8 @@ export const incomeTaxTypeText: Record<IncomeTaxType, string> = {
 }
 
 export const sourceTypeText: Record<SourceType, string> = {
-    [SourceType.UserAdded]: 'Người dùng thêm',
-    [SourceType.System]: 'Hệ thống',
+    [SourceType.UserAdded]: 'Tự thêm',
+    [SourceType.System]: 'Mặc định',
 }
 
 export const trackingStatusText: Record<TrackingStatus, string> = {
