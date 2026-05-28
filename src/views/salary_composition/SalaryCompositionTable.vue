@@ -45,9 +45,15 @@ const props = defineProps<SalaryCompositionTableProps>();
     <MsTable class="min-w-372.5 border-separate border-spacing-0 text-left text-[14px]" :is-loading="isLoading"
         :columns="columns" :rows="rows" :formatters="formatters">
 
+        <template #checkbox>
+            <th class="h-9 w-12 border-b border-border px-4 text-center align-middle">
+                <input class="size-4 rounded border-[#cfd4da] text-primary focus:ring-primary/20" type="checkbox">
+            </th>
+        </template>
+
         <template #status="{ row }">
             <MsStatus :text="trackingStatusText[row.status] ?? '--'"
-                :variant="row.status === TrackingStatus.Active ? 'success' : 'neutral'" />
+                :variant="row.status === TrackingStatus.Active ? 'success' : 'warning'" />
         </template>
 
     </MsTable>

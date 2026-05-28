@@ -23,9 +23,13 @@ const tableColspan = computed(() => visibleColumns.value.length + 1)
     <table>
         <thead class="sticky top-0 z-10 bg-grid-header">
             <tr>
-                <th class="h-9 w-12 border-b border-border px-4 text-center align-middle">
-                    <input class="size-4 rounded border-[#cfd4da] text-primary focus:ring-primary/20" type="checkbox">
-                </th>
+                <slot name="checkbox">
+                    <th class="h-9 w-12 border-b border-border px-4 text-center align-middle">
+                        <input class="size-4 rounded border-[#cfd4da] text-primary focus:ring-primary/20"
+                            type="checkbox">
+                    </th>
+                </slot>
+
                 <th class="h-9 border-b border-r border-border px-3 text-[13px] font-semibold text-[#001b44]"
                     v-for="column in visibleColumns" :key="column.fieldKey">
                     <span class="inline-flex items-center gap-2">
@@ -53,7 +57,7 @@ const tableColspan = computed(() => visibleColumns.value.length + 1)
         </tbody>
 
         <tbody v-else>
-            <tr v-for="row in rows" :key="row.code" class="bg-white hover:bg-[#f8faf9]">
+            <tr v-for="row in rows" :key="row.code" class="bg-white hover:bg-[#cdeadf] hover:cursor-pointer">
                 <td class="h-9 border-b border-border px-4 text-center">
                     <input class="size-4 rounded border-[#cfd4da] 
                     text-primary focus:ring-primary/20" type="checkbox" />
@@ -68,4 +72,5 @@ const tableColspan = computed(() => visibleColumns.value.length + 1)
         </tbody>
     </table>
 </template>
+
 <style scoped></style>

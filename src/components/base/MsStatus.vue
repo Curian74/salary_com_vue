@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-export type MsStatusVariant = 'success' | 'neutral' | 'warning' | 'danger'
+export type MsStatusVariant = 'success' | 'warning'
 
 interface MsStatusProps {
     text: string
@@ -9,26 +9,22 @@ interface MsStatusProps {
 }
 
 const props = withDefaults(defineProps<MsStatusProps>(), {
-    variant: 'neutral',
+    variant: 'warning',
 })
 
 const baseClasses = [
-    'inline-flex h-7 items-center gap-1.5 whitespace-nowrap rounded-[8px] border px-2.5',
-    'text-[14px] font-medium leading-none',
+    'inline-flex h-6 items-center gap-1.5 whitespace-nowrap rounded-[8px] border px-2.5',
+    'text-[13px] leading-none',
 ]
 
 const variantClasses: Record<MsStatusVariant, string> = {
-    success: 'border-primary/30 bg-focus text-primary',
-    neutral: 'border-border bg-grid-header text-text-secondary',
-    warning: 'border-warning bg-warning/10 text-pending',
-    danger: 'border-error/30 bg-error/10 text-error',
+    success: 'border-[#75e0ac] bg-[#edfcf4] text-primary',
+    warning: 'border-[#fedf89] bg-[#fffaeb] text-[#dc6803]',
 }
 
 const dotClasses: Record<MsStatusVariant, string> = {
     success: 'bg-primary',
-    neutral: 'bg-text-secondary',
-    warning: 'bg-pending',
-    danger: 'bg-error',
+    warning: 'bg-[#f79009]',
 }
 
 const statusClasses = computed(() => [
