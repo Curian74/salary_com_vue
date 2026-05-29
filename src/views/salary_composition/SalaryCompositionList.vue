@@ -10,6 +10,7 @@ import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
 import SalaryCompositionLeftFilters from './SalaryCompositionLeftFilters.vue';
 import SalaryCompositionRightActions from './SalaryCompositionRightActions.vue';
 import gridKeys from '@/constants/gridKeys.ts';
+import SalaryCompositionPagination from './SalaryCompositionPagination.vue';
 
 const columns = ref<GetGridConfigsResponse[]>([]);
 const salaryCompositions = ref<GetSalaryCompositionsResponse[]>([]);
@@ -73,56 +74,7 @@ onMounted(async () => {
                 <div>Tổng số: <span class="font-bold">{{ totalCount }}</span></div>
 
                 <div class="flex flex-wrap items-center gap-4">
-                    <div class="flex items-center gap-2">
-                        <span>Số dòng/trang</span>
-                        <MsButton variant="secondary" class="min-w-23 justify-between font-normal">
-                            <span>25</span>
-                            <svg class="size-4 text-text-secondary" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                aria-hidden="true">
-                                <path d="m6 9 6 6 6-6" />
-                            </svg>
-                        </MsButton>
-                    </div>
-
-                    <strong class="whitespace-nowrap">{{ rangeText }}</strong>
-
-                    <div class="flex items-center gap-4 text-[#cfd4da]">
-                        <MsButton variant="icon" size="sm"
-                            class="size-5 border-0 bg-transparent p-0 text-[#cfd4da] hover:bg-transparent"
-                            aria-label="Trang đầu">
-                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="m11 17-5-5 5-5" />
-                                <path d="M18 17V7" />
-                            </svg>
-                        </MsButton>
-                        <MsButton variant="icon" size="sm"
-                            class="size-5 border-0 bg-transparent p-0 text-[#cfd4da] hover:bg-transparent"
-                            aria-label="Trang trước">
-                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="m15 18-6-6 6-6" />
-                            </svg>
-                        </MsButton>
-                        <MsButton variant="icon" size="sm"
-                            class="size-5 border-0 bg-transparent p-0 text-[#cfd4da] hover:bg-transparent"
-                            aria-label="Trang sau">
-                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="m9 18 6-6-6-6" />
-                            </svg>
-                        </MsButton>
-                        <MsButton variant="icon" size="sm"
-                            class="size-5 border-0 bg-transparent p-0 text-[#cfd4da] hover:bg-transparent"
-                            aria-label="Trang cuối">
-                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="m13 17 5-5-5-5" />
-                                <path d="M6 17V7" />
-                            </svg>
-                        </MsButton>
-                    </div>
+                    <SalaryCompositionPagination />
                 </div>
             </div>
         </div>
