@@ -2,9 +2,9 @@ import type { GetGridConfigsRequest, GetGridConfigsResponse } from "@/types/grid
 import { axiosClient } from "./axiosClient";
 import type { ApiResponse } from "@/types/apiResponse";
 
-const fetchGridConfigs = async (params?: GetGridConfigsRequest)
+const fetchGridConfigs = async (gridName: string, params?: GetGridConfigsRequest)
     : Promise<ApiResponse<GetGridConfigsResponse[]>> => {
-    const response = await axiosClient.get('/GridConfigs', {
+    const response = await axiosClient.get(`/GridConfigs/${gridName}`, {
         params
     })
     return response.data;

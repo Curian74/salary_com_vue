@@ -158,3 +158,15 @@
     width: 16px;
     height: 16px;
 }
+
+.table-col-settings-icon {
+    background-position: -50px -122px;
+    width: 20px;
+    height: 20px;
+}
+
+.table-col-filter-icon {
+    background-position: -22px -2px;
+    width: 16px;
+    height: 16px;
+}

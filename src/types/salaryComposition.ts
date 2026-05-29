@@ -8,6 +8,7 @@ import type {
     TrackingStatus,
     ValueType
 } from "@/enums/salaryCompositionEnums";
+import type { ApiRequest } from "./apiRequest";
 
 export interface GetSalaryCompositionsResponse {
     id: string;
@@ -34,6 +35,6 @@ export interface GetSalaryCompositionsResponse {
     organizationUnitNames: string;
 }
 
-export interface GetSalaryCompositionsRequest {
+export interface GetSalaryCompositionsRequest extends ApiRequest {
 
 }
