@@ -1,23 +1,30 @@
 <script setup lang="ts">
-import MsButton from '@/components/base/MsButton.vue';
 import SalaryCompositionButtons from './SalaryCompositionButtons.vue';
 import SalaryCompositionTable from './SalaryCompositionTable.vue';
 import type { GetGridConfigsResponse } from '@/types/gridConfig';
 import type { GetSalaryCompositionsRequest, GetSalaryCompositionsResponse } from '@/types/salaryComposition.ts';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import gridConfigApi from '@/apis/gridConfigApi';
 import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
 import SalaryCompositionLeftFilters from './SalaryCompositionLeftFilters.vue';
 import SalaryCompositionRightActions from './SalaryCompositionRightActions.vue';
 import gridKeys from '@/constants/gridKeys.ts';
 import SalaryCompositionPagination from './SalaryCompositionPagination.vue';
+import type { PagedResult } from '@/types/apiResponse.ts';
 
 const columns = ref<GetGridConfigsResponse[]>([]);
-const salaryCompositions = ref<GetSalaryCompositionsResponse[]>([]);
-const totalCount = ref(0);
 const isTableLoading = ref(false);
-const pageIndex = ref(1);
+const pageIndex = ref(2);
 const pageSize = ref(3);
+const salaryCompositions = ref<PagedResult<GetSalaryCompositionsResponse>>({
+    items: [],
+    totalCount: 0,
+    pageSize: pageSize.value,
+    pageIndex: pageIndex.value,
+    totalPages: 0,
+    hasPreviousPage: false,
+    hasNextPage: false,
+});
 
 const queryObject = ref<GetSalaryCompositionsRequest>({
     pageIndex: pageIndex.value,
@@ -25,26 +32,58 @@ const queryObject = ref<GetSalaryCompositionsRequest>({
 });
 
 const rows = computed(() => {
-    return salaryCompositions.value;
+    return salaryCompositions.value.items;
 });
 
-const rangeText = computed(() => rows.value.length ? `1 - ${rows.value.length}` : '0 - 0');
+const totalCount = computed(() => salaryCompositions.value.totalCount);
 
-onMounted(async () => {
+const handlePreviousPage = () => {
+    pageIndex.value--;
+}
+
+const handleNextPage = () => {
+    pageIndex.value++;
+}
+
+const pagedData = computed(() => {
+    return salaryCompositions.value;
+})
+
+const fetchSalaryCompositions = async () => {
     try {
         isTableLoading.value = true;
-        const gridData = await gridConfigApi.fetchGridConfigs(gridKeys.SALARY_COMPOSITION);
-        columns.value = gridData.value;
 
-        const salData = await salaryCompositionApi.fetchSalaryCompositions(queryObject.value);
-        salaryCompositions.value = salData.value.items;
-        totalCount.value = salData.value.totalCount;
+        const salData = await salaryCompositionApi.fetchSalaryCompositions({
+            pageIndex: pageIndex.value,
+            pageSize: pageSize.value,
+        });
 
+        salaryCompositions.value = salData.value;
     }
     catch (err) {
         console.log(err);
     }
+    finally {
+        isTableLoading.value = false;
+    }
+}
 
+watch(pageIndex, async () => {
+    await fetchSalaryCompositions();
+});
+
+onMounted(async () => {
+    try {
+        isTableLoading.value = true;
+
+        const gridData = await gridConfigApi.fetchGridConfigs(gridKeys.SALARY_COMPOSITION);
+        columns.value = gridData.value;
+
+        await fetchSalaryCompositions();
+    }
+    catch (err) {
+        console.log(err);
+    }
     finally {
         isTableLoading.value = false;
     }
@@ -74,7 +113,8 @@ onMounted(async () => {
                 <div>Tổng số: <span class="font-bold">{{ totalCount }}</span></div>
 
                 <div class="flex flex-wrap items-center gap-4">
-                    <SalaryCompositionPagination />
+                    <SalaryCompositionPagination @next-page="handleNextPage" @previous-page="handlePreviousPage"
+                        :data="pagedData" />
                 </div>
             </div>
         </div>

@@ -1,15 +1,35 @@
-<script setup lang='ts'>
+<script setup lang='ts' generic="T">
 import { computed } from 'vue';
 import MsButton from './MsButton.vue';
+import type { PagedResult } from '@/types/apiResponse.ts';
 
 interface Props {
-    pageSize: number;
+    data: PagedResult<T>;
 }
 
 const props = defineProps<Props>();
+const emit = defineEmits<{
+    previousPage: [],
+    nextPage: [],
+}>();
+
+const handlePreviousPage = () => {
+    emit('previousPage');
+}
+
+const handleNextPage = () => {
+    emit('nextPage');
+}
 
 const rangeText = computed(() => {
-    return "range-text-here";
+    if (!props.data.totalCount) {
+        return '0 - 0';
+    }
+
+    const start = (props.data.pageIndex - 1) * props.data.pageSize + 1;
+    const end = Math.min(props.data.pageIndex * props.data.pageSize, props.data.totalCount);
+
+    return `${start} - ${end}`;
 })
 
 </script>
@@ -19,7 +39,7 @@ const rangeText = computed(() => {
         <slot name="pageSizeConfig">
             <span>Số dòng/trang</span>
             <MsButton variant="secondary" class="min-w-23 justify-between font-normal">
-                <span>{{ pageSize }}</span>
+                <span>{{ data.pageSize }}</span>
                 <svg class="size-4 text-text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="m6 9 6 6 6-6" />
@@ -38,14 +58,14 @@ const rangeText = computed(() => {
                     <path d="M18 17V7" />
                 </svg>
             </MsButton>
-            <MsButton variant="icon" size="sm"
+            <MsButton @click="handlePreviousPage" :disabled="!data.hasPreviousPage" variant="icon" size="sm"
                 class="size-8! shrink-0 border-0! bg-transparent! p-0! text-icon! hover:bg-icon-hover-bg">
                 <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="m15 18-6-6 6-6" />
                 </svg>
             </MsButton>
-            <MsButton variant="icon" size="sm"
+            <MsButton @click="handleNextPage" :disabled="!data.hasNextPage" variant="icon" size="sm"
                 class="size-8! shrink-0 border-0! bg-transparent! p-0! text-icon! hover:bg-icon-hover-bg">
                 <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
