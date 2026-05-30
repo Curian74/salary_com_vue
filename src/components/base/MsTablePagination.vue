@@ -11,6 +11,8 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
     previousPage: [],
     nextPage: [],
+    firstPage: [],
+    lastPage: [],
 }>();
 
 const handlePreviousPage = () => {
@@ -19,6 +21,14 @@ const handlePreviousPage = () => {
 
 const handleNextPage = () => {
     emit('nextPage');
+}
+
+const handleFirstPage = () => {
+    emit('firstPage');
+}
+
+const handleLastPage = () => {
+    emit('lastPage');
 }
 
 const rangeText = computed(() => {
@@ -50,7 +60,7 @@ const rangeText = computed(() => {
         <strong class="whitespace-nowrap">{{ rangeText }}</strong>
 
         <div class="flex items-center gap-1 text-icon">
-            <MsButton variant="icon" size="sm"
+            <MsButton :disabled="!data.hasPreviousPage" @click="handleFirstPage" variant="icon" size="sm"
                 class="size-8! shrink-0 border-0! bg-transparent! p-0! text-icon! hover:bg-icon-hover-bg">
                 <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -72,7 +82,7 @@ const rangeText = computed(() => {
                     <path d="m9 18 6-6-6-6" />
                 </svg>
             </MsButton>
-            <MsButton variant="icon" size="sm"
+            <MsButton :disabled="!data.hasNextPage" @click="handleLastPage" variant="icon" size="sm"
                 class="size-8! shrink-0 border-0! bg-transparent! p-0! text-icon! hover:bg-icon-hover-bg">
                 <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

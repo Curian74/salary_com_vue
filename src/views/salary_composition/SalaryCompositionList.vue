@@ -17,7 +17,7 @@ const isTableLoading = ref(false);
 
 const queryObject = ref<GetSalaryCompositionsRequest>({
     pageIndex: 1,
-    pageSize: 3,
+    pageSize: 2,
     searchTerm: '',
 });
 
@@ -49,6 +49,14 @@ const handleNextPage = () => {
     }
 }
 
+const handleFirstPage = () => {
+    queryObject.value.pageIndex = 1;
+}
+
+const handleLastPage = () => {
+    queryObject.value.pageIndex = salaryCompositions.value.totalPages;
+}
+
 const handleSearch = (searchTerm: string) => {
     queryObject.value.pageIndex = 1;
     queryObject.value.searchTerm = searchTerm
@@ -69,6 +77,7 @@ const fetchSalaryCompositions = async () => {
     catch (err) {
         console.log(err);
     }
+
     finally {
         isTableLoading.value = false;
     }
@@ -124,8 +133,8 @@ onMounted(async () => {
                 <div>Tổng số: <span class="font-bold">{{ totalCount }}</span></div>
 
                 <div class="flex flex-wrap items-center gap-4">
-                    <SalaryCompositionPagination @next-page="handleNextPage" @previous-page="handlePreviousPage"
-                        :data="pagedData" />
+                    <SalaryCompositionPagination @first-page="handleFirstPage" @last-page="handleLastPage"
+                        @next-page="handleNextPage" @previous-page="handlePreviousPage" :data="pagedData" />
                 </div>
             </div>
         </div>

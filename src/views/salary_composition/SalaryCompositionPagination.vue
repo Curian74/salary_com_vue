@@ -11,6 +11,8 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
     previousPage: [],
     nextPage: [],
+    firstPage: [],
+    lastPage: [],
 }>();
 
 const handlePreviousPage = () => {
@@ -21,10 +23,18 @@ const handleNextPage = () => {
     emit('nextPage');
 }
 
+const handleFirstPage = () => {
+    emit('firstPage');
+}
+
+const handleLastPage = () => {
+    emit('lastPage');
+}
+
 </script>
 <template>
-    <MsTablePagination @previous-page="handlePreviousPage" @next-page="handleNextPage" :page-index="data.pageIndex"
-        :data="data" :page-size="data.pageSize">
+    <MsTablePagination @first-page="handleFirstPage" @last-page="handleLastPage" @previous-page="handlePreviousPage"
+        @next-page="handleNextPage" :page-index="data.pageIndex" :data="data" :page-size="data.pageSize">
 
     </MsTablePagination>
 </template>

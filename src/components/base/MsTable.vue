@@ -48,10 +48,9 @@ const tableColspan = computed(() => visibleColumns.value.length + 1)
 
         <tbody v-if="isLoading">
             <tr>
-                <td :colspan="tableColspan" class="h-40 border-b border-border text-center text-primary">
+                <td :colspan="tableColspan" class="h-40 border-border text-center text-primary">
                     <div class="flex items-center justify-center gap-3 text-[13px] font-medium">
                         <ms-loading size="lg" />
-                        <span class="text-text-secondary">Đang tải dữ liệu</span>
                     </div>
                 </td>
             </tr>
