@@ -50,6 +50,7 @@ const handleNextPage = () => {
 }
 
 const handleSearch = (searchTerm: string) => {
+    queryObject.value.pageIndex = 1;
     queryObject.value.searchTerm = searchTerm
 }
 

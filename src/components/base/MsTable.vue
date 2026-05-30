@@ -2,6 +2,7 @@
 import type { GridConfig } from '@/types/gridConfig'
 import { computed } from 'vue';
 import MsLoading from './MsLoading.vue';
+import MsIcon from './MsIcon.vue';
 
 interface MsTableProps {
     columns: GridConfig[];
@@ -20,7 +21,7 @@ const tableColspan = computed(() => visibleColumns.value.length + 1)
 
 </script>
 <template>
-    <table>
+    <table v-bind="$attrs">
         <thead class="sticky top-0 z-10 bg-grid-header">
             <tr>
                 <slot name="checkbox">
@@ -57,7 +58,8 @@ const tableColspan = computed(() => visibleColumns.value.length + 1)
         </tbody>
 
         <tbody v-else>
-            <tr v-for="row in rows" :key="row.code" class="bg-white hover:bg-[#cdeadf] hover:cursor-pointer">
+            <tr v-if="rows.length > 0" v-for="row in rows" :key="row.code"
+                class="bg-white hover:bg-[#cdeadf] hover:cursor-pointer">
                 <td class="h-9 border-b border-border px-4 text-center">
                     <input class="size-3.5 rounded border-[#cfd4da] 
                     text-primary focus:ring-primary/20" type="checkbox" />
@@ -69,6 +71,17 @@ const tableColspan = computed(() => visibleColumns.value.length + 1)
                     </slot>
                 </td>
             </tr>
+
+            <tr v-else>
+                <td :colspan="tableColspan" class="h-80">
+                    <div class="sticky left-0 flex h-full w-screen max-w-full flex-col items-center
+                         justify-center gap-2 text-[13px] text-text-primary">
+                        <ms-icon name="table-not-found" class="cursor-default" />
+                        <span>Không có dữ liệu</span>
+                    </div>
+                </td>
+            </tr>
+
         </tbody>
     </table>
 </template>
