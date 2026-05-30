@@ -1,5 +1,5 @@
 
 export interface ApiRequest {
-    pageIndex?: number;
-    pageSize?: number;
+    pageIndex: number;
+    pageSize: number;
 }

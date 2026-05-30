@@ -1,5 +1,19 @@
 <script setup lang='ts'>
 import MsInput from '@/components/base/MsInput.vue';
+import configKeys from '@/constants/configs/configKeys';
+
+let debounceTimer: ReturnType<typeof setTimeout>;
+
+const emit = defineEmits<{
+    search: [value: string]
+}>()
+
+const handleSearchChange = (value: string) => {
+    clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(() => {
+        emit('search', value)
+    }, configKeys.DEBOUCE_TIMER);
+}
 
 </script>
 <template>
@@ -11,9 +25,8 @@ import MsInput from '@/components/base/MsInput.vue';
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.3-4.3" />
         </svg>
-        <MsInput
-        placeholder="Tìm kiếm"
-        class="h-full w-full rounded-lg border border-[#d7dce1]
+        <MsInput @update:model-value="handleSearchChange" placeholder="Tìm kiếm" class="h-full w-full rounded-lg
+         border border-[#d7dce1]
         pl-10 pr-3 text-[13px] font-normal text-text-primary 
         outline-none transition placeholder:text-text-placeholder 
         focus:border-primary focus:ring-2 focus:ring-primary/15" />

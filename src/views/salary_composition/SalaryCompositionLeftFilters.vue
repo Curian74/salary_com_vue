@@ -2,10 +2,17 @@
 import MsButton from '@/components/base/MsButton.vue';
 import SalaryCompositionSearch from './SalaryCompositionSearch.vue';
 
+const emit = defineEmits<{
+    search: [value: string]
+}>();
+
+const handleSearch = (value: string) => {
+    emit('search', value);
+};
 
 </script>
 <template>
-    <SalaryCompositionSearch />
+    <SalaryCompositionSearch @search="handleSearch" />
 
     <MsButton variant="secondary" class="font-normal text-[13px] text-text-secondary!">
         <span>Trạng thái: <span class="font-semibold text-text-primary">Tất cả</span></span>

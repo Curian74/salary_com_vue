@@ -1,5 +1,5 @@
 const configKeys = {
-    DEBOUCE_TIMER: 1000
+    DEBOUCE_TIMER: 300
 }
 
 export default configKeys;

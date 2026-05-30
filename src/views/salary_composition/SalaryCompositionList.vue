@@ -14,21 +14,21 @@ import type { PagedResult } from '@/types/apiResponse.ts';
 
 const columns = ref<GetGridConfigsResponse[]>([]);
 const isTableLoading = ref(false);
-const pageIndex = ref(2);
-const pageSize = ref(3);
+
+const queryObject = ref<GetSalaryCompositionsRequest>({
+    pageIndex: 1,
+    pageSize: 3,
+    searchTerm: '',
+});
+
 const salaryCompositions = ref<PagedResult<GetSalaryCompositionsResponse>>({
     items: [],
     totalCount: 0,
-    pageSize: pageSize.value,
-    pageIndex: pageIndex.value,
+    pageSize: queryObject.value.pageSize,
+    pageIndex: queryObject.value.pageIndex,
     totalPages: 0,
     hasPreviousPage: false,
     hasNextPage: false,
-});
-
-const queryObject = ref<GetSalaryCompositionsRequest>({
-    pageIndex: pageIndex.value,
-    pageSize: pageSize.value,
 });
 
 const rows = computed(() => {
@@ -38,11 +38,19 @@ const rows = computed(() => {
 const totalCount = computed(() => salaryCompositions.value.totalCount);
 
 const handlePreviousPage = () => {
-    pageIndex.value--;
+    if (salaryCompositions.value.hasPreviousPage) {
+        queryObject.value.pageIndex--;
+    }
 }
 
 const handleNextPage = () => {
-    pageIndex.value++;
+    if (salaryCompositions.value.hasNextPage) {
+        queryObject.value.pageIndex++;
+    }
+}
+
+const handleSearch = (searchTerm: string) => {
+    queryObject.value.searchTerm = searchTerm
 }
 
 const pagedData = computed(() => {
@@ -53,10 +61,7 @@ const fetchSalaryCompositions = async () => {
     try {
         isTableLoading.value = true;
 
-        const salData = await salaryCompositionApi.fetchSalaryCompositions({
-            pageIndex: pageIndex.value,
-            pageSize: pageSize.value,
-        });
+        const salData = await salaryCompositionApi.fetchSalaryCompositions(queryObject.value);
 
         salaryCompositions.value = salData.value;
     }
@@ -68,9 +73,14 @@ const fetchSalaryCompositions = async () => {
     }
 }
 
-watch(pageIndex, async () => {
-    await fetchSalaryCompositions();
-});
+watch(
+    () => [
+        queryObject.value.pageIndex,
+        queryObject.value.pageSize,
+        queryObject.value.searchTerm,
+    ],
+    fetchSalaryCompositions
+);
 
 onMounted(async () => {
     try {
@@ -100,7 +110,7 @@ onMounted(async () => {
 
         <div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-white">
             <div class="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2">
-                <SalaryCompositionLeftFilters />
+                <SalaryCompositionLeftFilters @search="handleSearch" />
                 <SalaryCompositionRightActions />
             </div>
 
