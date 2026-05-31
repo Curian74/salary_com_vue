@@ -47,10 +47,12 @@ const handlePageSizeChange = (value: string | number | null) => {
 <template>
     <MsTablePagination @first-page="handleFirstPage" @last-page="handleLastPage" @previous-page="handlePreviousPage"
         @next-page="handleNextPage" :page-index="data.pageIndex" :data="data" :page-size="data.pageSize">
+
         <template #pageSizeConfig>
             <span>Số dòng/trang</span>
             <MsSelect :model-value="pageSize" :options="pageSizeOptions" @update:model-value="handlePageSizeChange" />
         </template>
+
     </MsTablePagination>
 </template>
 <style scoped></style>

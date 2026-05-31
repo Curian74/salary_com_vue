@@ -32,6 +32,7 @@ const handleChange = (event: Event) => {
     emit('update:modelValue', value);
     emit('change', value);
 };
+
 </script>
 
 <template>

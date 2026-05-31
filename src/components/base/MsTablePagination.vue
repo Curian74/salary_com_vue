@@ -35,7 +35,6 @@ const rangeText = computed(() => {
     if (!props.data.totalCount) {
         return '0 - 0';
     }
-
     const start = (props.data.pageIndex - 1) * props.data.pageSize + 1;
     const end = Math.min(props.data.pageIndex * props.data.pageSize, props.data.totalCount);
 

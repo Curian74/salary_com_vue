@@ -15,16 +15,18 @@ import { TrackingStatus } from '@/enums/salaryCompositionEnums';
 import type { LookupResponse, PagedResult } from '@/types/apiResponse.ts';
 import type { MsMenuOption } from '@/components/base/MsMenu.vue';
 import { trackingStatusLabels } from '@/constants/trackingStatusLabels.ts';
-import type { MsSelectOption } from '@/components/base/MsSelect.vue';
+import localStorageKeys from '@/constants/localStorageKeys.ts';
 
 const columns = ref<GetGridConfigsResponse[]>([]);
 const isTableLoading = ref(false);
 const selectedStatus = ref<TrackingStatus | null>(null);
 const trackingStatusOptions = ref<LookupResponse[]>([]);
 
+const pageSize = Number(localStorage.getItem(localStorageKeys.PAGE_SIZE_KEY)) || 15;
+
 const queryObject = ref<GetSalaryCompositionsRequest>({
     pageIndex: 1,
-    pageSize: 2,
+    pageSize,
     searchTerm: '',
 });
 
@@ -95,6 +97,8 @@ const handleStatusChange = (status: string | number | null) => {
 
 const handlePageSizeChange = (pageSize: number) => {
     queryObject.value.pageIndex = 1;
+    const pageSizeString = pageSize.toString();
+    localStorage.setItem(localStorageKeys.PAGE_SIZE_KEY, pageSizeString);
     queryObject.value.pageSize = pageSize;
 }
 
