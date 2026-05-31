@@ -15,6 +15,7 @@ import { TrackingStatus } from '@/enums/salaryCompositionEnums';
 import type { LookupResponse, PagedResult } from '@/types/apiResponse.ts';
 import type { MsMenuOption } from '@/components/base/MsMenu.vue';
 import { trackingStatusLabels } from '@/constants/trackingStatusLabels.ts';
+import type { MsSelectOption } from '@/components/base/MsSelect.vue';
 
 const columns = ref<GetGridConfigsResponse[]>([]);
 const isTableLoading = ref(false);
@@ -36,6 +37,13 @@ const salaryCompositions = ref<PagedResult<GetSalaryCompositionsResponse>>({
     hasPreviousPage: false,
     hasNextPage: false,
 });
+
+const pageSizeOptions = [
+    { value: 15, label: '15' },
+    { value: 25, label: '25' },
+    { value: 50, label: '50' },
+    { value: 100, label: '100' }
+]
 
 const rows = computed(() => {
     return salaryCompositions.value.items;
@@ -83,6 +91,11 @@ const handleStatusChange = (status: string | number | null) => {
     selectedStatus.value = typeof status === 'number' ? status : null;
     queryObject.value.pageIndex = 1;
     queryObject.value.trackingStatus = selectedStatus.value;
+}
+
+const handlePageSizeChange = (pageSize: number) => {
+    queryObject.value.pageIndex = 1;
+    queryObject.value.pageSize = pageSize;
 }
 
 const pagedData = computed(() => {
@@ -172,7 +185,9 @@ onMounted(async () => {
 
                 <div class="flex flex-wrap items-center gap-4">
                     <SalaryCompositionPagination @first-page="handleFirstPage" @last-page="handleLastPage"
-                        @next-page="handleNextPage" @previous-page="handlePreviousPage" :data="pagedData" />
+                        @next-page="handleNextPage" @previous-page="handlePreviousPage"
+                        @update:page-size="handlePageSizeChange" :data="pagedData" :page-size="queryObject.pageSize"
+                        :page-size-options="pageSizeOptions" />
                 </div>
             </div>
         </div>
