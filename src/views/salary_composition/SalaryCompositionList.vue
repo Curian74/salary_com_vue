@@ -14,6 +14,7 @@ import SalaryCompositionPagination from './SalaryCompositionPagination.vue';
 import { TrackingStatus } from '@/enums/salaryCompositionEnums';
 import type { LookupResponse, PagedResult } from '@/types/apiResponse.ts';
 import type { MsMenuOption } from '@/components/base/MsMenu.vue';
+import { trackingStatusLabels } from '@/constants/trackingStatusLabels.ts';
 
 const columns = ref<GetGridConfigsResponse[]>([]);
 const isTableLoading = ref(false);
@@ -41,11 +42,6 @@ const rows = computed(() => {
 });
 
 const totalCount = computed(() => salaryCompositions.value.totalCount);
-
-const trackingStatusLabels: Record<number, string> = {
-    [TrackingStatus.Active]: 'Đang theo dõi',
-    [TrackingStatus.Inactive]: 'Ngừng theo dõi',
-};
 
 const statusMenuOptions = computed<MsMenuOption[]>(() => [
     {
@@ -170,8 +166,8 @@ onMounted(async () => {
                 <SalaryCompositionTable :is-loading="isTableLoading" :rows="rows" :columns="columns" />
             </div>
 
-            <div
-                class="flex min-h-12.5 flex-wrap items-center justify-between gap-2 border-t border-border px-4 text-[14px] text-[#001b44]">
+            <div class="flex min-h-12.5 flex-wrap items-center justify-between gap-2 border-t 
+                border-border px-4 text-[14px] text-[#001b44]">
                 <div>Tổng số: <span class="font-bold">{{ totalCount }}</span></div>
 
                 <div class="flex flex-wrap items-center gap-4">
