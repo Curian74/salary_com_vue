@@ -37,4 +37,5 @@ export interface GetSalaryCompositionsResponse {
 
 export interface GetSalaryCompositionsRequest extends ApiRequest {
     searchTerm?: string
+    trackingStatus?: TrackingStatus | null
 }

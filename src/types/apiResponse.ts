@@ -27,3 +27,8 @@ export interface Pagination<T> {
     page: number
     pageSize: number
 }
+
+export interface LookupResponse {
+    value: number;
+    name: string;
+}
