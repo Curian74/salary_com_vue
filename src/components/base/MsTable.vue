@@ -24,12 +24,9 @@ const tableColspan = computed(() => visibleColumns.value.length + 1)
     <table v-bind="$attrs">
         <thead class="sticky top-0 z-10 bg-grid-header">
             <tr>
-                <slot name="checkbox">
-                    <th class="h-9 w-12 border-b border-border px-4 text-center align-middle">
-                        <input class="size-4 rounded border-[#cfd4da] text-primary focus:ring-primary/20"
-                            type="checkbox">
-                    </th>
-                </slot>
+                <th class="h-9 w-12 border-b border-border px-4 text-center align-middle">
+                    <input class="size-4 rounded border-[#cfd4da] text-primary focus:ring-primary/20" type="checkbox">
+                </th>
 
                 <th class="h-9 border-b border-r border-border px-3 text-[13px] font-semibold text-[#001b44]"
                     v-for="column in visibleColumns" :key="column.fieldKey">
@@ -66,7 +63,8 @@ const tableColspan = computed(() => visibleColumns.value.length + 1)
                 <td v-for="column in visibleColumns" :key="column.fieldKey"
                     class="h-9 border-b border-border px-3 text-[#001b44]">
                     <slot :name="column.fieldKey" :row="row" :column="column">
-                        {{ formatters?.[column.fieldKey]?.(row[column.fieldKey], row) ?? row[column.fieldKey] ?? '--' }}
+                        {{ formatters?.[column.fieldKey]?.(row[column.fieldKey], row)
+                            ?? row[column.fieldKey] ?? '--' }}
                     </slot>
                 </td>
             </tr>
