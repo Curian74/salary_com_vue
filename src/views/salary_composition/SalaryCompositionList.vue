@@ -16,6 +16,7 @@ import type { LookupResponse, PagedResult } from '@/types/apiResponse.ts';
 import type { MsMenuOption } from '@/components/base/MsMenu.vue';
 import { trackingStatusLabels } from '@/constants/trackingStatusLabels.ts';
 import localStorageKeys from '@/constants/localStorageKeys.ts';
+import MsCheckbox from '@/components/base/MsCheckbox.vue';
 
 const columns = ref<GetGridConfigsResponse[]>([]);
 const isTableLoading = ref(false);
