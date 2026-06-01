@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 export interface MsMenuOption {
     value: string | number | null
@@ -10,15 +10,19 @@ export interface MsMenuOption {
 
 interface MsMenuProps {
     options?: MsMenuOption[]
-    modelValue: string | number | null
+    modelValue?: string | number | null
     disabled?: boolean
     emptyText?: string
+    width?: number | string
+    align?: 'left' | 'right'
 }
 
 const props = withDefaults(defineProps<MsMenuProps>(), {
     options: () => [],
     disabled: false,
     emptyText: 'Không có dữ liệu',
+    width: 172,
+    align: 'left',
 })
 
 const emit = defineEmits<{
@@ -28,6 +32,12 @@ const emit = defineEmits<{
 
 const isOpen = ref(false)
 const menuRef = ref<HTMLElement | null>(null)
+
+const menuStyle = computed(() => {
+    const width = typeof props.width === 'number' ? `${props.width}px` : props.width
+
+    return { width }
+})
 
 function closeMenu() {
     isOpen.value = false
@@ -112,8 +122,9 @@ onBeforeUnmount(() => {
     <div ref="menuRef" class="relative inline-block">
         <slot name="trigger" :open="toggleMenu" :show="openMenu" :close="closeMenu" :is-open="isOpen" />
 
-        <div v-if="isOpen" class="absolute left-0 top-full z-10000 mt-1 overflow-hidden w-43 rounded-lg
-             border border-border bg-white py-1 shadow-[0_4px_16px_rgba(0,0,0,0.14)]" role="menu">
+        <div v-if="isOpen" class="absolute right-0 top-full z-10000 mt-1 overflow-hidden rounded-lg
+             border border-border bg-white py-1 shadow-[0_4px_16px_rgba(0,0,0,0.14)]"
+            :class="align === 'right' ? 'right-0' : 'left-0'" :style="menuStyle" role="menu">
             <div v-if="options.length === 0" class="px-3 py-2 text-[14px] leading-5 text-text-placeholder">
                 {{ emptyText }}
             </div>
