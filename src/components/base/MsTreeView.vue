@@ -1,4 +1,4 @@
-<script setup lang='ts' generic="T extends Record<string, any>">
+<script setup lang='ts' generic="T">
 import DxTreeView from 'devextreme-vue/tree-view';
 
 defineOptions({

@@ -3,7 +3,7 @@ import SalaryCompositionButtons from './SalaryCompositionButtons.vue';
 import SalaryCompositionTable from './SalaryCompositionTable.vue';
 import type { GetGridConfigsResponse } from '@/types/gridConfig';
 import type { GetSalaryCompositionsRequest, GetSalaryCompositionsResponse } from '@/types/salaryComposition.ts';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import gridConfigApi from '@/apis/gridConfigApi';
 import lookupApi from '@/apis/lookupApi.ts';
 import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
@@ -16,7 +16,6 @@ import type { LookupResponse, PagedResult } from '@/types/apiResponse.ts';
 import type { MsMenuOption } from '@/components/base/MsMenu.vue';
 import { trackingStatusLabels } from '@/constants/trackingStatusLabels.ts';
 import localStorageKeys from '@/constants/localStorageKeys.ts';
-import MsCheckbox from '@/components/base/MsCheckbox.vue';
 
 const columns = ref<GetGridConfigsResponse[]>([]);
 const isTableLoading = ref(false);
@@ -24,6 +23,81 @@ const selectedStatus = ref<TrackingStatus | null>(null);
 const trackingStatusOptions = ref<LookupResponse[]>([]);
 
 const pageSize = Number(localStorage.getItem(localStorageKeys.PAGE_SIZE_KEY)) || 15;
+
+interface OrganizationTreeItem {
+    id: string
+    parentId?: string
+    name: string
+    level: number
+    expanded?: boolean
+}
+
+const organizationDropdownRef = ref<HTMLElement | null>(null);
+const isOrganizationDropdownOpen = ref(false);
+const showInactiveOrganizations = ref(false);
+
+const organizationTreeItems: OrganizationTreeItem[] = [
+    {
+        id: 'misa-2024',
+        name: 'Misa Test pdthien 2024',
+        level: 0,
+        expanded: true,
+    },
+    {
+        id: 'north-branch',
+        parentId: 'misa-2024',
+        name: 'Chi nhánh miền Bắc',
+        level: 1,
+    },
+    {
+        id: 'south-branch',
+        parentId: 'misa-2024',
+        name: 'Chi nhánh miền Nam',
+        level: 1,
+    },
+]
+
+const toggleOrganizationDropdown = () => {
+    isOrganizationDropdownOpen.value = !isOrganizationDropdownOpen.value;
+};
+
+const closeOrganizationDropdown = () => {
+    isOrganizationDropdownOpen.value = false;
+};
+
+const setOrganizationDropdownElement = (element: HTMLElement | null) => {
+    organizationDropdownRef.value = element;
+};
+
+const handleDocumentPointerDown = (event: PointerEvent) => {
+    if (!isOrganizationDropdownOpen.value) {
+        return;
+    }
+
+    const target = event.target as Node | null;
+
+    if (target && organizationDropdownRef.value?.contains(target)) {
+        return;
+    }
+
+    closeOrganizationDropdown();
+};
+
+const handleDocumentKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+        closeOrganizationDropdown();
+    }
+};
+
+onMounted(() => {
+    document.addEventListener('pointerdown', handleDocumentPointerDown);
+    document.addEventListener('keydown', handleDocumentKeydown);
+});
+
+onBeforeUnmount(() => {
+    document.removeEventListener('pointerdown', handleDocumentPointerDown);
+    document.removeEventListener('keydown', handleDocumentKeydown);
+});
 
 const queryObject = ref<GetSalaryCompositionsRequest>({
     pageIndex: 1,
@@ -175,9 +249,16 @@ onMounted(async () => {
 
         <div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-white">
             <div class="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2">
-                <SalaryCompositionLeftFilters :status="selectedStatus" :status-options="statusMenuOptions"
-                    @update:status="handleStatusChange" @search="handleSearch" />
-                <SalaryCompositionRightActions />
+                <SalaryCompositionLeftFilters :organization-items="organizationTreeItems"
+                    :is-organization-dropdown-open="isOrganizationDropdownOpen"
+                    v-model:show-inactive-organizations="showInactiveOrganizations" :status="selectedStatus"
+                    :status-options="statusMenuOptions" @toggle-organization-dropdown="toggleOrganizationDropdown"
+                    @set-organization-dropdown-el="setOrganizationDropdownElement" @update:status="handleStatusChange"
+                    @search="handleSearch">
+                </SalaryCompositionLeftFilters>
+
+                <SalaryCompositionRightActions>
+                </SalaryCompositionRightActions>
             </div>
 
             <div class="relative min-h-0 flex-1 overflow-auto">
