@@ -255,7 +255,9 @@ onBeforeUnmount(() => {
 
         <div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-white">
             <div class="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2">
-                <SalaryCompositionLeftFilters @update:show-inactive-organizations="handleShowAllOrganization"
+                <SalaryCompositionLeftFilters
+                    :show-inactive-organizations="organizationQueryObject.trackingStatus === undefined"
+                    @update:show-inactive-organizations="handleShowAllOrganization"
                     :organization-items="organizationTreeItems"
                     :is-organization-dropdown-open="isOrganizationDropdownOpen" :status="selectedStatus"
                     :status-options="statusMenuOptions" @toggle-organization-dropdown="toggleOrganizationDropdown"
