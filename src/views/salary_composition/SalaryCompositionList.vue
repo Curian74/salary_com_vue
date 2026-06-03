@@ -16,6 +16,8 @@ import type { LookupResponse, PagedResult } from '@/types/apiResponse.ts';
 import type { MsMenuOption } from '@/components/base/MsMenu.vue';
 import { trackingStatusLabels } from '@/constants/trackingStatusLabels.ts';
 import localStorageKeys from '@/constants/localStorageKeys.ts';
+import type { GetOrganizationTreeRequest, GetOrganizationTreeResponse } from '@/types/organization.ts';
+import organizationApi from '@/apis/organizationApi.ts';
 
 const columns = ref<GetGridConfigsResponse[]>([]);
 const isTableLoading = ref(false);
@@ -31,31 +33,6 @@ interface OrganizationTreeItem {
     level: number
     expanded?: boolean
 }
-
-const organizationDropdownRef = ref<HTMLElement | null>(null);
-const isOrganizationDropdownOpen = ref(false);
-const showInactiveOrganizations = ref(false);
-
-const organizationTreeItems: OrganizationTreeItem[] = [
-    {
-        id: 'misa-2024',
-        name: 'Misa Test pdthien 2024',
-        level: 0,
-        expanded: true,
-    },
-    {
-        id: 'north-branch',
-        parentId: 'misa-2024',
-        name: 'Chi nhánh miền Bắc',
-        level: 1,
-    },
-    {
-        id: 'south-branch',
-        parentId: 'misa-2024',
-        name: 'Chi nhánh miền Nam',
-        level: 1,
-    },
-]
 
 const toggleOrganizationDropdown = () => {
     isOrganizationDropdownOpen.value = !isOrganizationDropdownOpen.value;
@@ -98,6 +75,13 @@ onBeforeUnmount(() => {
     document.removeEventListener('pointerdown', handleDocumentPointerDown);
     document.removeEventListener('keydown', handleDocumentKeydown);
 });
+
+const organizationDropdownRef = ref<HTMLElement | null>(null);
+const isOrganizationDropdownOpen = ref(false);
+const organizationQueryObject = ref<GetOrganizationTreeRequest>({
+    trackingStatus: TrackingStatus.Active,
+});
+const organizationTreeItems = ref<GetOrganizationTreeResponse[]>();
 
 const queryObject = ref<GetSalaryCompositionsRequest>({
     pageIndex: 1,
@@ -181,6 +165,10 @@ const pagedData = computed(() => {
     return salaryCompositions.value;
 })
 
+const isShowInactiveOrganizations = computed(() => {
+    return organizationQueryObject.value.trackingStatus === TrackingStatus.Active;
+})
+
 const fetchTrackingStatuses = async () => {
     try {
         const response = await lookupApi.getTrackingStatuses();
@@ -190,6 +178,17 @@ const fetchTrackingStatuses = async () => {
     catch (err) {
         console.log(err);
         trackingStatusOptions.value = [];
+    }
+}
+
+const fetchOrganizationTree = async () => {
+    try {
+        const response = await organizationApi.fetchOrganizationTree(organizationQueryObject.value);
+        organizationTreeItems.value = response.value
+    }
+    catch (err) {
+        console.log(err);
+        organizationTreeItems.value = [];
     }
 }
 
@@ -229,6 +228,7 @@ onMounted(async () => {
 
         await fetchTrackingStatuses();
         await fetchSalaryCompositions();
+        await fetchOrganizationTree();
     }
     catch (err) {
         console.log(err);
@@ -251,7 +251,7 @@ onMounted(async () => {
             <div class="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2">
                 <SalaryCompositionLeftFilters :organization-items="organizationTreeItems"
                     :is-organization-dropdown-open="isOrganizationDropdownOpen"
-                    v-model:show-inactive-organizations="showInactiveOrganizations" :status="selectedStatus"
+                    v-model:show-inactive-organizations="isShowInactiveOrganizations" :status="selectedStatus"
                     :status-options="statusMenuOptions" @toggle-organization-dropdown="toggleOrganizationDropdown"
                     @set-organization-dropdown-el="setOrganizationDropdownElement" @update:status="handleStatusChange"
                     @search="handleSearch">

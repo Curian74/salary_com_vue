@@ -5,6 +5,10 @@ defineOptions({
     inheritAttrs: false,
 })
 
+interface TreeViewItemTemplateContext<T> {
+    data: T;
+}
+
 interface Props {
     items: T[];
     keyExpr?: string; // Key để định danh từng node
@@ -29,9 +33,11 @@ const props = withDefaults(defineProps<Props>(), {
             :display-expr="displayExpr" :parent-id-expr="parentIdExpr"
             :show-check-boxes-mode="selectable ? 'normal' : 'none'" :selection-mode="multiple ? 'multiple' : 'single'"
             :select-nodes-recursive="multiple" :select-by-click="false" no-data-text="Không có dữ liệu">
-            <template #item="item">
-                <slot name="item" :item="item.data">
-                    <span class="truncate">{{ item.data?.[displayExpr] }}</span>
+            <template #item="slotProps">
+                <slot name="item" :item="slotProps.data as T">
+                    <span>
+                        {{ slotProps.data[displayExpr] }}
+                    </span>
                 </slot>
             </template>
         </DxTreeView>

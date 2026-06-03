@@ -6,11 +6,12 @@ import MsCheckbox from '@/components/base/MsCheckbox.vue';
 import MsMenu, { type MsMenuOption } from '@/components/base/MsMenu.vue';
 import MsTreeView from '@/components/base/MsTreeView.vue';
 import SalaryCompositionSearch from './SalaryCompositionSearch.vue';
+import type { GetOrganizationTreeResponse } from '@/types/organization.ts';
 
 interface SalaryCompositionLeftFiltersProps {
     status?: string | number | null
     statusOptions?: MsMenuOption[]
-    organizationItems?: Record<string, any>[]
+    organizationItems?: GetOrganizationTreeResponse[]
     isOrganizationDropdownOpen?: boolean
     showInactiveOrganizations?: boolean
 }
@@ -92,7 +93,7 @@ const setOrganizationDropdownElement = (element: Element | ComponentPublicInstan
             <MsTreeView :items="organizationItems" key-expr="id" parent-id-expr="parentId" display-expr="name"
                 class="salary-organization-tree max-h-64 overflow-auto">
                 <template #item="{ item }">
-                    <span class="block truncate" :class="item.level <= 1 ? 'font-semibold text-text-primary' : ''">
+                    <span class="block truncate" :class="item.hasChildren ? 'font-medium text-text-primary' : ''">
                         {{ item.name }}
                     </span>
                 </template>
@@ -108,26 +109,4 @@ const setOrganizationDropdownElement = (element: Element | ComponentPublicInstan
     </div>
 </template>
 
-<style scoped>
-.salary-organization-tree :deep(.dx-treeview-node-container) {
-    padding: 0;
-}
-
-.salary-organization-tree :deep(.dx-treeview-item) {
-    min-height: 38px;
-    padding-block: 0;
-    color: var(--app-color-text-primary);
-}
-
-.salary-organization-tree :deep(.dx-treeview-item-with-checkbox .dx-treeview-item) {
-    padding-left: 0;
-}
-
-.salary-organization-tree :deep(.dx-treeview-node.dx-state-selected > .dx-treeview-item) {
-    background-color: var(--app-color-focus);
-}
-
-.salary-organization-tree :deep(.dx-treeview-node.dx-state-hover > .dx-treeview-item) {
-    background-color: #f8f9fb;
-}
-</style>
+<style scoped></style>
