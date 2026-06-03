@@ -81,7 +81,11 @@ const setDropdownElement = (element: Element | ComponentPublicInstance | null) =
     background-color: var(--app-color-focus);
 }
 
-.salary-organization-tree :deep(.dx-treeview-node.dx-state-hover > .dx-treeview-item) {
+.salary-organization-tree :deep(.dx-treeview-node.dx-state-hover:not(.dx-state-selected) > .dx-treeview-item) {
     background-color: #f8f9fb;
+}
+
+.salary-organization-tree :deep(.dx-treeview-node.dx-state-selected.dx-state-hover > .dx-treeview-item) {
+    background-color: #cdeadf;
 }
 </style>
