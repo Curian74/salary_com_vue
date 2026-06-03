@@ -5,10 +5,6 @@ defineOptions({
     inheritAttrs: false,
 })
 
-interface TreeViewItemTemplateContext<T> {
-    data: T;
-}
-
 interface Props {
     items: T[];
     keyExpr?: string; // Key để định danh từng node

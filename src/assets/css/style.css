@@ -66,6 +66,7 @@
 body {
     margin: 0;
     padding: 0;
+    font-family: var(--font-sans);
 }
 
 .v-popper--theme-ms-tooltip {

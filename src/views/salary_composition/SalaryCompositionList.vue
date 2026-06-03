@@ -26,14 +26,6 @@ const trackingStatusOptions = ref<LookupResponse[]>([]);
 
 const pageSize = Number(localStorage.getItem(localStorageKeys.PAGE_SIZE_KEY)) || 15;
 
-interface OrganizationTreeItem {
-    id: string
-    parentId?: string
-    name: string
-    level: number
-    expanded?: boolean
-}
-
 const toggleOrganizationDropdown = () => {
     isOrganizationDropdownOpen.value = !isOrganizationDropdownOpen.value;
 };
@@ -65,16 +57,6 @@ const handleDocumentKeydown = (event: KeyboardEvent) => {
         closeOrganizationDropdown();
     }
 };
-
-onMounted(() => {
-    document.addEventListener('pointerdown', handleDocumentPointerDown);
-    document.addEventListener('keydown', handleDocumentKeydown);
-});
-
-onBeforeUnmount(() => {
-    document.removeEventListener('pointerdown', handleDocumentPointerDown);
-    document.removeEventListener('keydown', handleDocumentKeydown);
-});
 
 const organizationDropdownRef = ref<HTMLElement | null>(null);
 const isOrganizationDropdownOpen = ref(false);
@@ -209,6 +191,15 @@ const fetchSalaryCompositions = async () => {
     }
 }
 
+const handleShowAllOrganization = () => {
+    if (organizationQueryObject.value.trackingStatus === TrackingStatus.Active) {
+        organizationQueryObject.value.trackingStatus = undefined;
+    }
+    else {
+        organizationQueryObject.value.trackingStatus = TrackingStatus.Active;
+    }
+}
+
 watch(
     () => [
         queryObject.value.pageIndex,
@@ -217,6 +208,13 @@ watch(
         queryObject.value.trackingStatus,
     ],
     fetchSalaryCompositions
+);
+
+watch(
+    () => [
+        organizationQueryObject.value.trackingStatus,
+    ],
+    fetchOrganizationTree
 );
 
 onMounted(async () => {
@@ -229,6 +227,9 @@ onMounted(async () => {
         await fetchTrackingStatuses();
         await fetchSalaryCompositions();
         await fetchOrganizationTree();
+
+        document.addEventListener('pointerdown', handleDocumentPointerDown);
+        document.addEventListener('keydown', handleDocumentKeydown);
     }
     catch (err) {
         console.log(err);
@@ -236,6 +237,11 @@ onMounted(async () => {
     finally {
         isTableLoading.value = false;
     }
+});
+
+onBeforeUnmount(() => {
+    document.removeEventListener('pointerdown', handleDocumentPointerDown);
+    document.removeEventListener('keydown', handleDocumentKeydown);
 });
 
 </script>
@@ -249,9 +255,9 @@ onMounted(async () => {
 
         <div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-white">
             <div class="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2">
-                <SalaryCompositionLeftFilters :organization-items="organizationTreeItems"
-                    :is-organization-dropdown-open="isOrganizationDropdownOpen"
-                    v-model:show-inactive-organizations="isShowInactiveOrganizations" :status="selectedStatus"
+                <SalaryCompositionLeftFilters @update:show-inactive-organizations="handleShowAllOrganization"
+                    :organization-items="organizationTreeItems"
+                    :is-organization-dropdown-open="isOrganizationDropdownOpen" :status="selectedStatus"
                     :status-options="statusMenuOptions" @toggle-organization-dropdown="toggleOrganizationDropdown"
                     @set-organization-dropdown-el="setOrganizationDropdownElement" @update:status="handleStatusChange"
                     @search="handleSearch">

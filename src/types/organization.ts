@@ -9,5 +9,5 @@ export interface GetOrganizationTreeResponse {
 }
 
 export interface GetOrganizationTreeRequest {
-    trackingStatus: TrackingStatus
+    trackingStatus?: TrackingStatus
 }

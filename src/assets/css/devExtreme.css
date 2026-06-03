@@ -1,0 +1,18 @@
+.dx-widget,
+.dx-overlay-wrapper,
+.dx-overlay-content,
+.dx-popup-wrapper,
+.dx-popup-content,
+.dx-menu,
+.dx-treeview,
+.dx-treeview-item,
+.dx-checkbox,
+.dx-button,
+.dx-texteditor,
+.dx-texteditor-input {
+    font-family: var(--font-sans);
+}
+
+.dx-widget {
+    color: var(--app-color-text-primary);
+}
