@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import 'devextreme/dist/css/dx.light.css'
 import './assets/css/style.css'
 import 'floating-vue/dist/style.css'
 import router from './router'
