@@ -5,7 +5,10 @@ import type { ApiResponse, PagedResult } from "@/types/apiResponse";
 const fetchSalaryCompositions = async (params?: GetSalaryCompositionsRequest)
     : Promise<ApiResponse<PagedResult<GetSalaryCompositionsResponse>>> => {
     const response = await axiosClient.get('/SalaryCompositions/paged', {
-        params
+        params,
+        paramsSerializer: {
+            indexes: null,
+        },
     })
     return response.data;
 }

@@ -11,6 +11,7 @@ interface SalaryCompositionLeftFiltersProps {
     organizationItems?: GetOrganizationTreeResponse[]
     isOrganizationDropdownOpen?: boolean
     showInactiveOrganizations?: boolean
+    selectedOrganizationIds?: string[]
 }
 
 withDefaults(defineProps<SalaryCompositionLeftFiltersProps>(), {
@@ -19,6 +20,7 @@ withDefaults(defineProps<SalaryCompositionLeftFiltersProps>(), {
     organizationItems: () => [],
     isOrganizationDropdownOpen: false,
     showInactiveOrganizations: false,
+    selectedOrganizationIds: () => [],
 });
 
 const emit = defineEmits<{
@@ -26,7 +28,8 @@ const emit = defineEmits<{
     'update:status': [value: string | number | null]
     'update:showInactiveOrganizations': [value: boolean]
     'toggle-organization-dropdown': []
-    'set-organization-dropdown-el': [element: HTMLElement | null]
+    'set-organization-dropdown-el': [element: HTMLElement | null],
+    'update:selectedOrganizationIds': [string[]]
 }>();
 </script>
 
@@ -37,8 +40,9 @@ const emit = defineEmits<{
         @update:status="value => emit('update:status', value)" />
 
     <SalaryCompositionOrganizationFilter :organization-items="organizationItems" :is-open="isOrganizationDropdownOpen"
-        :show-inactive-organizations="showInactiveOrganizations"
+        :show-inactive-organizations="showInactiveOrganizations" :selected-organization-ids="selectedOrganizationIds"
         @update:show-inactive-organizations="value => emit('update:showInactiveOrganizations', value)"
+        @update:selected-organization-ids="value => emit('update:selectedOrganizationIds', value)"
         @toggle="emit('toggle-organization-dropdown')"
         @set-dropdown-el="element => emit('set-organization-dropdown-el', element)" />
 </template>

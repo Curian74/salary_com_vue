@@ -69,6 +69,7 @@ const queryObject = ref<GetSalaryCompositionsRequest>({
     pageIndex: 1,
     pageSize,
     searchTerm: '',
+    organizationIds: null,
 });
 
 const salaryCompositions = ref<PagedResult<GetSalaryCompositionsResponse>>({
@@ -136,6 +137,11 @@ const handleStatusChange = (status: string | number | null) => {
     queryObject.value.trackingStatus = selectedStatus.value;
 }
 
+const handleOrganizationIdsChange = (organizationIds: string[]) => {
+    queryObject.value.pageIndex = 1;
+    queryObject.value.organizationIds = organizationIds.length > 0 ? organizationIds : null;
+}
+
 const handlePageSizeChange = (pageSize: number) => {
     queryObject.value.pageIndex = 1;
     const pageSizeString = pageSize.toString();
@@ -148,7 +154,7 @@ const pagedData = computed(() => {
 })
 
 const isShowInactiveOrganizations = computed(() => {
-    return organizationQueryObject.value.trackingStatus === TrackingStatus.Active;
+    return organizationQueryObject.value.trackingStatus === undefined;
 })
 
 const fetchTrackingStatuses = async () => {
@@ -206,6 +212,7 @@ watch(
         queryObject.value.pageSize,
         queryObject.value.searchTerm,
         queryObject.value.trackingStatus,
+        queryObject.value.organizationIds,
     ],
     fetchSalaryCompositions
 );
@@ -255,8 +262,9 @@ onBeforeUnmount(() => {
 
         <div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-white">
             <div class="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2">
-                <SalaryCompositionLeftFilters
-                    :show-inactive-organizations="organizationQueryObject.trackingStatus === undefined"
+                <SalaryCompositionLeftFilters :selected-organization-ids="queryObject.organizationIds ?? []"
+                    @update:selected-organization-ids="handleOrganizationIdsChange"
+                    :show-inactive-organizations="isShowInactiveOrganizations"
                     @update:show-inactive-organizations="handleShowAllOrganization"
                     :organization-items="organizationTreeItems"
                     :is-organization-dropdown-open="isOrganizationDropdownOpen" :status="selectedStatus"

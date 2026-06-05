@@ -12,6 +12,7 @@ interface Props {
     displayExpr?: string; // Field hiển thị label lên UI
     selectable?: boolean;
     multiple?: boolean;
+    selectedKeys?: string[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -20,19 +21,29 @@ const props = withDefaults(defineProps<Props>(), {
     displayExpr: 'text',
     selectable: true,
     multiple: true,
+    selectedKeys: () => [],
 });
 
 function getItem(data: unknown): T {
     return data as T;
 }
 
+const emit = defineEmits<{
+    'update:selectedKeys': [string[]]
+}>()
+
+function handleSelectionChanged(e: any) {
+    emit('update:selectedKeys', e.component.getSelectedNodeKeys().map((key: unknown) => String(key)))
+}
+
 </script>
 <template>
     <div class="ms-tree-view text-[13px] text-text-primary">
-        <DxTreeView v-bind="$attrs" :data-source="items" data-structure="plain" :key-expr="keyExpr"
-            :display-expr="displayExpr" :parent-id-expr="parentIdExpr"
-            :show-check-boxes-mode="selectable ? 'normal' : 'none'" :selection-mode="multiple ? 'multiple' : 'single'"
-            :select-nodes-recursive="multiple" :select-by-click="false" no-data-text="Không có dữ liệu">
+        <DxTreeView @selection-changed="handleSelectionChanged" v-bind="$attrs" :selected-item-keys="selectedKeys"
+            :data-source="items" data-structure="plain" :key-expr="keyExpr" :display-expr="displayExpr"
+            :parent-id-expr="parentIdExpr" :show-check-boxes-mode="selectable ? 'normal' : 'none'"
+            :selection-mode="multiple ? 'multiple' : 'single'" :select-nodes-recursive="multiple"
+            :select-by-click="false" no-data-text="Không có dữ liệu">
             <template #item="slotProps">
                 <slot name="item" :item="getItem(slotProps.data)">
                     <span>
