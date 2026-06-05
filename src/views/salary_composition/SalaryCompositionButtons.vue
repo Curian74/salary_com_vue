@@ -2,6 +2,9 @@
 import MsButton from '@/components/base/MsButton.vue'
 import MsIcon from '@/components/base/MsIcon.vue';
 import MsMenu, { type MsMenuOption } from '@/components/base/MsMenu.vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const addMenuOptions: MsMenuOption[] = [
   {
@@ -9,6 +12,10 @@ const addMenuOptions: MsMenuOption[] = [
     label: 'Chọn từ danh mục của hệ thống',
   },
 ];
+
+const handleAddClick = () => {
+  router.push({ name: 'SalaryCompositionAdd' });
+};
 </script>
 
 <template>
@@ -23,7 +30,7 @@ const addMenuOptions: MsMenuOption[] = [
     <MsMenu :options="addMenuOptions" :width="280" align="right">
       <template #trigger="{ open, isOpen }">
         <div class="inline-flex h-9 rounded-lg bg-primary text-white shadow-sm">
-          <MsButton variant="primary" class="rounded-r-none! shadow-none!">
+          <MsButton variant="primary" class="rounded-r-none! shadow-none!" @click="handleAddClick">
             <template #prepend>
               <MsIcon name="salary-add" />
             </template>
