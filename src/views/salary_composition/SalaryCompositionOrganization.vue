@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, type ComponentPublicInstance } from 'vue';
+import { computed, ref, type ComponentPublicInstance } from 'vue';
 import MsButton from '@/components/base/MsButton.vue';
 import MsCheckbox from '@/components/base/MsCheckbox.vue';
 import MsTreeView from '@/components/base/MsTreeView.vue';
@@ -26,6 +26,8 @@ const emit = defineEmits<{
     'set-dropdown-el': [element: HTMLElement | null],
     'update:selectedOrganizationIds': [string[]]
 }>();
+
+const treeViewRef = ref<any>(null);
 
 const setDropdownElement = (element: Element | ComponentPublicInstance | null) => {
     emit('set-dropdown-el', element instanceof HTMLElement ? element : null);
@@ -61,6 +63,11 @@ const removeOrganization = (id: string) => {
 };
 
 const clearOrganizations = () => {
+    const treeInstance = treeViewRef.value?.instance;
+    if (treeInstance) {
+        treeInstance.unselectAll();   // Clears all checked nodes
+        treeInstance.collapseAll();   // Collapses all expanded nodes
+    }
     updateSelectedOrganizationIds([]);
 };
 
@@ -91,11 +98,7 @@ const handleRemoveKeydown = (event: KeyboardEvent, id: string) => {
                             :aria-label="`Bỏ chọn ${primaryOrganization.name}`"
                             @click.stop="removeOrganization(primaryOrganization.id)"
                             @keydown.stop="handleRemoveKeydown($event, primaryOrganization.id)">
-                            <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M18 6 6 18" />
-                                <path d="m6 6 12 12" />
-                            </svg>
+                            X
                         </span>
                     </span>
                 </template>

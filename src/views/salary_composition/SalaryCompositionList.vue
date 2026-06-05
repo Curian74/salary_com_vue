@@ -9,7 +9,6 @@ import lookupApi from '@/apis/lookupApi.ts';
 import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
 import SalaryCompositionSearch from './SalaryCompositionSearch.vue';
 import SalaryCompositionStatusFilter from './SalaryCompositionStatusFilter.vue';
-import SalaryCompositionOrganizationFilter from './SalaryCompositionOrganizationFilter.vue';
 import SalaryCompositionRightActions from './SalaryCompositionRightActions.vue';
 import gridKeys from '@/constants/gridKeys.ts';
 import SalaryCompositionPagination from './SalaryCompositionPagination.vue';
@@ -20,6 +19,7 @@ import { trackingStatusLabels } from '@/constants/trackingStatusLabels.ts';
 import localStorageKeys from '@/constants/localStorageKeys.ts';
 import type { GetOrganizationTreeRequest, GetOrganizationTreeResponse } from '@/types/organization.ts';
 import organizationApi from '@/apis/organizationApi.ts';
+import SalaryCompositionOrganization from './SalaryCompositionOrganization.vue';
 
 const columns = ref<GetGridConfigsResponse[]>([]);
 const isTableLoading = ref(false);
@@ -269,12 +269,12 @@ onBeforeUnmount(() => {
                 <SalaryCompositionStatusFilter :status="selectedStatus" :status-options="statusMenuOptions"
                     @update:status="handleStatusChange" />
 
-                <SalaryCompositionOrganizationFilter :selected-organization-ids="queryObject.organizationIds ?? []"
+                <SalaryCompositionOrganization :selected-organization-ids="queryObject.organizationIds ?? []"
                     :show-inactive-organizations="isShowInactiveOrganizations"
                     :organization-items="organizationTreeItems" :is-open="isOrganizationDropdownOpen"
                     @update:selected-organization-ids="handleOrganizationIdsChange"
-                    @update:show-inactive-organizations="handleShowAllOrganization"
-                    @toggle="toggleOrganizationDropdown" @set-dropdown-el="setOrganizationDropdownElement" />
+                    @update:show-inactive-organizations="handleShowAllOrganization" @toggle="toggleOrganizationDropdown"
+                    @set-dropdown-el="setOrganizationDropdownElement" />
 
                 <SalaryCompositionRightActions>
                 </SalaryCompositionRightActions>

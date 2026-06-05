@@ -1,4 +1,5 @@
 <script setup lang='ts' generic="T">
+import { ref, watch } from 'vue';
 import DxTreeView from 'devextreme-vue/tree-view';
 
 defineOptions({
@@ -13,6 +14,14 @@ interface Props {
     selectable?: boolean;
     multiple?: boolean;
     selectedKeys?: string[];
+}
+
+interface TreeViewComponentRef {
+    instance?: {
+        getSelectedNodeKeys: () => unknown[];
+        selectItem: (key: string) => void;
+        unselectAll: () => void;
+    }
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -32,18 +41,65 @@ const emit = defineEmits<{
     'update:selectedKeys': [string[]]
 }>()
 
+const treeViewRef = ref<TreeViewComponentRef | null>(null);
+let isSyncingSelection = false;
+
+function areSameKeys(first: string[], second: string[]) {
+    if (first.length !== second.length) {
+        return false;
+    }
+
+    return first.every((key, index) => key === second[index]);
+}
+
 function handleSelectionChanged(e: any) {
+    if (isSyncingSelection) {
+        return;
+    }
+
     emit('update:selectedKeys', e.component.getSelectedNodeKeys().map((key: unknown) => String(key)))
 }
+
+watch(
+    () => props.selectedKeys,
+    (selectedKeys) => {
+        const instance = treeViewRef.value?.instance;
+
+        if (!instance) {
+            return;
+        }
+
+        const normalizedSelectedKeys = selectedKeys.map((key) => String(key));
+        const currentSelectedKeys = instance.getSelectedNodeKeys().map((key) => String(key));
+
+        if (areSameKeys(currentSelectedKeys, normalizedSelectedKeys)) {
+            return;
+        }
+
+        isSyncingSelection = true;
+
+        try {
+            instance.unselectAll();
+
+            normalizedSelectedKeys.forEach((key) => {
+                instance.selectItem(key);
+            });
+        }
+        finally {
+            isSyncingSelection = false;
+        }
+    },
+    { flush: 'post' }
+);
 
 </script>
 <template>
     <div class="ms-tree-view text-[13px] text-text-primary">
-        <DxTreeView @selection-changed="handleSelectionChanged" v-bind="$attrs" :selected-item-keys="selectedKeys"
-            :data-source="items" data-structure="plain" :key-expr="keyExpr" :display-expr="displayExpr"
-            :parent-id-expr="parentIdExpr" :show-check-boxes-mode="selectable ? 'normal' : 'none'"
-            :selection-mode="multiple ? 'multiple' : 'single'" :select-nodes-recursive="multiple"
-            :select-by-click="false" no-data-text="Không có dữ liệu">
+        <DxTreeView ref="treeViewRef" @selection-changed="handleSelectionChanged" v-bind="$attrs"
+            :selected-item-keys="selectedKeys" :data-source="items" data-structure="plain" :key-expr="keyExpr"
+            :display-expr="displayExpr" :parent-id-expr="parentIdExpr"
+            :show-check-boxes-mode="selectable ? 'normal' : 'none'" :selection-mode="multiple ? 'multiple' : 'single'"
+            :select-nodes-recursive="multiple" :select-by-click="false" no-data-text="Không có dữ liệu">
             <template #item="slotProps">
                 <slot name="item" :item="getItem(slotProps.data)">
                     <span>
