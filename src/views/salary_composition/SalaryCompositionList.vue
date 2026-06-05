@@ -7,7 +7,9 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import gridConfigApi from '@/apis/gridConfigApi';
 import lookupApi from '@/apis/lookupApi.ts';
 import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
-import SalaryCompositionLeftFilters from './SalaryCompositionLeftFilters.vue';
+import SalaryCompositionSearch from './SalaryCompositionSearch.vue';
+import SalaryCompositionStatusFilter from './SalaryCompositionStatusFilter.vue';
+import SalaryCompositionOrganizationFilter from './SalaryCompositionOrganizationFilter.vue';
 import SalaryCompositionRightActions from './SalaryCompositionRightActions.vue';
 import gridKeys from '@/constants/gridKeys.ts';
 import SalaryCompositionPagination from './SalaryCompositionPagination.vue';
@@ -262,16 +264,17 @@ onBeforeUnmount(() => {
 
         <div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-white">
             <div class="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2">
-                <SalaryCompositionLeftFilters :selected-organization-ids="queryObject.organizationIds ?? []"
-                    @update:selected-organization-ids="handleOrganizationIdsChange"
+                <SalaryCompositionSearch @search="handleSearch" />
+
+                <SalaryCompositionStatusFilter :status="selectedStatus" :status-options="statusMenuOptions"
+                    @update:status="handleStatusChange" />
+
+                <SalaryCompositionOrganizationFilter :selected-organization-ids="queryObject.organizationIds ?? []"
                     :show-inactive-organizations="isShowInactiveOrganizations"
+                    :organization-items="organizationTreeItems" :is-open="isOrganizationDropdownOpen"
+                    @update:selected-organization-ids="handleOrganizationIdsChange"
                     @update:show-inactive-organizations="handleShowAllOrganization"
-                    :organization-items="organizationTreeItems"
-                    :is-organization-dropdown-open="isOrganizationDropdownOpen" :status="selectedStatus"
-                    :status-options="statusMenuOptions" @toggle-organization-dropdown="toggleOrganizationDropdown"
-                    @set-organization-dropdown-el="setOrganizationDropdownElement" @update:status="handleStatusChange"
-                    @search="handleSearch">
-                </SalaryCompositionLeftFilters>
+                    @toggle="toggleOrganizationDropdown" @set-dropdown-el="setOrganizationDropdownElement" />
 
                 <SalaryCompositionRightActions>
                 </SalaryCompositionRightActions>
