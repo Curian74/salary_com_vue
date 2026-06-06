@@ -1,6 +1,7 @@
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import SalaryCompositionAdd from '@/views/salary_composition/SalaryCompositionAdd.vue'
 import SalaryCompositionList from '@/views/salary_composition/SalaryCompositionList.vue'
+import Test from '@/views/Test.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -17,6 +18,11 @@ const routes = [
         path: 'add',
         name: 'SalaryCompositionAdd',
         component: SalaryCompositionAdd,
+      },
+      {
+        path: 'test',
+        name: 'test',
+        component: Test,
       },
     ],
   },

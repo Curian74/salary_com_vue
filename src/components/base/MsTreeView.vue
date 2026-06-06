@@ -1,6 +1,7 @@
 <script setup lang='ts' generic="T">
-import { ref, watch } from 'vue';
-import DxTreeView from 'devextreme-vue/tree-view';
+import { computed, ref, watch } from 'vue';
+import TreeSelect from './tree_view/TreeSelect.vue';
+import type { TreeNodeItem } from '@/types/treeNode';
 
 defineOptions({
     inheritAttrs: false,
@@ -8,20 +9,12 @@ defineOptions({
 
 interface Props {
     items: T[];
-    keyExpr?: string; // Key để định danh từng node
-    parentIdExpr?: string; // Key để định danh node cha
-    displayExpr?: string; // Field hiển thị label lên UI
+    keyExpr?: string;
+    parentIdExpr?: string;
+    displayExpr?: string;
     selectable?: boolean;
     multiple?: boolean;
     selectedKeys?: string[];
-}
-
-interface TreeViewComponentRef {
-    instance?: {
-        getSelectedNodeKeys: () => unknown[];
-        selectItem: (key: string) => void;
-        unselectAll: () => void;
-    }
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -33,207 +26,157 @@ const props = withDefaults(defineProps<Props>(), {
     selectedKeys: () => [],
 });
 
-function getItem(data: unknown): T {
-    return data as T;
-}
-
 const emit = defineEmits<{
     'update:selectedKeys': [string[]]
 }>()
 
-const treeViewRef = ref<TreeViewComponentRef | null>(null);
-let isSyncingSelection = false;
+defineSlots<{
+    item?: (props: { item: T }) => any;
+}>();
 
-function areSameKeys(first: string[], second: string[]) {
-    if (first.length !== second.length) {
-        return false;
-    }
+const expandedKeys = ref<Set<string>>(new Set());
 
-    return first.every((key, index) => key === second[index]);
+function getValue(item: T, expr: string): unknown {
+    return (item as Record<string, unknown>)[expr];
 }
 
-function handleSelectionChanged(e: any) {
-    if (isSyncingSelection) {
-        return;
-    }
+function toTreeNode(item: T): TreeNodeItem<T> {
+    const children = ((item as { children?: T[] }).children ?? []);
 
-    emit('update:selectedKeys', e.component.getSelectedNodeKeys().map((key: unknown) => String(key)))
+    return {
+        id: String(getValue(item, props.keyExpr)),
+        name: String(getValue(item, props.displayExpr) ?? ''),
+        raw: item,
+        children: children.map(toTreeNode),
+    };
+}
+
+const treeNodes = computed(() => props.items.map(toTreeNode));
+
+function getAllNodeIds(nodes: TreeNodeItem<T>[]): string[] {
+    return nodes.flatMap((node) => [
+        node.id,
+        ...getAllNodeIds(node.children ?? []),
+    ]);
 }
 
 watch(
-    () => props.selectedKeys,
-    (selectedKeys) => {
-        const instance = treeViewRef.value?.instance;
-
-        if (!instance) {
-            return;
-        }
-
-        const normalizedSelectedKeys = selectedKeys.map((key) => String(key));
-        const currentSelectedKeys = instance.getSelectedNodeKeys().map((key) => String(key));
-
-        if (areSameKeys(currentSelectedKeys, normalizedSelectedKeys)) {
-            return;
-        }
-
-        isSyncingSelection = true;
-
-        try {
-            instance.unselectAll();
-
-            normalizedSelectedKeys.forEach((key) => {
-                instance.selectItem(key);
-            });
-        }
-        finally {
-            isSyncingSelection = false;
-        }
+    treeNodes,
+    (nodes) => {
+        expandedKeys.value = new Set(getAllNodeIds(nodes));
     },
-    { flush: 'post' }
+    { immediate: true }
 );
 
+function toggleExpand(id: string) {
+    const next = new Set(expandedKeys.value);
+
+    if (next.has(id)) {
+        next.delete(id);
+    }
+    else {
+        next.add(id);
+    }
+
+    expandedKeys.value = next;
+}
+
+function updateSelectedKeys(keys: string[]) {
+    if (!props.multiple) {
+        emit('update:selectedKeys', keys.slice(-1));
+        return;
+    }
+
+    emit('update:selectedKeys', keys);
+}
+
+const instance = {
+    getSelectedNodeKeys: () => props.selectedKeys,
+
+    selectItem: (key: string) => {
+        updateSelectedKeys(Array.from(new Set([...props.selectedKeys, key])));
+    },
+
+    unselectAll: () => {
+        updateSelectedKeys([]);
+    },
+
+    collapseAll: () => {
+        expandedKeys.value = new Set();
+    },
+
+    expandAll: () => {
+        expandedKeys.value = new Set(getAllNodeIds(treeNodes.value));
+    },
+};
+
+defineExpose({ instance });
 </script>
+
 <template>
-    <div class="ms-tree-view text-[13px] text-text-primary">
-        <DxTreeView ref="treeViewRef" @selection-changed="handleSelectionChanged" v-bind="$attrs"
-            :selected-item-keys="selectedKeys" :data-source="items" data-structure="plain" :key-expr="keyExpr"
-            :display-expr="displayExpr" :parent-id-expr="parentIdExpr"
-            :show-check-boxes-mode="selectable ? 'normal' : 'none'" :selection-mode="multiple ? 'multiple' : 'single'"
-            :select-nodes-recursive="multiple" :select-by-click="false" no-data-text="Không có dữ liệu">
-            <template #item="slotProps">
-                <slot name="item" :item="getItem(slotProps.data)">
-                    <span>
-                        {{ slotProps.data[displayExpr] }}
-                    </span>
+    <div class="ms-tree-view text-[13px] text-text-primary" v-bind="$attrs">
+        <div v-if="treeNodes.length === 0" class="px-4 py-3 text-text-placeholder">
+            Không có dữ liệu
+        </div>
+
+        <TreeSelect v-else :nodes="treeNodes" :model-value="selectedKeys" :expanded-keys="expandedKeys"
+            :selectable="selectable" :multiple="multiple" @update:model-value="updateSelectedKeys"
+            @toggle-expand="toggleExpand">
+            <template #item="{ item }">
+                <slot name="item" :item="item">
+                    {{ (item as Record<string, unknown>)[displayExpr] }}
                 </slot>
             </template>
-        </DxTreeView>
+        </TreeSelect>
     </div>
 </template>
+
 <style scoped>
-:deep(.dx-treeview .dx-checkbox) {
-    line-height: 0;
+:deep(.ms-tree-node__row) {
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-right: 12px;
+    color: var(--app-color-text-primary);
 }
 
-:deep(.dx-treeview .dx-checkbox-container) {
-    width: 16px;
-    height: 16px;
+:deep(.ms-tree-node__row:hover) {
+    background-color: #f8f9fb;
 }
 
-:deep(.dx-treeview .dx-checkbox-icon) {
-    position: relative;
-    width: 16px;
-    height: 16px;
-    border: 1px solid #cfd4da;
-    border-radius: 4px;
-    background: #ffffff;
-    color: #ffffff;
-    box-sizing: border-box;
-    font-size: 0;
-    transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-:deep(.dx-treeview .dx-checkbox-icon::before) {
-    content: "";
-    display: none;
-}
-
-:deep(.dx-treeview .dx-checkbox-icon::after) {
-    content: "";
-    display: none;
-}
-
-:deep(.dx-treeview .dx-checkbox.dx-state-hover .dx-checkbox-icon),
-:deep(.dx-treeview .dx-checkbox:hover .dx-checkbox-icon) {
-    border-color: var(--app-color-primary);
-}
-
-:deep(.dx-treeview .dx-checkbox.dx-state-focused .dx-checkbox-icon),
-:deep(.dx-treeview .dx-treeview-item-with-checkbox.dx-state-focused > .dx-treeview-item .dx-checkbox-icon) {
-    box-shadow: 0 0 0 2px rgba(14, 154, 98, 0.2);
-}
-
-:deep(.dx-treeview .dx-checkbox-checked .dx-checkbox-icon),
-:deep(.dx-treeview .dx-checkbox-indeterminate .dx-checkbox-icon) {
-    border-color: var(--app-color-primary);
-    background: var(--app-color-primary);
-}
-
-:deep(.dx-treeview .dx-treeview-node),
-:deep(.dx-treeview .dx-treeview-node-container) {
-    overflow: visible;
-}
-
-:deep(.dx-treeview .dx-treeview-item) {
-    position: relative;
-    overflow: visible;
-    background-color: transparent !important;
-    box-shadow: none;
-}
-
-:deep(.dx-treeview .dx-treeview-item-content),
-:deep(.dx-treeview .dx-treeview-toggle-item-visibility),
-:deep(.dx-treeview .dx-checkbox) {
-    position: relative;
-    z-index: 1;
-}
-
-:deep(.dx-treeview .dx-treeview-node.dx-state-selected > .dx-treeview-item) {
-    background-color: var(--app-color-focus) !important;
-    box-shadow:
-        -100vw 0 0 100vw var(--app-color-focus),
-        100vw 0 0 100vw var(--app-color-focus);
+:deep(.ms-tree-node__row--selected) {
+    background-color: var(--app-color-focus);
     color: var(--app-color-primary);
     font-weight: 500;
 }
 
-:deep(.dx-treeview .dx-treeview-node.dx-state-selected.dx-state-hover > .dx-treeview-item) {
-    background-color: #cdeadf !important;
-    box-shadow:
-        -100vw 0 0 100vw #cdeadf,
-        100vw 0 0 100vw #cdeadf;
+:deep(.ms-tree-node__row--selected:hover) {
+    background-color: #cdeadf;
 }
 
-:deep(.dx-treeview .dx-treeview-node.dx-state-hover:not(.dx-state-selected) > .dx-treeview-item) {
-    background-color: #f8f9fb !important;
-    box-shadow:
-        -100vw 0 0 100vw #f8f9fb,
-        100vw 0 0 100vw #f8f9fb;
+:deep(.ms-tree-node__toggle) {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    border: 0;
+    background: transparent;
+    color: var(--app-color-icon);
+    cursor: pointer;
+    font-size: 10px;
+    line-height: 16px;
 }
 
-:deep(.dx-treeview .dx-treeview-node.dx-state-selected > .dx-treeview-item *) {
-    color: inherit !important;
+:deep(.ms-tree-node__checkbox) {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    flex-shrink: 0;
+    accent-color: var(--app-color-primary);
 }
 
-:deep(.dx-treeview .dx-checkbox-checked .dx-checkbox-icon::after) {
-    content: "";
-    display: block;
-    position: absolute;
-    top: 1px;
-    left: 5px;
-    width: 5px;
-    height: 9px;
-    border: solid #ffffff;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-    z-index: 1;
-}
-
-:deep(.dx-treeview .dx-checkbox-indeterminate .dx-checkbox-icon::after) {
-    content: "";
-    display: block;
-    position: absolute;
-    top: 6px;
-    left: 3px;
-    width: 8px;
-    height: 2px;
-    border-radius: 999px;
-    background: #ffffff;
-    z-index: 1;
-}
-
-:deep(.dx-treeview .dx-state-disabled .dx-checkbox-icon),
-:deep(.dx-treeview .dx-checkbox.dx-state-disabled .dx-checkbox-icon) {
-    opacity: 0.6;
+:deep(.ms-tree-node__content) {
+    min-width: 0;
+    flex: 1;
 }
 </style>

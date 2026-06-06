@@ -36,9 +36,14 @@ const setDropdownElement = (element: Element | ComponentPublicInstance | null) =
 const organizationById = computed(() => {
     const map = new Map<string, GetOrganizationTreeResponse>();
 
-    props.organizationItems.forEach((organization) => {
-        map.set(organization.id, organization);
-    });
+    function traverse(items: GetOrganizationTreeResponse[]) {
+        items.forEach((organization) => {
+            map.set(organization.id, organization);
+            traverse(organization.children ?? []);
+        });
+    }
+
+    traverse(props.organizationItems);
 
     return map;
 });
@@ -127,9 +132,9 @@ const handleRemoveKeydown = (event: KeyboardEvent, id: string) => {
 
         <div v-if="isOpen" class="absolute left-0 top-full z-10000 mt-1 w-full overflow-hidden
              rounded-lg border border-border bg-white shadow-[0_4px_16px_rgba(0,0,0,0.14)]">
-            <MsTreeView @update:selected-keys="updateSelectedOrganizationIds" :selected-keys="selectedOrganizationIds"
-                :items="organizationItems" key-expr="id" parent-id-expr="parentId" display-expr="name"
-                class="salary-organization-tree max-h-64 overflow-auto">
+            <MsTreeView ref="treeViewRef" @update:selected-keys="updateSelectedOrganizationIds"
+                :selected-keys="selectedOrganizationIds" :items="organizationItems" key-expr="id"
+                parent-id-expr="parentId" display-expr="name" class="salary-organization-tree max-h-64 overflow-auto">
                 <template #item="{ item }">
                     <span class="block truncate" :class="[
                         item.hasChildren ? 'font-medium text-text-primary' : '',
@@ -211,29 +216,7 @@ const handleRemoveKeydown = (event: KeyboardEvent, id: string) => {
     color: #9aa0a6;
 }
 
-.salary-organization-tree :deep(.dx-treeview-node-container) {
-    padding: 0;
-}
-
-.salary-organization-tree :deep(.dx-treeview-item) {
+.salary-organization-tree :deep(.ms-tree-node__row) {
     min-height: 38px;
-    padding-block: 0;
-    color: var(--app-color-text-primary);
-}
-
-.salary-organization-tree :deep(.dx-treeview-item-with-checkbox .dx-treeview-item) {
-    padding-left: 0;
-}
-
-.salary-organization-tree :deep(.dx-treeview-node.dx-state-selected > .dx-treeview-item) {
-    background-color: var(--app-color-focus);
-}
-
-.salary-organization-tree :deep(.dx-treeview-node.dx-state-hover:not(.dx-state-selected) > .dx-treeview-item) {
-    background-color: #f8f9fb;
-}
-
-.salary-organization-tree :deep(.dx-treeview-node.dx-state-selected.dx-state-hover > .dx-treeview-item) {
-    background-color: #cdeadf;
 }
 </style>

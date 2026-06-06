@@ -6,6 +6,7 @@ export interface GetOrganizationTreeResponse {
     parentId: string;
     trackingStatus: TrackingStatus;
     hasChildren: boolean;
+    children?: GetOrganizationTreeResponse[];
 }
 
 export interface GetOrganizationTreeRequest {
