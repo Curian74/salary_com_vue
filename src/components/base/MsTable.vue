@@ -11,10 +11,15 @@ interface MsTableProps {
     isLoading?: boolean;
     formatters?: Record<string, (value: any, row: T) => string>
     rowKey?: keyof T;
+    columnWidths?: Record<string, number>;
+    maxChars?: number;
+    maxCharsByColumn?: Record<string, number>;
 }
 
 const props = defineProps<MsTableProps>();
 const selectedRowKeys = ref(new Set<string>());
+const selectionColumnWidth = 48;
+const defaultMaxChars = 28;
 
 const isAllSelected = computed(() => {
     // Kiểm tra xem selectedKeys có chứa tất cả row từ data gốc
@@ -39,8 +44,58 @@ const visibleColumns = computed(() => {
 
 const tableColspan = computed(() => visibleColumns.value.length + 1);
 
+const tableMinWidth = computed(() => {
+    return visibleColumns.value.reduce((total, column) => {
+        return total + (getColumnWidth(column) ?? 0);
+    }, selectionColumnWidth);
+});
+
+const hasColumnWidths = computed(() => {
+    return visibleColumns.value.some(column => props.columnWidths?.[column.fieldKey] !== undefined);
+});
+
+const tableStyle = computed(() => {
+    if (!hasColumnWidths.value) {
+        return { width: '100%' };
+    }
+
+    return {
+        minWidth: `${tableMinWidth.value}px`,
+        width: `max(100%, ${tableMinWidth.value}px)`,
+    };
+});
+
 const getRowKey = (row: T) => {
     return props.rowKey ? row[props.rowKey] : row.code;
+}
+
+const getColumnWidth = (column: GridConfig) => {
+    return props.columnWidths?.[column.fieldKey] ?? null;
+}
+
+const getColumnMaxChars = (column: GridConfig) => {
+    return props.maxCharsByColumn?.[column.fieldKey]
+        ?? props.maxChars
+        ?? defaultMaxChars;
+}
+
+const getCellRawText = (row: T, column: GridConfig) => {
+    const value = props.formatters?.[column.fieldKey]?.(row[column.fieldKey], row)
+        ?? row[column.fieldKey]
+        ?? '--';
+
+    return String(value);
+}
+
+const getCellText = (row: T, column: GridConfig) => {
+    const text = getCellRawText(row, column);
+    const maxChars = getColumnMaxChars(column);
+
+    if (text.length <= maxChars) {
+        return text;
+    }
+
+    return `${text.slice(0, maxChars).trimEnd()}...`;
 }
 
 const handleSelectAll = () => {
@@ -81,24 +136,30 @@ watch(selectedRowKeys, () => {
 
 </script>
 <template>
-    <table v-bind="$attrs">
+    <table v-bind="$attrs" class="ms-table table-fixed" :style="tableStyle">
+        <colgroup>
+            <col :style="{ width: `${selectionColumnWidth}px` }">
+            <col v-for="column in visibleColumns" :key="column.fieldKey"
+                :style="getColumnWidth(column) ? { width: `${getColumnWidth(column)}px` } : undefined">
+        </colgroup>
+
         <thead class="sticky top-0 z-10 bg-grid-header">
             <tr>
-                <th class="h-9 w-12 border-b border-border px-4 text-center align-middle">
+                <th class="h-10 w-12 border-b border-border px-4 text-center align-middle">
                     <ms-checkbox @change="handleSelectAll" :checked="isAllSelected"
                         :indeterminate="isIndeterminate"></ms-checkbox>
                 </th>
 
-                <th class="h-9 border-b border-r border-border px-3 text-[13px] font-semibold text-[#001b44]"
-                    v-for="column in visibleColumns" :key="column.fieldKey">
-                    <span class="inline-flex items-center gap-2 text-[13px]">
+                <th class="ms-table__head-cell h-10 border-b border-r border-border px-3 text-[13px] font-semibold text-[#001b44]"
+                    v-for="column in visibleColumns" :key="column.fieldKey" :title="column.columnName">
+                    <span class="ms-table__header-content text-[13px]">
                         <svg v-if="column.isPinned" class="size-4 text-[#6b7280]" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             aria-hidden="true">
                             <path d="M12 17v5" />
                             <path d="M9 3h6l1 7 3 3H5l3-3Z" />
                         </svg>
-                        {{ column.columnName }}
+                        <span class="min-w-0 truncate">{{ column.columnName }}</span>
                     </span>
                 </th>
             </tr>
@@ -115,17 +176,18 @@ watch(selectedRowKeys, () => {
         </tbody>
 
         <tbody v-else>
-            <tr v-if="rows.length > 0" v-for="row in rows" :key="row.code"
+            <tr v-if="rows.length > 0" v-for="row in rows" :key="getRowKey(row)"
                 class="bg-white hover:bg-[#cdeadf] hover:cursor-pointer">
-                <td class="h-9 border-b border-border px-4 text-center">
+                <td class="h-10 border-b border-border px-4 text-center align-middle">
                     <ms-checkbox @change="checked => handleSelectRow(row, checked)" :checked="isRowSelected(row)">
                     </ms-checkbox>
                 </td>
                 <td v-for="column in visibleColumns" :key="column.fieldKey"
-                    class="h-9 border-b border-border px-3 text-[#001b44]">
-                    <slot :name="column.fieldKey" :row="row" :column="column">
-                        {{ formatters?.[column.fieldKey]?.(row[column.fieldKey], row)
-                            ?? row[column.fieldKey] ?? '--' }}
+                    class="ms-table__cell h-10 border-b border-border px-3 text-[#001b44]"
+                    :title="getCellRawText(row, column)">
+                    <slot :name="column.fieldKey" :row="row" :column="column" :value="getCellRawText(row, column)"
+                        :display-value="getCellText(row, column)">
+                        <span class="ms-table__cell-content">{{ getCellText(row, column) }}</span>
                     </slot>
                 </td>
             </tr>
@@ -144,4 +206,38 @@ watch(selectedRowKeys, () => {
     </table>
 </template>
 
-<style scoped></style>
+<style scoped>
+.ms-table {
+    table-layout: fixed;
+}
+
+.ms-table__head-cell,
+.ms-table__cell {
+    box-sizing: border-box;
+    max-width: 0;
+}
+
+.ms-table__header-content {
+    display: inline-flex;
+    min-width: 0;
+    max-width: 100%;
+    align-items: center;
+    gap: 8px;
+}
+
+.ms-table__header-content svg {
+    flex-shrink: 0;
+}
+
+.ms-table__cell {
+    vertical-align: middle;
+}
+
+.ms-table__cell-content {
+    display: block;
+    overflow: hidden;
+    max-width: 100%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+</style>

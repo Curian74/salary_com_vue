@@ -38,12 +38,44 @@ const formatters = {
     valueType: (value: ValueType) => valueTypeText[value] ?? '--',
 }
 
+const maxCharsByColumn = {
+    code: 22,
+    name: 22,
+    organizationUnitNames: 34,
+    compositionNature: 14,
+    compositionType: 16,
+    incomeTaxType: 16,
+    deductionType: 16,
+    valueType: 14,
+    valueFormula: 26,
+    description: 34,
+    optionShowPaycheck: 16,
+}
+
+const columnWidths = {
+    code: 180,
+    name: 150,
+    organizationUnitNames: 220,
+    compositionNature: 100,
+    compositionType: 120,
+    incomeTaxType: 110,
+    deductionType: 110,
+    valueType: 100,
+    valueFormula: 180,
+    description: 240,
+    optionShowPaycheck: 130,
+    sourceType: 120,
+    status: 140,
+    autoSumEmployeeType: 160,
+}
+
 const props = defineProps<SalaryCompositionTableProps>();
 
 </script>
 <template>
-    <MsTable class="min-w-372.5 border-separate border-spacing-0 text-left text-[14px]" :is-loading="isLoading"
-        :columns="columns" :rows="rows" :formatters="formatters">
+    <MsTable class="border-separate border-spacing-0 text-left text-[14px]" :is-loading="isLoading" :columns="columns"
+        :rows="rows" :formatters="formatters" :column-widths="columnWidths"
+        :max-chars-by-column="maxCharsByColumn">
 
         <template #status="{ row }">
             <MsStatus :text="trackingStatusText[row.status] ?? '--'"
