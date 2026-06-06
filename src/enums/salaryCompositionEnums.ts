@@ -27,7 +27,8 @@ export enum DeductionType {
 
 export enum IncomeTaxType {
     Taxable = 1,
-    TaxFree = 2
+    TaxFree = 2,
+    PartialTaxFree = 3
 }
 
 export enum SourceType {

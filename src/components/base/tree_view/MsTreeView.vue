@@ -1,6 +1,6 @@
 <script setup lang='ts' generic="T">
 import { computed, ref, watch } from 'vue';
-import TreeSelect from './tree_view/TreeSelect.vue';
+import TreeSelect from './TreeSelect.vue';
 import type { TreeNodeItem } from '@/types/treeNode';
 
 defineOptions({

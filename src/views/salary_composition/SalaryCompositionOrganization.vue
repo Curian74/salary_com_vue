@@ -2,7 +2,7 @@
 import { computed, ref, type ComponentPublicInstance } from 'vue';
 import MsButton from '@/components/base/MsButton.vue';
 import MsCheckbox from '@/components/base/MsCheckbox.vue';
-import MsTreeView from '@/components/base/MsTreeView.vue';
+import MsTreeView from '@/components/base/tree_view/MsTreeView.vue';
 import type { GetOrganizationTreeResponse } from '@/types/organization.ts';
 import { TrackingStatus } from '@/enums/salaryCompositionEnums';
 
