@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { Slot, VNodeChild } from 'vue';
+import MsCheckbox from '../MsCheckbox.vue';
 import type { TreeNodeItem } from '@/types/treeNode';
 
 const props = withDefaults(defineProps<{
@@ -50,15 +51,7 @@ const isIndeterminate = computed(() => {
     return selectedCount > 0 && selectedCount < allIds.value.length;
 });
 
-function setIndeterminate(el: HTMLInputElement | null) {
-    if (el) {
-        el.indeterminate = isIndeterminate.value;
-    }
-}
-
-function onCheckboxChange(event: Event) {
-    const checked = (event.target as HTMLInputElement).checked;
-
+function onCheckboxChange(checked: boolean) {
     if (!props.multiple) {
         emit('update:modelValue', checked ? [props.node.id] : []);
         return;
@@ -90,8 +83,8 @@ function onCheckboxChange(event: Event) {
 
             <span v-else class="ms-tree-node__toggle"></span>
 
-            <input v-if="selectable" type="checkbox" class="ms-tree-node__checkbox" :checked="isChecked"
-                :ref="(el) => setIndeterminate(el as HTMLInputElement | null)" @change="onCheckboxChange">
+            <MsCheckbox v-if="selectable" class="ms-tree-node__checkbox" :checked="isChecked"
+                :indeterminate="isIndeterminate" @change="onCheckboxChange" />
 
             <div class="ms-tree-node__content">
                 <TreeNodeItemContent :item-slot="itemSlot" :item="node.raw" :name="node.name" />
