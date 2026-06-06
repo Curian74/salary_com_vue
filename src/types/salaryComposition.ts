@@ -4,6 +4,7 @@ import type {
     CompositionType,
     DeductionType,
     IncomeTaxType,
+    OptionShowPaycheck,
     SourceType,
     TrackingStatus,
     ValueType
@@ -28,7 +29,7 @@ export interface GetSalaryCompositionsResponse {
     organizationalStructureLevel: number | null;
     salaryCompositionId: string | null;
     valueFormula: string;
-    optionShowPaycheck: number;
+    optionShowPaycheck: OptionShowPaycheck;
     sourceType: SourceType;
     status: TrackingStatus;
     organizationUnitIds: string;
@@ -57,6 +58,35 @@ export interface SalaryCompositionFormModel {
     autoSumEmployeeType: AutoSumEmployeeType;
     valueFormula: string;
     description: string;
-    optionShowPaycheck: number;
+    optionShowPaycheck: OptionShowPaycheck;
     sourceType: SourceType;
+}
+
+export type SalaryCompositionFormErrors = Partial<Record<keyof SalaryCompositionFormModel, string>>;
+
+export interface CreateSalaryCompositionRequest {
+    code: string;
+    name: string;
+    description?: string;
+
+    systemCompositionId?: string;
+
+    compositionType: CompositionType;
+    compositionNature: CompositionNature;
+
+    incomeTaxType?: IncomeTaxType;
+    deductionType?: DeductionType;
+
+    quotaFormula?: string;
+    allowToExceedQuota?: boolean;
+
+    valueType: ValueType;
+    isAutoSumEmployee?: boolean;
+    autoSumEmployeeType?: AutoSumEmployeeType;
+    organizationalStructureLevel?: number;
+
+    valueFormula?: string;
+    optionShowPaycheck: OptionShowPaycheck;
+
+    organizationUnitIds?: string[];
 }

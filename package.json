@@ -12,13 +12,16 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.0",
+    "@vee-validate/yup": "^4.15.1",
     "axios": "^1.16.1",
     "devextreme": "24.2.15",
     "devextreme-vue": "24.2.15",
     "floating-vue": "^5.2.2",
     "tailwindcss": "^4.3.0",
+    "vee-validate": "^4.15.1",
     "vue": "^3.5.32",
-    "vue-router": "^5.0.7"
+    "vue-router": "^5.0.7",
+    "yup": "^1.7.1"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.4",

@@ -48,3 +48,9 @@ export enum ValueType {
     Text = 4,
     Date = 5
 }
+
+export enum OptionShowPaycheck {
+    No = 0,
+    Yes = 1,
+    OnlyWhenNonZero = 2
+}
