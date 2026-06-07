@@ -1,11 +1,3 @@
-<template>
-    <div class="ms-tree-select">
-        <TreeNode v-for="node in nodes" :key="node.id" :node="node" :model-value="modelValue"
-            :expanded-keys="expandedKeys" :item-slot="itemSlot" :selectable="selectable" :multiple="multiple"
-            @update:model-value="emit('update:modelValue', $event)" @toggle-expand="emit('toggle-expand', $event)" />
-    </div>
-</template>
-
 <script setup lang="ts" generic="T">
 import { computed } from 'vue';
 import type { Slot } from 'vue';
@@ -38,3 +30,11 @@ const itemSlot = computed<Slot<{ item: unknown }> | undefined>(() => {
         slots.item?.(slotProps as { item: T }) ?? []) as Slot<{ item: unknown }>;
 });
 </script>
+
+<template>
+    <div class="ms-tree-select">
+        <TreeNode v-for="node in nodes" :key="node.id" :node="node" :model-value="modelValue"
+            :expanded-keys="expandedKeys" :item-slot="itemSlot" :selectable="selectable" :multiple="multiple"
+            @update:model-value="emit('update:modelValue', $event)" @toggle-expand="emit('toggle-expand', $event)" />
+    </div>
+</template>

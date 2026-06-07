@@ -11,6 +11,7 @@ interface SalaryCompositionOrganizationFilterProps {
     isOpen?: boolean
     showInactiveOrganizations?: boolean,
     selectedOrganizationIds?: string[],
+    invalid?: boolean,
 }
 
 const props = withDefaults(defineProps<SalaryCompositionOrganizationFilterProps>(), {
@@ -18,6 +19,7 @@ const props = withDefaults(defineProps<SalaryCompositionOrganizationFilterProps>
     isOpen: false,
     showInactiveOrganizations: false,
     selectedOrganizationIds: () => [],
+    invalid: false,
 });
 
 const emit = defineEmits<{
@@ -91,7 +93,9 @@ const handleRemoveKeydown = (event: KeyboardEvent, id: string) => {
     <div :ref="setDropdownElement" class="relative min-w-65 flex-1 max-w-109.5">
         <MsButton variant="secondary" class="organization-filter-trigger w-full
          justify-between! gap-2! px-2! font-normal
-             text-[13px] text-text-placeholder focus:border-primary" :aria-expanded="isOpen" aria-haspopup="tree"
+             text-[13px] text-text-placeholder focus:border-primary"
+            :class="{ 'organization-filter-trigger--invalid': invalid }" :aria-expanded="isOpen"
+            :aria-invalid="invalid" aria-haspopup="tree"
             @click="emit('toggle')">
             <div class="min-w-0 flex flex-1 items-center gap-1 overflow-hidden">
                 <template v-if="selectedCount > 0">
@@ -158,6 +162,16 @@ const handleRemoveKeydown = (event: KeyboardEvent, id: string) => {
 <style scoped>
 .organization-filter-trigger {
     min-height: 36px;
+}
+
+.organization-filter-trigger--invalid,
+.organization-filter-trigger--invalid:hover,
+.organization-filter-trigger--invalid:focus {
+    border-color: var(--app-color-error);
+}
+
+.organization-filter-trigger--invalid:focus {
+    box-shadow: 0 0 0 2px rgba(229, 72, 72, 0.12);
 }
 
 .organization-count-chip,

@@ -62,8 +62,8 @@ function getAllNodeIds(nodes: TreeNodeItem<T>[]): string[] {
 
 watch(
     treeNodes,
-    (nodes) => {
-        expandedKeys.value = new Set(getAllNodeIds(nodes));
+    () => {
+        expandedKeys.value = new Set();
     },
     { immediate: true }
 );

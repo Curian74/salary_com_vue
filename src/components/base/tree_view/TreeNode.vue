@@ -16,6 +16,7 @@ const props = withDefaults(defineProps<{
     depth: 0,
     selectable: true,
     multiple: true,
+    expandedKeys: () => new Set<string>(),
 });
 
 const emit = defineEmits<{
@@ -94,8 +95,7 @@ function onCheckboxChange(checked: boolean) {
         <div v-if="hasChildren && isExpanded">
             <TreeNode v-for="child in node.children" :key="child.id" :node="child" :model-value="modelValue"
                 :expanded-keys="expandedKeys" :item-slot="itemSlot" :depth="depth + 1" :selectable="selectable"
-                :multiple="multiple"
-                @update:model-value="emit('update:modelValue', $event)"
+                :multiple="multiple" @update:model-value="emit('update:modelValue', $event)"
                 @toggle-expand="emit('toggle-expand', $event)" />
         </div>
     </div>

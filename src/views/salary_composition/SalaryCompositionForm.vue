@@ -321,6 +321,7 @@ onMounted(async () => {
                 <SalaryCompositionOrganization :selected-organization-ids="selectedOrganizationIds"
                     :show-inactive-organizations="isShowInactiveOrganizations"
                     :organization-items="organizationTreeItems" :is-open="isOrganizationDropdownOpen"
+                    :invalid="Boolean(errors.organizationUnitIds)"
                     @update:selected-organization-ids="handleOrganizationIdsChange"
                     @update:show-inactive-organizations="handleShowAllOrganization" @toggle="toggleOrganizationDropdown"
                     @set-dropdown-el="setOrganizationDropdownElement" />
@@ -336,7 +337,9 @@ onMounted(async () => {
             <div class="salary-composition-form__control" data-validation-field="compositionType">
                 <MsSelect id="composition-type" :model-value="compositionType ?? null" :disabled="isReadOnly"
                     :options="salaryCompositionFormOptions.compositionType" class="salary-composition-form__select
-                    salary-composition-form__select--medium" @update:model-value="handleCompositionTypeChange" />
+                    salary-composition-form__select--medium"
+                    :class="{ 'salary-composition-form__select--invalid': errors.compositionType }"
+                    @update:model-value="handleCompositionTypeChange" />
                 <span v-if="errors.compositionType" class="text-error text-[13px]">
                     {{ errors.compositionType }}
                 </span>
@@ -349,7 +352,9 @@ onMounted(async () => {
                 <div class="flex flex-wrap items-center gap-x-7 gap-y-2">
                     <MsSelect id="nature" :model-value="compositionNature" :disabled="isReadOnly"
                         :options="salaryCompositionFormOptions.compositionNature" class="salary-composition-form__select
-                        salary-composition-form__select--medium" @update:model-value="handleCompositionNatureChange" />
+                        salary-composition-form__select--medium"
+                        :class="{ 'salary-composition-form__select--invalid': errors.compositionNature }"
+                        @update:model-value="handleCompositionNatureChange" />
 
                     <label v-for="option in salaryCompositionFormOptions.incomeTaxType" :key="option.value"
                         class="salary-composition-form__radio">
@@ -382,7 +387,12 @@ onMounted(async () => {
             <div class="salary-composition-form__control" data-validation-field="valueType">
                 <MsSelect id="value-type" :model-value="valueType" :disabled="isReadOnly"
                     :options="salaryCompositionFormOptions.valueType" class="salary-composition-form__select
-                    salary-composition-form__select--medium" @update:model-value="handleValueTypeChange" />
+                    salary-composition-form__select--medium"
+                    :class="{ 'salary-composition-form__select--invalid': errors.valueType }"
+                    @update:model-value="handleValueTypeChange" />
+                <span v-if="errors.valueType" class="text-error text-[13px]">
+                    {{ errors.valueType }}
+                </span>
             </div>
 
             <label class="salary-composition-form__label">Giá trị</label>
@@ -534,6 +544,16 @@ onMounted(async () => {
     border-color: #cfd4da;
     font-size: 13px;
     color: #001b44;
+}
+
+.salary-composition-form__select--invalid :deep(select),
+.salary-composition-form__select--invalid :deep(select:hover),
+.salary-composition-form__select--invalid :deep(select:focus) {
+    border-color: var(--app-color-error);
+}
+
+.salary-composition-form__select--invalid :deep(select:focus) {
+    box-shadow: 0 0 0 2px rgba(229, 72, 72, 0.12);
 }
 
 .salary-composition-form__radio {
