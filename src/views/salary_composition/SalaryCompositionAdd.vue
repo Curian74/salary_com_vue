@@ -8,6 +8,7 @@ import {
 } from '@/enums/salaryCompositionEnums';
 import type { GetOrganizationTreeResponse } from '@/types/organization';
 import type { CreateSalaryCompositionRequest } from '@/types/salaryComposition.ts';
+import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
 
 const router = useRouter();
 
@@ -48,12 +49,24 @@ const goBack = () => {
     router.push({ name: 'SalaryCompositionList' });
 };
 
-const handleSubmit = (payload: CreateSalaryCompositionRequest) => {
+const handleSubmit = async (payload: CreateSalaryCompositionRequest) => {
     console.log(payload);
+
+    try {
+        const data = await salaryCompositionApi.createSalaryComposition(payload);
+        console.log(data);
+        alert("ngon");
+    }
+
+    catch (err) {
+        console.log(err);
+        alert("haiz");
+    }
 };
 
 // Ref để gọi phương thức submitForm của SalaryCompositionForm
 const formRef = ref<InstanceType<typeof SalaryCompositionForm>>();
+
 
 </script>
 

@@ -158,15 +158,12 @@ const { errors, defineField, handleSubmit, } =
         initialValues: {
             code: '',
             name: '',
-            description: '',
-            systemCompositionId: '',
 
             compositionType: undefined,
             compositionNature: CompositionNature.Income,
             incomeTaxType: IncomeTaxType.Taxable,
             deductionType: undefined,
 
-            quotaFormula: '',
             allowToExceedQuota: false,
 
             valueType: ValueType.Number,
@@ -174,7 +171,6 @@ const { errors, defineField, handleSubmit, } =
             autoSumEmployeeType: AutoSumEmployeeType.SameWorkingUnit,
             organizationalStructureLevel: undefined,
 
-            valueFormula: '',
             optionShowPaycheck: OptionShowPaycheck.Yes,
 
             organizationUnitIds: [],
