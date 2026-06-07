@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import MsButton from '@/components/base/MsButton.vue';
 import SalaryCompositionForm from './SalaryCompositionForm.vue';
@@ -52,6 +52,9 @@ const handleSubmit = (payload: CreateSalaryCompositionRequest) => {
     console.log(payload);
 };
 
+// Ref để gọi phương thức submitForm của SalaryCompositionForm
+const formRef = ref<InstanceType<typeof SalaryCompositionForm>>();
+
 </script>
 
 <template>
@@ -71,7 +74,8 @@ const handleSubmit = (payload: CreateSalaryCompositionRequest) => {
         </div>
 
         <div class="mx-5 min-h-0 flex-1 overflow-hidden bg-white">
-            <SalaryCompositionForm @submit="handleSubmit" @cancel="goBack" mode="create" />
+            <!-- Gắn ref cho form để có thể gọi phương thức submitForm -->
+            <SalaryCompositionForm ref="formRef" @submit="handleSubmit" @cancel="goBack" mode="create" />
         </div>
 
         <div class="flex h-13 shrink-0 items-center justify-end gap-3 border-t border-border bg-background px-3">
@@ -80,7 +84,7 @@ const handleSubmit = (payload: CreateSalaryCompositionRequest) => {
                 variant="secondary">
                 Lưu và thêm
             </MsButton>
-            <MsButton class="min-w-25" variant="primary" @click="handleSubmit">Lưu</MsButton>
+            <MsButton class="min-w-25" variant="primary" @click="formRef?.submitForm()">Lưu</MsButton>
         </div>
     </section>
 </template>

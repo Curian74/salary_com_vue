@@ -98,7 +98,7 @@ const handleOrganizationIdsChange = (organizationIds: string[]) => {
     }
 
     selectedOrganizationIds.value = organizationIds;
-    setFieldValue('organizationUnitIds', organizationIds);
+    organizationUnitIds.value = organizationIds;
 };
 
 const handleShowAllOrganization = () => {
@@ -161,7 +161,7 @@ const emit = defineEmits<{
     submit: [payload: CreateSalaryCompositionRequest]
 }>();
 
-const { values, errors, setFieldValue, handleSubmit, } =
+const { errors, defineField, handleSubmit, } =
     useForm<CreateSalaryCompositionRequest>({
         validationSchema: salaryCompositionSchema,
         validateOnMount: false,
@@ -191,28 +191,42 @@ const { values, errors, setFieldValue, handleSubmit, } =
         },
     });
 
+const [code] = defineField('code');
+const [name] = defineField('name');
+const [description] = defineField('description');
+const [compositionType] = defineField('compositionType');
+const [compositionNature] = defineField('compositionNature');
+const [incomeTaxType] = defineField('incomeTaxType');
+const [allowToExceedQuota] = defineField('allowToExceedQuota');
+const [valueType] = defineField('valueType');
+const [isAutoSumEmployee] = defineField('isAutoSumEmployee');
+const [autoSumEmployeeType] = defineField('autoSumEmployeeType');
+const [optionShowPaycheck] = defineField('optionShowPaycheck');
+const [organizationUnitIds] = defineField('organizationUnitIds');
+
 const handleCompositionTypeChange = (value: SelectValue) => {
-    setFieldValue('compositionType', value as CompositionType);
+    compositionType.value = value as CompositionType;
 };
 
 const handleCompositionNatureChange = (value: SelectValue) => {
-    setFieldValue('compositionNature', value as CompositionNature);
+    compositionNature.value = value as CompositionNature;
 };
 
 const handleValueTypeChange = (value: SelectValue) => {
-    setFieldValue('valueType', value as ValueType);
+    valueType.value = value as ValueType;
 };
 
 const handleAutoSumEmployeeTypeChange = (value: SelectValue) => {
-    setFieldValue('autoSumEmployeeType', value as AutoSumEmployeeType);
+    autoSumEmployeeType.value = value as AutoSumEmployeeType;
 };
 
 const submitForm = handleSubmit((payload) => {
     emit('submit', payload);
 });
 
-onMounted(() => {
-    console.log('errors', errors.value);
+// Đẩy hàm submitForm ra ngoài để component cha có thể gọi khi click nút Lưu
+defineExpose({
+    submitForm,
 });
 
 </script>
@@ -224,8 +238,8 @@ onMounted(() => {
                 Tên thành phần <span class="text-error">*</span>
             </label>
             <div class="salary-composition-form__control">
-                <MsInput id="composition-name" class="salary-composition-form__input" :value="values.name"
-                    :disabled="isReadOnly" @update:model-value="setFieldValue('name', $event)" />
+                <MsInput v-model="name" id="composition-name" class="salary-composition-form__input"
+                    :disabled="isReadOnly" />
                 <span v-if="errors.name" class="text-error text-[13px]">
                     {{ errors.name }}
                 </span>
@@ -235,8 +249,8 @@ onMounted(() => {
                 Mã thành phần <span class="text-error">*</span>
             </label>
             <div class="salary-composition-form__control">
-                <MsInput id="composition-code" class="salary-composition-form__input" :disabled="isReadOnly"
-                    placeholder="Nhập mã viết liền" />
+                <MsInput v-model="code" id="composition-code" class="salary-composition-form__input"
+                    :disabled="isReadOnly" placeholder="Nhập mã viết liền" />
                 <span v-if="errors.code" class="text-error text-[13px]">
                     {{ errors.code }}
                 </span>
@@ -263,7 +277,7 @@ onMounted(() => {
                 Loại thành phần <span class="text-error">*</span>
             </label>
             <div class="salary-composition-form__control">
-                <MsSelect id="composition-type" :model-value="values.compositionType ?? null" :disabled="isReadOnly"
+                <MsSelect id="composition-type" :model-value="compositionType ?? null" :disabled="isReadOnly"
                     :options="salaryCompositionFormOptions.compositionType" class="salary-composition-form__select
                     salary-composition-form__select--medium" @update:model-value="handleCompositionTypeChange" />
                 <span v-if="errors.compositionType" class="text-error text-[13px]">
@@ -276,15 +290,15 @@ onMounted(() => {
             </label>
             <div class="salary-composition-form__control">
                 <div class="flex flex-wrap items-center gap-x-7 gap-y-2">
-                    <MsSelect id="nature" :model-value="values.compositionNature" :disabled="isReadOnly"
+                    <MsSelect id="nature" :model-value="compositionNature" :disabled="isReadOnly"
                         :options="salaryCompositionFormOptions.compositionNature" class="salary-composition-form__select
                         salary-composition-form__select--medium" @update:model-value="handleCompositionNatureChange" />
 
                     <label v-for="option in salaryCompositionFormOptions.incomeTaxType" :key="option.value"
                         class="salary-composition-form__radio">
                         <input type="radio" name="tax-status" :value="option.value"
-                            :checked="values.incomeTaxType === option.value" :disabled="isReadOnly"
-                            @change="setFieldValue('incomeTaxType', option.value)" />
+                            :checked="incomeTaxType === option.value" :disabled="isReadOnly"
+                            @change="incomeTaxType = option.value" />
                         <span>{{ option.label }}</span>
                     </label>
 
@@ -296,13 +310,12 @@ onMounted(() => {
 
             <label class="salary-composition-form__label" for="limit">Định mức</label>
             <textarea id="description" class="salary-composition-form__textarea h-22" :readonly="isReadOnly"
-                :value="values.description"
-                @input="setFieldValue('description', ($event.target as HTMLTextAreaElement).value)"></textarea>
+                v-model="description"></textarea>
 
             <div></div>
             <div class="flex h-7 items-center gap-2.5 text-[13px] text-[#001b44]">
-                <MsCheckbox :checked="values.allowToExceedQuota" :disabled="isReadOnly"
-                    @change="setFieldValue('allowToExceedQuota', $event)" />
+                <MsCheckbox :checked="allowToExceedQuota" :disabled="isReadOnly"
+                    @change="allowToExceedQuota = $event" />
                 <span>Cho phép giá trị tính vượt quá định mức</span>
                 <span class="inline-flex size-5 items-center justify-center rounded-full border border-[#7d8591]
                          text-[13px] font-bold text-[#6b7280]">i</span>
@@ -310,7 +323,7 @@ onMounted(() => {
 
             <label class="salary-composition-form__label" for="value-type">Kiểu giá trị</label>
             <div class="salary-composition-form__control">
-                <MsSelect id="value-type" :model-value="values.valueType" :disabled="isReadOnly"
+                <MsSelect id="value-type" :model-value="valueType" :disabled="isReadOnly"
                     :options="salaryCompositionFormOptions.valueType" class="salary-composition-form__select
                     salary-composition-form__select--medium" @update:model-value="handleValueTypeChange" />
             </div>
@@ -318,18 +331,18 @@ onMounted(() => {
             <label class="salary-composition-form__label">Giá trị</label>
             <div class="flex flex-col gap-3">
                 <label class="salary-composition-form__radio">
-                    <input type="radio" name="value-method" :checked="values.isAutoSumEmployee" :disabled="isReadOnly"
-                        @change="setFieldValue('isAutoSumEmployee', true)" />
+                    <input type="radio" name="value-method" :checked="isAutoSumEmployee" :disabled="isReadOnly"
+                        @change="isAutoSumEmployee = true" />
                     <span>Tự động cộng tổng giá trị của các nhân viên</span>
                 </label>
 
-                <MsSelect :model-value="values.autoSumEmployeeType ?? null" :disabled="isReadOnly"
+                <MsSelect :model-value="autoSumEmployeeType ?? null" :disabled="isReadOnly"
                     :options="salaryCompositionFormOptions.autoSumEmployeeType" class="salary-composition-form__select
                     salary-composition-form__select--medium" @update:model-value="handleAutoSumEmployeeTypeChange" />
 
                 <label class="salary-composition-form__radio">
-                    <input type="radio" name="value-method" :checked="!values.isAutoSumEmployee" :disabled="isReadOnly"
-                        @change="setFieldValue('isAutoSumEmployee', false)" />
+                    <input type="radio" name="value-method" :checked="!isAutoSumEmployee" :disabled="isReadOnly"
+                        @change="isAutoSumEmployee = false" />
                     <span>Tính theo công thức tự đặt</span>
                 </label>
 
@@ -348,8 +361,8 @@ onMounted(() => {
                     <label v-for="option in salaryCompositionFormOptions.optionShowPaycheck" :key="option.value"
                         class="salary-composition-form__radio">
                         <input type="radio" name="show-on-payroll" :value="option.value"
-                            :checked="values.optionShowPaycheck === option.value" :disabled="isReadOnly"
-                            @change="setFieldValue('optionShowPaycheck', option.value)" />
+                            :checked="optionShowPaycheck === option.value" :disabled="isReadOnly"
+                            @change="optionShowPaycheck = option.value" />
                         <span>{{ option.label }}</span>
                     </label>
                 </div>
