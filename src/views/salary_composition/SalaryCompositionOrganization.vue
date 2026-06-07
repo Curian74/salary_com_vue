@@ -12,6 +12,7 @@ interface SalaryCompositionOrganizationFilterProps {
     showInactiveOrganizations?: boolean,
     selectedOrganizationIds?: string[],
     invalid?: boolean,
+    showUnfollowedOrgs?: boolean,
 }
 
 const props = withDefaults(defineProps<SalaryCompositionOrganizationFilterProps>(), {
@@ -94,9 +95,8 @@ const handleRemoveKeydown = (event: KeyboardEvent, id: string) => {
         <MsButton variant="secondary" class="organization-filter-trigger w-full
          justify-between! gap-2! px-2! font-normal
              text-[13px] text-text-placeholder focus:border-primary"
-            :class="{ 'organization-filter-trigger--invalid': invalid }" :aria-expanded="isOpen"
-            :aria-invalid="invalid" aria-haspopup="tree"
-            @click="emit('toggle')">
+            :class="{ 'organization-filter-trigger--invalid': invalid }" :aria-expanded="isOpen" :aria-invalid="invalid"
+            aria-haspopup="tree" @click="emit('toggle')">
             <div class="min-w-0 flex flex-1 items-center gap-1 overflow-hidden">
                 <template v-if="selectedCount > 0">
                     <span class="organization-count-chip">{{ selectedCount }}</span>
@@ -149,7 +149,8 @@ const handleRemoveKeydown = (event: KeyboardEvent, id: string) => {
                 </template>
             </MsTreeView>
 
-            <label class="flex min-h-10 items-center gap-3 border-t border-[#d7f1e3] bg-[#eafaef]
+            <label v-if="showUnfollowedOrgs" class="flex min-h-10 items-center gap-3 border-t
+             border-[#d7f1e3] bg-[#eafaef]
                  px-5 text-[13px] text-text-primary">
                 <MsCheckbox :checked="showInactiveOrganizations"
                     @change="checked => emit('update:showInactiveOrganizations', checked)" />

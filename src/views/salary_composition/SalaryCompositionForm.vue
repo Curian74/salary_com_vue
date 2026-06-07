@@ -128,6 +128,19 @@ const handleDocumentKeydown = (event: KeyboardEvent) => {
     }
 };
 
+const getAllOrganizationIds = (items: GetOrganizationTreeResponse[]): string[] =>
+    items.flatMap((organization) => [
+        organization.id,
+        ...getAllOrganizationIds(organization.children ?? []),
+    ]);
+
+const selectAllOrganizations = (items: GetOrganizationTreeResponse[]) => {
+    const organizationIds = getAllOrganizationIds(items);
+
+    selectedOrganizationIds.value = organizationIds;
+    organizationUnitIds.value = organizationIds;
+};
+
 const fetchOrganizationTree = async () => {
     try {
         const response = await organizationApi.fetchOrganizationTree({
@@ -135,6 +148,7 @@ const fetchOrganizationTree = async () => {
         });
 
         organizationTreeItems.value = response.value;
+        selectAllOrganizations(organizationTreeItems.value);
     }
     catch (err) {
         console.log(err);
@@ -318,7 +332,8 @@ onMounted(async () => {
             </label>
 
             <div data-validation-field="organizationUnitIds">
-                <SalaryCompositionOrganization :selected-organization-ids="selectedOrganizationIds"
+                <SalaryCompositionOrganization class="salary-composition-form__organization"
+                    :show-unfollowed-orgs="false" :selected-organization-ids="selectedOrganizationIds"
                     :show-inactive-organizations="isShowInactiveOrganizations"
                     :organization-items="organizationTreeItems" :is-open="isOrganizationDropdownOpen"
                     :invalid="Boolean(errors.organizationUnitIds)"
@@ -496,6 +511,11 @@ onMounted(async () => {
     padding: 0 9px;
 }
 
+.salary-composition-form__organization {
+    width: 80%;
+    max-width: none;
+}
+
 .salary-composition-form__textarea {
     resize: vertical;
     padding: 8px 12px;
@@ -586,6 +606,10 @@ onMounted(async () => {
     .salary-composition-form__label {
         min-height: auto;
         padding-top: 8px;
+    }
+
+    .salary-composition-form__organization {
+        width: 100%;
     }
 }
 </style>
