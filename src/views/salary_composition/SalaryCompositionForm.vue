@@ -7,6 +7,7 @@ import {
     AutoSumEmployeeType,
     CompositionNature,
     CompositionType,
+    DeductionType,
     IncomeTaxType,
     OptionShowPaycheck,
     SourceType,
@@ -17,6 +18,7 @@ import {
     autoSumEmployeeTypeText,
     compositionNatureText,
     compositionTypeText,
+    deductionTypeText,
     incomeTaxTypeText,
     optionShowPaycheckText,
     sourceTypeText,
@@ -50,6 +52,7 @@ const salaryCompositionFormOptions = {
     compositionType: toSelectOptions<CompositionType>(CompositionType, compositionTypeText),
     compositionNature: toSelectOptions<CompositionNature>(CompositionNature, compositionNatureText),
     incomeTaxType: toSelectOptions<IncomeTaxType>(IncomeTaxType, incomeTaxTypeText),
+    deductionType: toSelectOptions<DeductionType>(DeductionType, deductionTypeText),
     valueType: toSelectOptions<ValueType>(ValueType, valueTypeText),
     autoSumEmployeeType: toSelectOptions<AutoSumEmployeeType>(
         AutoSumEmployeeType,
@@ -67,7 +70,7 @@ const salaryCompositionFormOptions = {
     ],
 };
 
-//#region Organization picker logic
+// #region Organization picker logic
 const organizationTreeItems = ref<GetOrganizationTreeResponse[]>([]);
 const selectedOrganizationIds = ref<string[]>([]);
 const organizationDropdownRef = ref<HTMLElement | null>(null);
@@ -197,22 +200,13 @@ const [description] = defineField('description');
 const [compositionType] = defineField('compositionType');
 const [compositionNature] = defineField('compositionNature');
 const [incomeTaxType] = defineField('incomeTaxType');
+const [deductionType] = defineField('deductionType');
 const [allowToExceedQuota] = defineField('allowToExceedQuota');
 const [valueType] = defineField('valueType');
 const [isAutoSumEmployee] = defineField('isAutoSumEmployee');
 const [autoSumEmployeeType] = defineField('autoSumEmployeeType');
 const [optionShowPaycheck] = defineField('optionShowPaycheck');
 const [organizationUnitIds] = defineField('organizationUnitIds');
-
-const validationFieldOrder: Array<keyof CreateSalaryCompositionRequest> = [
-    'name',
-    'code',
-    'organizationUnitIds',
-    'compositionType',
-    'compositionNature',
-    'valueType',
-    'optionShowPaycheck',
-];
 
 const focusFirstInvalidField = async (
     validationErrors: Partial<Record<keyof CreateSalaryCompositionRequest, string | undefined>>,
@@ -252,7 +246,21 @@ const handleCompositionTypeChange = (value: SelectValue) => {
 };
 
 const handleCompositionNatureChange = (value: SelectValue) => {
-    compositionNature.value = value as CompositionNature;
+    const nextCompositionNature = value as CompositionNature;
+
+    compositionNature.value = nextCompositionNature;
+
+    if (nextCompositionNature !== CompositionNature.Income) {
+        incomeTaxType.value = undefined;
+    }
+
+    if (nextCompositionNature !== CompositionNature.Deduction) {
+        deductionType.value = undefined;
+    }
+};
+
+const handleDeductionTypeChange = (value: DeductionType, checked: boolean) => {
+    deductionType.value = checked ? value : undefined;
 };
 
 const handleValueTypeChange = (value: SelectValue) => {
@@ -371,11 +379,18 @@ onMounted(async () => {
                         :class="{ 'salary-composition-form__select--invalid': errors.compositionNature }"
                         @update:model-value="handleCompositionNatureChange" />
 
-                    <label v-for="option in salaryCompositionFormOptions.incomeTaxType" :key="option.value"
-                        class="salary-composition-form__radio">
+                    <label v-if="compositionNature === 1" v-for="option in salaryCompositionFormOptions.incomeTaxType"
+                        :key="option.value" class="salary-composition-form__radio">
                         <input type="radio" name="tax-status" :value="option.value"
                             :checked="incomeTaxType === option.value" :disabled="isReadOnly"
                             @change="incomeTaxType = option.value" />
+                        <span>{{ option.label }}</span>
+                    </label>
+
+                    <label v-if="compositionNature === 2" v-for="option in salaryCompositionFormOptions.deductionType"
+                        :key="option.value" class="salary-composition-form__radio">
+                        <MsCheckbox :checked="deductionType === option.value" :disabled="isReadOnly"
+                            @change="checked => handleDeductionTypeChange(option.value, checked)" />
                         <span>{{ option.label }}</span>
                     </label>
 

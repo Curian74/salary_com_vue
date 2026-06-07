@@ -12,6 +12,7 @@ interface MsTableProps {
     formatters?: Record<string, (value: any, row: T) => string>
     rowKey?: keyof T;
     columnWidths?: Record<string, number>;
+    defaultColumnWidth?: number;
     maxChars?: number;
     maxCharsByColumn?: Record<string, number>;
 }
@@ -19,6 +20,7 @@ interface MsTableProps {
 const props = defineProps<MsTableProps>();
 const selectedRowKeys = ref(new Set<string>());
 const selectionColumnWidth = 48;
+const defaultColumnWidth = 140;
 const defaultMaxChars = 28;
 
 const isAllSelected = computed(() => {
@@ -39,14 +41,16 @@ const isIndeterminate = computed(() => {
 });
 
 const visibleColumns = computed(() => {
-    return props.columns.filter(x => x.isDisplayed);
+    return [...props.columns]
+        .filter(x => x.isDisplayed)
+        .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
 })
 
 const tableColspan = computed(() => visibleColumns.value.length + 1);
 
 const tableMinWidth = computed(() => {
     return visibleColumns.value.reduce((total, column) => {
-        return total + (getColumnWidth(column) ?? 0);
+        return total + (getRenderedColumnWidth(column) ?? 0);
     }, selectionColumnWidth);
 });
 
@@ -71,6 +75,11 @@ const getRowKey = (row: T) => {
 
 const getColumnWidth = (column: GridConfig) => {
     return props.columnWidths?.[column.fieldKey] ?? null;
+}
+
+const getRenderedColumnWidth = (column: GridConfig) => {
+    return getColumnWidth(column)
+        ?? (hasColumnWidths.value ? props.defaultColumnWidth ?? defaultColumnWidth : null);
 }
 
 const getColumnMaxChars = (column: GridConfig) => {
@@ -140,7 +149,7 @@ watch(selectedRowKeys, () => {
         <colgroup>
             <col :style="{ width: `${selectionColumnWidth}px` }">
             <col v-for="column in visibleColumns" :key="column.fieldKey"
-                :style="getColumnWidth(column) ? { width: `${getColumnWidth(column)}px` } : undefined">
+                :style="getRenderedColumnWidth(column) ? { width: `${getRenderedColumnWidth(column)}px` } : undefined">
         </colgroup>
 
         <thead class="sticky top-0 z-10 bg-grid-header">

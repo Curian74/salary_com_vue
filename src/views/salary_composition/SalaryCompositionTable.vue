@@ -3,7 +3,7 @@ import MsStatus from '@/components/base/MsStatus.vue';
 import MsTable from '@/components/base/MsTable.vue';
 import {
     AutoSumEmployeeType, CompositionNature, CompositionType, DeductionType,
-    IncomeTaxType, SourceType, TrackingStatus, ValueType
+    IncomeTaxType, OptionShowPaycheck, SourceType, TrackingStatus, ValueType
 }
     from '@/enums/salaryCompositionEnums';
 import {
@@ -12,6 +12,7 @@ import {
     compositionTypeText,
     deductionTypeText,
     incomeTaxTypeText,
+    optionShowPaycheckText,
     sourceTypeText,
     trackingStatusText,
     valueTypeText
@@ -27,12 +28,18 @@ interface SalaryCompositionTableProps {
     isLoading?: boolean;
 }
 
-const formatters = {
+const formatters: Record<string, (value: any, row: GetSalaryCompositionsResponse) => string> = {
     autoSumEmployeeType: (value: AutoSumEmployeeType) => autoSumEmployeeTypeText[value] ?? '--',
     compositionNature: (value: CompositionNature) => compositionNatureText[value] ?? '--',
     compositionType: (value: CompositionType) => compositionTypeText[value] ?? '--',
     deductionType: (value: DeductionType) => deductionTypeText[value] ?? '--',
+    taxDeduction: (_value: any, row: GetSalaryCompositionsResponse) => deductionTypeText[row.deductionType] ?? '--',
     incomeTaxType: (value: IncomeTaxType) => incomeTaxTypeText[value] ?? '--',
+    optionShowPaycheck: (value: OptionShowPaycheck) => optionShowPaycheckText[value] ?? '--',
+    showOnPayroll: (_value: any, row: GetSalaryCompositionsResponse) =>
+        optionShowPaycheckText[row.optionShowPaycheck] ?? '--',
+    quota: (_value: any, row: GetSalaryCompositionsResponse) => row.quotaFormula ?? '--',
+    quotaFormula: (value: string | null) => value ?? '--',
     sourceType: (value: SourceType) => sourceTypeText[value] ?? '--',
     status: (value: TrackingStatus) => trackingStatusText[value] ?? '--',
     valueType: (value: ValueType) => valueTypeText[value] ?? '--',
@@ -46,10 +53,14 @@ const maxCharsByColumn = {
     compositionType: 16,
     incomeTaxType: 16,
     deductionType: 16,
+    taxDeduction: 16,
+    quota: 16,
+    quotaFormula: 16,
     valueType: 14,
     valueFormula: 26,
     description: 34,
     optionShowPaycheck: 16,
+    showOnPayroll: 18,
 }
 
 const columnWidths = {
@@ -60,10 +71,14 @@ const columnWidths = {
     compositionType: 120,
     incomeTaxType: 110,
     deductionType: 110,
+    taxDeduction: 170,
+    quota: 120,
+    quotaFormula: 120,
     valueType: 100,
     valueFormula: 180,
     description: 240,
     optionShowPaycheck: 130,
+    showOnPayroll: 180,
     sourceType: 120,
     status: 140,
     autoSumEmployeeType: 160,

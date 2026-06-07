@@ -34,7 +34,7 @@ export const compositionTypeText: Record<CompositionType, string> = {
 }
 
 export const deductionTypeText: Record<DeductionType, string> = {
-    [DeductionType.TaxDeduction]: 'Khấu trừ thuế',
+    [DeductionType.TaxDeduction]: 'Giảm trừ khi tính thuế',
 }
 
 export const incomeTaxTypeText: Record<IncomeTaxType, string> = {
