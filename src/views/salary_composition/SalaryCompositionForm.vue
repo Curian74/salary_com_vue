@@ -239,7 +239,7 @@ defineExpose({
             </label>
             <div class="salary-composition-form__control">
                 <MsInput v-model="name" id="composition-name" class="salary-composition-form__input"
-                    :disabled="isReadOnly" />
+                    :class="{ 'salary-composition-form__input--invalid': errors.name }" :disabled="isReadOnly" />
                 <span v-if="errors.name" class="text-error text-[13px]">
                     {{ errors.name }}
                 </span>
@@ -250,7 +250,8 @@ defineExpose({
             </label>
             <div class="salary-composition-form__control">
                 <MsInput v-model="code" id="composition-code" class="salary-composition-form__input"
-                    :disabled="isReadOnly" placeholder="Nhập mã viết liền" />
+                    :class="{ 'salary-composition-form__input--invalid': errors.code }" :disabled="isReadOnly"
+                    placeholder="Nhập mã viết liền" />
                 <span v-if="errors.code" class="text-error text-[13px]">
                     {{ errors.code }}
                 </span>
@@ -450,6 +451,16 @@ defineExpose({
 .salary-composition-form__textarea:focus {
     border-color: var(--app-color-primary);
     box-shadow: 0 0 0 2px rgba(14, 154, 98, 0.12);
+}
+
+.salary-composition-form__input--invalid,
+.salary-composition-form__input--invalid:hover,
+.salary-composition-form__input--invalid:focus {
+    border-color: var(--app-color-error);
+}
+
+.salary-composition-form__input--invalid:focus {
+    box-shadow: 0 0 0 2px rgba(229, 72, 72, 0.12);
 }
 
 .salary-composition-form__select {
