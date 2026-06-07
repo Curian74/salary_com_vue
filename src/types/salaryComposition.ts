@@ -44,26 +44,6 @@ export interface GetSalaryCompositionsRequest extends ApiRequest {
 
 export type SalaryCompositionFormMode = 'create' | 'edit' | 'view';
 
-export interface SalaryCompositionFormModel {
-    name: string;
-    code: string;
-    organizationIds: string[];
-    compositionType: CompositionType | null;
-    compositionNature: CompositionNature;
-    incomeTaxType: IncomeTaxType;
-    quotaFormula: string;
-    allowToExceedQuota: boolean;
-    valueType: ValueType;
-    isAutoSumEmployee: boolean;
-    autoSumEmployeeType: AutoSumEmployeeType;
-    valueFormula: string;
-    description: string;
-    optionShowPaycheck: OptionShowPaycheck;
-    sourceType: SourceType;
-}
-
-export type SalaryCompositionFormErrors = Partial<Record<keyof SalaryCompositionFormModel, string>>;
-
 export interface CreateSalaryCompositionRequest {
     code: string;
     name: string;

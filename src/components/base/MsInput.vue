@@ -4,6 +4,7 @@ interface MsInputProps {
     placeholder?: string;
     value?: string;
     disabled?: boolean,
+    required?: boolean,
 }
 
 const props = defineProps<MsInputProps>();
@@ -19,6 +20,7 @@ const handleInput = (event: Event) => {
 
 </script>
 <template>
-    <input @input="handleInput" :value="value" :disabled="disabled" :placeholder="placeholder" type="text">
+    <input @input="handleInput" :value="value" :disabled="disabled" :placeholder="placeholder" :required="required"
+        type="text">
 </template>
 <style scoped></style>

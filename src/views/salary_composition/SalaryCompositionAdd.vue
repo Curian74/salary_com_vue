@@ -4,15 +4,10 @@ import { useRouter } from 'vue-router';
 import MsButton from '@/components/base/MsButton.vue';
 import SalaryCompositionForm from './SalaryCompositionForm.vue';
 import {
-    AutoSumEmployeeType,
-    CompositionNature,
-    IncomeTaxType,
-    SourceType,
     TrackingStatus,
-    ValueType,
 } from '@/enums/salaryCompositionEnums';
 import type { GetOrganizationTreeResponse } from '@/types/organization';
-import type { SalaryCompositionFormModel } from '@/types/salaryComposition';
+import type { CreateSalaryCompositionRequest } from '@/types/salaryComposition.ts';
 
 const router = useRouter();
 
@@ -49,33 +44,14 @@ const organizationItems: GetOrganizationTreeResponse[] = [
     },
 ];
 
-const formData = ref<SalaryCompositionFormModel>({
-    name: '',
-    code: '',
-    organizationIds: ['phuc-lam'],
-    compositionType: null,
-    compositionNature: CompositionNature.Income,
-    incomeTaxType: IncomeTaxType.Taxable,
-    quotaFormula: '',
-    allowToExceedQuota: false,
-    valueType: ValueType.Currency,
-    isAutoSumEmployee: false,
-    autoSumEmployeeType: AutoSumEmployeeType.SameWorkingUnit,
-    valueFormula: '',
-    description: '',
-    optionShowPaycheck: 1,
-    sourceType: SourceType.UserAdded,
-});
-
 const goBack = () => {
     router.push({ name: 'SalaryCompositionList' });
 };
 
-const handleSave = () => {
+const handleSubmit = (payload: CreateSalaryCompositionRequest) => {
+    console.log(payload);
 };
 
-const handleSaveAndAdd = () => {
-};
 </script>
 
 <template>
@@ -95,17 +71,16 @@ const handleSaveAndAdd = () => {
         </div>
 
         <div class="mx-5 min-h-0 flex-1 overflow-hidden bg-white">
-            <SalaryCompositionForm v-model="formData" mode="create" :organization-items="organizationItems"
-                @submit="handleSave" />
+            <SalaryCompositionForm @submit="handleSubmit" @cancel="goBack" mode="create" />
         </div>
 
         <div class="flex h-13 shrink-0 items-center justify-end gap-3 border-t border-border bg-background px-3">
             <MsButton class="min-w-25" variant="secondary" @click="goBack">Hủy bỏ</MsButton>
             <MsButton class="min-w-32 border border-primary bg-white! text-primary! shadow-none! hover:bg-focus!"
-                variant="secondary" @click="handleSaveAndAdd">
+                variant="secondary">
                 Lưu và thêm
             </MsButton>
-            <MsButton class="min-w-25" variant="primary" @click="handleSave">Lưu</MsButton>
+            <MsButton class="min-w-25" variant="primary" @click="handleSubmit">Lưu</MsButton>
         </div>
     </section>
 </template>

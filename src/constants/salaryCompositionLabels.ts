@@ -4,6 +4,7 @@ import {
     CompositionType,
     DeductionType,
     IncomeTaxType,
+    OptionShowPaycheck,
     SourceType,
     TrackingStatus,
     ValueType
@@ -58,4 +59,10 @@ export const valueTypeText: Record<ValueType, string> = {
     [ValueType.Percentage]: 'Phần trăm',
     [ValueType.Text]: 'Chữ',
     [ValueType.Date]: 'Ngày',
+}
+
+export const optionShowPaycheckText: Record<OptionShowPaycheck, string> = {
+    [OptionShowPaycheck.Yes]: 'Có',
+    [OptionShowPaycheck.No]: 'Không',
+    [OptionShowPaycheck.OnlyWhenNonZero]: 'Chỉ hiển thị nếu giá trị khác 0',
 }
