@@ -23,7 +23,7 @@ import {
     valueTypeText,
 } from '@/constants/salaryCompositionLabels';
 import type { GetOrganizationTreeResponse } from '@/types/organization';
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import SalaryCompositionOrganization from './SalaryCompositionOrganization.vue';
 import { useForm } from 'vee-validate';
 import type { CreateSalaryCompositionRequest } from '@/types/salaryComposition';
@@ -141,21 +141,11 @@ const fetchOrganizationTree = async () => {
         organizationTreeItems.value = [];
     }
 };
-
-onMounted(async () => {
-    await fetchOrganizationTree();
-
-    document.addEventListener('pointerdown', handleDocumentPointerDown);
-    document.addEventListener('keydown', handleDocumentKeydown);
-});
-
-onBeforeUnmount(() => {
-    document.removeEventListener('pointerdown', handleDocumentPointerDown);
-    document.removeEventListener('keydown', handleDocumentKeydown);
-});
 //#endregion
 
 const isReadOnly = computed(() => props.mode === 'view');
+const salaryCompositionFormRef = ref<HTMLFormElement | null>(null);
+const nameInputRef = ref<InstanceType<typeof MsInput>>();
 
 const emit = defineEmits<{
     submit: [payload: CreateSalaryCompositionRequest]
@@ -204,6 +194,49 @@ const [autoSumEmployeeType] = defineField('autoSumEmployeeType');
 const [optionShowPaycheck] = defineField('optionShowPaycheck');
 const [organizationUnitIds] = defineField('organizationUnitIds');
 
+const validationFieldOrder: Array<keyof CreateSalaryCompositionRequest> = [
+    'name',
+    'code',
+    'organizationUnitIds',
+    'compositionType',
+    'compositionNature',
+    'valueType',
+    'optionShowPaycheck',
+];
+
+const focusFirstInvalidField = async (
+    validationErrors: Partial<Record<keyof CreateSalaryCompositionRequest, string | undefined>>,
+) => {
+    if (isReadOnly.value) {
+        return;
+    }
+
+    await nextTick();
+
+    // 1. Lấy tất cả các container có gắn attribute data-validation-field theo thứ tự DOM từ trên xuống
+    const formFields = salaryCompositionFormRef.value?.querySelectorAll('[data-validation-field]');
+    if (!formFields) return;
+
+    // 2. Duyệt qua từng phần tử để tìm trường đầu tiên bị lỗi
+    for (const fieldElement of formFields) {
+        const fieldName = fieldElement.getAttribute('data-validation-field') as keyof CreateSalaryCompositionRequest;
+
+        // Nếu trường này có trong object errors trả về từ vee-validate
+        if (fieldName && validationErrors[fieldName]) {
+            // 3. Tìm phần tử có thể focus được bên trong container đó
+            const focusableElement = fieldElement.matches('input, select, textarea, button, [tabindex]:not([tabindex="-1"])')
+                ? fieldElement
+                : fieldElement.querySelector<HTMLElement>('input, select, textarea, button, [tabindex]:not([tabindex="-1"])');
+
+            if (focusableElement) {
+                (focusableElement as HTMLElement).focus({ preventScroll: true });
+                (focusableElement as HTMLElement).scrollIntoView({ behavior: 'auto', block: 'center' });
+                break; // Tìm thấy trường đầu tiên bị lỗi rồi thì dừng vòng lặp ngay
+            }
+        }
+    }
+};
+
 const handleCompositionTypeChange = (value: SelectValue) => {
     compositionType.value = value as CompositionType;
 };
@@ -220,25 +253,52 @@ const handleAutoSumEmployeeTypeChange = (value: SelectValue) => {
     autoSumEmployeeType.value = value as AutoSumEmployeeType;
 };
 
-const submitForm = handleSubmit((payload) => {
-    emit('submit', payload);
-});
+
+const submitForm = handleSubmit(
+    (payload) => {
+        emit('submit', payload);
+    },
+    ({ errors }) => {
+        focusFirstInvalidField(errors);
+    },
+);
 
 // Đẩy hàm submitForm ra ngoài để component cha có thể gọi khi click nút Lưu
 defineExpose({
     submitForm,
 });
 
+onMounted(async () => {
+    await fetchOrganizationTree();
+
+    document.addEventListener('pointerdown', handleDocumentPointerDown);
+    document.addEventListener('keydown', handleDocumentKeydown);
+});
+
+onBeforeUnmount(() => {
+    document.removeEventListener('pointerdown', handleDocumentPointerDown);
+    document.removeEventListener('keydown', handleDocumentKeydown);
+});
+
+onMounted(async () => {
+    // Chờ dom load xong mới auto focus
+    await nextTick();
+
+    if (!isReadOnly.value) {
+        nameInputRef.value?.focus();
+    }
+});
+
 </script>
 
 <template>
     <div class="salary-composition-form-scroll h-full overflow-y-auto px-12 pb-22 pt-5">
-        <form class="salary-composition-form" @submit.prevent="submitForm">
+        <form ref="salaryCompositionFormRef" class="salary-composition-form" @submit.prevent="submitForm">
             <label class="salary-composition-form__label" for="composition-name">
                 Tên thành phần <span class="text-error">*</span>
             </label>
-            <div class="salary-composition-form__control">
-                <MsInput v-model="name" id="composition-name" class="salary-composition-form__input"
+            <div class="salary-composition-form__control" data-validation-field="name">
+                <MsInput ref="nameInputRef" v-model="name" id="composition-name" class="salary-composition-form__input"
                     :class="{ 'salary-composition-form__input--invalid': errors.name }" :disabled="isReadOnly" />
                 <span v-if="errors.name" class="text-error text-[13px]">
                     {{ errors.name }}
@@ -248,7 +308,7 @@ defineExpose({
             <label class="salary-composition-form__label" for="composition-code">
                 Mã thành phần <span class="text-error">*</span>
             </label>
-            <div class="salary-composition-form__control">
+            <div class="salary-composition-form__control" data-validation-field="code">
                 <MsInput v-model="code" id="composition-code" class="salary-composition-form__input"
                     :class="{ 'salary-composition-form__input--invalid': errors.code }" :disabled="isReadOnly"
                     placeholder="Nhập mã viết liền" />
@@ -261,7 +321,7 @@ defineExpose({
                 Đơn vị áp dụng <span class="text-error">*</span>
             </label>
 
-            <div>
+            <div data-validation-field="organizationUnitIds">
                 <SalaryCompositionOrganization :selected-organization-ids="selectedOrganizationIds"
                     :show-inactive-organizations="isShowInactiveOrganizations"
                     :organization-items="organizationTreeItems" :is-open="isOrganizationDropdownOpen"
@@ -277,7 +337,7 @@ defineExpose({
             <label class="salary-composition-form__label" for="composition-type">
                 Loại thành phần <span class="text-error">*</span>
             </label>
-            <div class="salary-composition-form__control">
+            <div class="salary-composition-form__control" data-validation-field="compositionType">
                 <MsSelect id="composition-type" :model-value="compositionType ?? null" :disabled="isReadOnly"
                     :options="salaryCompositionFormOptions.compositionType" class="salary-composition-form__select
                     salary-composition-form__select--medium" @update:model-value="handleCompositionTypeChange" />
@@ -289,7 +349,7 @@ defineExpose({
             <label class="salary-composition-form__label" for="nature">
                 Tính chất <span class="text-error">*</span>
             </label>
-            <div class="salary-composition-form__control">
+            <div class="salary-composition-form__control" data-validation-field="compositionNature">
                 <div class="flex flex-wrap items-center gap-x-7 gap-y-2">
                     <MsSelect id="nature" :model-value="compositionNature" :disabled="isReadOnly"
                         :options="salaryCompositionFormOptions.compositionNature" class="salary-composition-form__select
@@ -323,7 +383,7 @@ defineExpose({
             </div>
 
             <label class="salary-composition-form__label" for="value-type">Kiểu giá trị</label>
-            <div class="salary-composition-form__control">
+            <div class="salary-composition-form__control" data-validation-field="valueType">
                 <MsSelect id="value-type" :model-value="valueType" :disabled="isReadOnly"
                     :options="salaryCompositionFormOptions.valueType" class="salary-composition-form__select
                     salary-composition-form__select--medium" @update:model-value="handleValueTypeChange" />
@@ -357,7 +417,7 @@ defineExpose({
             <textarea id="description" class="salary-composition-form__textarea h-22" :readonly="isReadOnly"></textarea>
 
             <label class="salary-composition-form__label">Hiển thị trên phiếu lương</label>
-            <div class="salary-composition-form__control">
+            <div class="salary-composition-form__control" data-validation-field="optionShowPaycheck">
                 <div class="flex flex-wrap items-center gap-6">
                     <label v-for="option in salaryCompositionFormOptions.optionShowPaycheck" :key="option.value"
                         class="salary-composition-form__radio">

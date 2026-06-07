@@ -1,4 +1,6 @@
 <script setup lang='ts'>
+import { ref } from 'vue';
+
 
 interface MsInputProps {
     placeholder?: string;
@@ -18,9 +20,15 @@ const handleInput = (event: Event) => {
     emit('update:modelValue', target.value);
 }
 
+const inputRef = ref<HTMLInputElement | null>(null);
+
+defineExpose({
+    focus: () => inputRef.value?.focus(),
+})
+
 </script>
 <template>
-    <input @input="handleInput" :value="modelValue" :disabled="disabled" :placeholder="placeholder" :required="required"
-        type="text">
+    <input ref="inputRef" @input="handleInput" :value="modelValue" :disabled="disabled" :placeholder="placeholder"
+        :required="required" type="text">
 </template>
 <style scoped></style>
