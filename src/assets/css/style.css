@@ -79,9 +79,14 @@ body {
     background: #414651;
     color: #ffffff;
     padding: 4px 14px;
-    font-size: 13px;
+    font-size: 12px;
     line-height: 20px;
     box-shadow: none;
+
+    max-width: 500px;
+    white-space: normal;
+    overflow-wrap: break-word;
+    text-align: center;
 }
 
 .v-popper--theme-ms-tooltip.ms-tooltip--without-arrow .v-popper__arrow-container {

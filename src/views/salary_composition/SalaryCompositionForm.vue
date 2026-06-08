@@ -30,6 +30,8 @@ import SalaryCompositionOrganization from './SalaryCompositionOrganization.vue';
 import { useForm } from 'vee-validate';
 import type { CreateSalaryCompositionRequest } from '@/types/salaryComposition';
 import { salaryCompositionSchema } from '@/validations/salaryCompositionSchema';
+import MsIcon from '@/components/base/MsIcon.vue';
+import MsTooltip from '@/components/base/MsTooltip.vue';
 
 type FormMode = 'create' | 'edit' | 'view';
 type EnumLike = Record<string, string | number>;
@@ -183,7 +185,7 @@ const { errors, defineField, handleSubmit, } =
 
             allowToExceedQuota: false,
 
-            valueType: ValueType.Number,
+            valueType: ValueType.Currency,
             isAutoSumEmployee: true,
             autoSumEmployeeType: AutoSumEmployeeType.SameWorkingUnit,
             organizationalStructureLevel: undefined,
@@ -201,12 +203,21 @@ const [compositionType] = defineField('compositionType');
 const [compositionNature] = defineField('compositionNature');
 const [incomeTaxType] = defineField('incomeTaxType');
 const [deductionType] = defineField('deductionType');
+const [quotaFormula] = defineField('quotaFormula');
 const [allowToExceedQuota] = defineField('allowToExceedQuota');
 const [valueType] = defineField('valueType');
 const [isAutoSumEmployee] = defineField('isAutoSumEmployee');
 const [autoSumEmployeeType] = defineField('autoSumEmployeeType');
 const [optionShowPaycheck] = defineField('optionShowPaycheck');
 const [organizationUnitIds] = defineField('organizationUnitIds');
+
+const isShowValueMethodOptions = computed(() => {
+    return [
+        ValueType.Percentage,
+        ValueType.Date,
+        ValueType.Text,
+    ].includes(valueType.value as ValueType);
+});
 
 const focusFirstInvalidField = async (
     validationErrors: Partial<Record<keyof CreateSalaryCompositionRequest, string | undefined>>,
@@ -252,6 +263,11 @@ const handleCompositionNatureChange = (value: SelectValue) => {
 
     if (nextCompositionNature !== CompositionNature.Deduction) {
         deductionType.value = undefined;
+    }
+
+    if (nextCompositionNature === CompositionNature.Other) {
+        allowToExceedQuota.value = undefined;
+        quotaFormula.value = undefined;
     }
 };
 
@@ -417,8 +433,11 @@ onMounted(async () => {
                         <MsCheckbox :checked="allowToExceedQuota" :disabled="isReadOnly"
                             @change="allowToExceedQuota = $event" />
                         <span>Cho phép giá trị tính vượt quá định mức</span>
-                        <span class="inline-flex size-5 items-center justify-center rounded-full border border-[#7d8591]
-                                 text-[13px] font-bold text-[#6b7280]">i</span>
+                        <MsTooltip :show-arrow="true"
+                            content='Nếu không tích chọn thì khi tính giá trị của thành phần lương
+                             này mà số tiền vượt quá định mức thì chương trình sẽ tự động lấy tối đa bằng định mức đã nhập'>
+                            <MsIcon name="info-icon"></MsIcon>
+                        </MsTooltip>
                     </div>
                 </div>
             </template>
@@ -426,7 +445,7 @@ onMounted(async () => {
             <div class="salary-composition-form__row">
                 <label class="salary-composition-form__label" for="value-type">Kiểu giá trị</label>
                 <div class="salary-composition-form__control" data-validation-field="valueType">
-                    <MsMenuSelect id="value-type" v-model="valueType" :disabled="isReadOnly"
+                    <MsMenuSelect id="value-type" v-model="valueType" :disabled="isReadOnly || compositionNature !== 3"
                         :options="salaryCompositionFormOptions.valueType" class="salary-composition-form__select
                         salary-composition-form__select--medium" :invalid="Boolean(errors.valueType)" />
                     <span v-if="errors.valueType" class="text-error text-[13px]">
@@ -438,24 +457,26 @@ onMounted(async () => {
             <div class="salary-composition-form__row">
                 <label class="salary-composition-form__label">Giá trị</label>
                 <div class="salary-composition-form__control salary-composition-form__control--stacked">
-                    <label class="salary-composition-form__radio">
-                        <input type="radio" name="value-method" :checked="isAutoSumEmployee" :disabled="isReadOnly"
-                            @change="isAutoSumEmployee = true" />
-                        <span>Tự động cộng tổng giá trị của các nhân viên</span>
-                    </label>
+                    <div v-if="isShowValueMethodOptions" class="salary-composition-form__value-methods">
+                        <label class="salary-composition-form__radio">
+                            <input type="radio" name="value-method" :checked="isAutoSumEmployee" :disabled="isReadOnly"
+                                @change="isAutoSumEmployee = true" />
+                            <span>Tự động cộng tổng giá trị của các nhân viên</span>
+                        </label>
 
-                    <MsMenuSelect :model-value="autoSumEmployeeType ?? null" :disabled="isReadOnly"
-                        :options="salaryCompositionFormOptions.autoSumEmployeeType" class="salary-composition-form__select
+                        <MsMenuSelect :model-value="autoSumEmployeeType ?? null" :disabled="isReadOnly"
+                            :options="salaryCompositionFormOptions.autoSumEmployeeType" class="salary-composition-form__select
                         salary-composition-form__select--medium"
-                        @update:model-value="handleAutoSumEmployeeTypeChange" />
+                            @update:model-value="handleAutoSumEmployeeTypeChange" />
 
-                    <label class="salary-composition-form__radio">
-                        <input type="radio" name="value-method" :checked="!isAutoSumEmployee" :disabled="isReadOnly"
-                            @change="isAutoSumEmployee = false" />
-                        <span>Tính theo công thức tự đặt</span>
-                    </label>
+                        <label class="salary-composition-form__radio">
+                            <input type="radio" name="value-method" :checked="!isAutoSumEmployee" :disabled="isReadOnly"
+                                @change="isAutoSumEmployee = false" />
+                            <span>Tính theo công thức tự đặt</span>
+                        </label>
+                    </div>
 
-                    <div class="relative max-w-262">
+                    <div class="salary-composition-form__formula">
                         <textarea class="salary-composition-form__textarea h-22" :readonly="isReadOnly"
                             placeholder="Tự động gợi ý công thức và tham số khi gõ"></textarea>
                     </div>
@@ -631,6 +652,18 @@ onMounted(async () => {
     height: 16px;
     margin: 0;
     accent-color: var(--app-color-primary);
+}
+
+.salary-composition-form__value-methods {
+    display: flex;
+    max-width: 394px;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.salary-composition-form__formula {
+    position: relative;
+    max-width: 1048px;
 }
 
 .salary-composition-form-scroll {

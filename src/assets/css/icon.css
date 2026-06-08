@@ -177,3 +177,9 @@
     background-image: url('/src/assets/images/EmptyState-hFasANEP.svg');
     background-position: -152px -3046px;
 }
+
+.info-icon {
+    background-position: -129px -546px;
+    width: 14px;
+    height: 14px;
+}

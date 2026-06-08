@@ -33,6 +33,7 @@ const iconClasses: Record<string, string> = {
   'table-settings': 'icon-sprite table-col-settings-icon',
   'table-filter': 'icon-sprite table-col-filter-icon',
   'table-not-found': 'icon-sprite table-not-found-icon',
+  'info-icon': 'icon-sprite info-icon',
 }
 </script>
 

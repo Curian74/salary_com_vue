@@ -10,7 +10,7 @@ export interface MsMenuSelectOption {
     value: string | number | null
     label?: string
     name?: string
-    disabled?: boolean
+    disabled?: boolean,
 }
 
 interface MsMenuSelectProps {
@@ -149,7 +149,7 @@ onBeforeUnmount(() => {
 
 <template>
     <div ref="selectRef" class="relative inline-block" :class="attrs.class" :style="attrs.style">
-        <button ref="triggerRef" :id="id" type="button" class="ms-menu-select__trigger" :class="{
+        <button ref="triggerRef" :id="id" type="button" class="ms-menu-select__trigger cursor-pointer" :class="{
             'ms-menu-select__trigger--invalid': invalid,
             'ms-menu-select__trigger--placeholder': !selectedOption,
         }" :disabled="disabled" aria-haspopup="listbox" :aria-expanded="isOpen" @click="toggleMenu">
@@ -202,8 +202,7 @@ onBeforeUnmount(() => {
 }
 
 .ms-menu-select__trigger:hover {
-    border-color: #aab2bd;
-    background: #f8f9fb;
+    border-color: var(--app-color-primary);
 }
 
 .ms-menu-select__trigger:focus {
