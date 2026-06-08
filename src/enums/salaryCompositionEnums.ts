@@ -1,6 +1,7 @@
 export enum AutoSumEmployeeType {
     SameWorkingUnit = 1,
-    UnderAuthority = 2
+    UnderAuthority = 2,
+    OrganizationStructure = 3,
 }
 
 export enum CompositionNature {

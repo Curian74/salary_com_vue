@@ -11,8 +11,9 @@ import {
 } from '@/enums/salaryCompositionEnums'
 
 export const autoSumEmployeeTypeText: Record<AutoSumEmployeeType, string> = {
-    [AutoSumEmployeeType.SameWorkingUnit]: 'Cùng đơn vị công tác',
-    [AutoSumEmployeeType.UnderAuthority]: 'Cấp dưới',
+    [AutoSumEmployeeType.SameWorkingUnit]: 'Trong cùng đơn vị công tác',
+    [AutoSumEmployeeType.UnderAuthority]: 'Dưới quyền',
+    [AutoSumEmployeeType.OrganizationStructure]: 'Thuộc cơ cấu tổ chức',
 }
 
 export const compositionNatureText: Record<CompositionNature, string> = {
