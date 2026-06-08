@@ -3,14 +3,17 @@ import { ref } from 'vue';
 import MsButton from '@/components/base/MsButton.vue';
 import SalaryCompositionForm from './SalaryCompositionForm.vue';
 import type { GetOrganizationTreeResponse } from '@/types/organization.ts';
-import type { CreateSalaryCompositionRequest } from '@/types/salaryComposition.ts';
+import type { CreateSalaryCompositionRequest, GetSalaryCompositionsResponse } from '@/types/salaryComposition.ts';
 import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
 
 type SubmitAction = 'save' | 'saveAndAdd';
 
-defineProps<{
-    organizationItems?: GetOrganizationTreeResponse[]
-}>();
+interface Props {
+    organizationItems?: GetOrganizationTreeResponse[],
+    salaryComposition?: GetSalaryCompositionsResponse[],
+}
+
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
     back: []
@@ -61,6 +64,7 @@ const handleSaveAndAdd = () => {
     submitAction.value = 'saveAndAdd';
     formRef.value?.submitForm();
 };
+
 </script>
 
 <template>
@@ -80,8 +84,8 @@ const handleSaveAndAdd = () => {
         </div>
 
         <div class="mx-5 min-h-0 flex-1 overflow-hidden bg-white">
-            <SalaryCompositionForm :key="formKey" ref="formRef" :organization-items="organizationItems"
-                @submit="handleSubmit" mode="create" />
+            <SalaryCompositionForm :salary-composition="salaryComposition" :key="formKey" ref="formRef"
+                :organization-items="organizationItems" @submit="handleSubmit" mode="create" />
         </div>
 
         <div class="flex h-13 shrink-0 items-center justify-end gap-3 border-t border-border bg-background px-3">

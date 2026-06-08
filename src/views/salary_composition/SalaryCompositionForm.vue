@@ -26,7 +26,7 @@ import type { GetOrganizationTreeResponse } from '@/types/organization';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import SalaryCompositionOrganization from './SalaryCompositionOrganization.vue';
 import { useForm } from 'vee-validate';
-import type { CreateSalaryCompositionRequest } from '@/types/salaryComposition';
+import type { CreateSalaryCompositionRequest, GetSalaryCompositionsResponse } from '@/types/salaryComposition';
 import { salaryCompositionSchema } from '@/validations/salaryCompositionSchema';
 import MsIcon from '@/components/base/MsIcon.vue';
 import MsTooltip from '@/components/base/MsTooltip.vue';
@@ -35,11 +35,15 @@ type FormMode = 'create' | 'edit' | 'view';
 type EnumLike = Record<string, string | number>;
 type SelectValue = string | number | null;
 
-const props = withDefaults(defineProps<{
+interface Props {
     mode: FormMode
-    organizationItems?: GetOrganizationTreeResponse[]
-}>(), {
+    organizationItems?: GetOrganizationTreeResponse[],
+    salaryComposition?: GetSalaryCompositionsResponse[],
+}
+
+const props = withDefaults(defineProps<Props>(), {
     organizationItems: () => [],
+    salaryComposition: () => [],
 });
 
 const getEnumNumberValues = (enumObject: EnumLike) =>
@@ -294,6 +298,8 @@ onBeforeUnmount(() => {
 onMounted(async () => {
     // Chờ dom load xong mới auto focus
     await nextTick();
+
+    console.log('salaryComposition', props.salaryComposition);
 
     if (!isReadOnly.value) {
         nameInputRef.value?.focus();
