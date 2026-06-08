@@ -51,7 +51,6 @@ const goBack = () => {
 
 const handleSubmit = async (payload: CreateSalaryCompositionRequest) => {
     console.log(payload);
-
     try {
         const data = await salaryCompositionApi.createSalaryComposition(payload);
         console.log(data);

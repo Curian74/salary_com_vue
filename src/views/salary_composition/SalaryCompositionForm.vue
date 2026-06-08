@@ -312,173 +312,214 @@ onMounted(async () => {
 <template>
     <div class="salary-composition-form-scroll h-full overflow-y-auto px-12 pb-22 pt-5">
         <form ref="salaryCompositionFormRef" class="salary-composition-form" @submit.prevent="submitForm">
-            <label class="salary-composition-form__label" for="composition-name">
-                Tên thành phần <span class="text-error">*</span>
-            </label>
-            <div class="salary-composition-form__control" data-validation-field="name">
-                <MsInput ref="nameInputRef" v-model="name" id="composition-name" class="salary-composition-form__input"
-                    :class="{ 'salary-composition-form__input--invalid': errors.name }" :disabled="isReadOnly" />
-                <span v-if="errors.name" class="text-error text-[13px]">
-                    {{ errors.name }}
-                </span>
-            </div>
-
-            <label class="salary-composition-form__label" for="composition-code">
-                Mã thành phần <span class="text-error">*</span>
-            </label>
-            <div class="salary-composition-form__control" data-validation-field="code">
-                <MsInput v-model="code" id="composition-code" class="salary-composition-form__input"
-                    :class="{ 'salary-composition-form__input--invalid': errors.code }" :disabled="isReadOnly"
-                    placeholder="Nhập mã viết liền" />
-                <span v-if="errors.code" class="text-error text-[13px]">
-                    {{ errors.code }}
-                </span>
-            </div>
-
-            <label class="salary-composition-form__label">
-                Đơn vị áp dụng <span class="text-error">*</span>
-            </label>
-
-            <div data-validation-field="organizationUnitIds">
-                <SalaryCompositionOrganization class="salary-composition-form__organization"
-                    :show-unfollowed-orgs="false" :selected-organization-ids="selectedOrganizationIds"
-                    :show-inactive-organizations="isShowInactiveOrganizations"
-                    :organization-items="organizationTreeItems" :is-open="isOrganizationDropdownOpen"
-                    :invalid="Boolean(errors.organizationUnitIds)"
-                    @update:selected-organization-ids="handleOrganizationIdsChange"
-                    @update:show-inactive-organizations="handleShowAllOrganization" @toggle="toggleOrganizationDropdown"
-                    @set-dropdown-el="setOrganizationDropdownElement" />
-
-                <span v-if="errors.organizationUnitIds" class="text-error text-[13px]">
-                    {{ errors.organizationUnitIds }}
-                </span>
-            </div>
-
-            <label class="salary-composition-form__label" for="composition-type">
-                Loại thành phần <span class="text-error">*</span>
-            </label>
-            <div class="salary-composition-form__control" data-validation-field="compositionType">
-                <MsSelect id="composition-type" :model-value="compositionType ?? null" :disabled="isReadOnly"
-                    :options="salaryCompositionFormOptions.compositionType" class="salary-composition-form__select
-                    salary-composition-form__select--medium"
-                    :class="{ 'salary-composition-form__select--invalid': errors.compositionType }"
-                    @update:model-value="handleCompositionTypeChange" />
-                <span v-if="errors.compositionType" class="text-error text-[13px]">
-                    {{ errors.compositionType }}
-                </span>
-            </div>
-
-            <label class="salary-composition-form__label" for="nature">
-                Tính chất <span class="text-error">*</span>
-            </label>
-            <div class="salary-composition-form__control" data-validation-field="compositionNature">
-                <div class="flex flex-wrap items-center gap-x-7 gap-y-2">
-                    <MsSelect id="nature" :model-value="compositionNature" :disabled="isReadOnly"
-                        :options="salaryCompositionFormOptions.compositionNature" class="salary-composition-form__select
-                        salary-composition-form__select--medium"
-                        :class="{ 'salary-composition-form__select--invalid': errors.compositionNature }"
-                        @update:model-value="handleCompositionNatureChange" />
-
-                    <label v-if="compositionNature === 1" v-for="option in salaryCompositionFormOptions.incomeTaxType"
-                        :key="option.value" class="salary-composition-form__radio">
-                        <input type="radio" name="tax-status" :value="option.value"
-                            :checked="incomeTaxType === option.value" :disabled="isReadOnly"
-                            @change="incomeTaxType = option.value" />
-                        <span>{{ option.label }}</span>
-                    </label>
-
-                    <label v-if="compositionNature === 2" v-for="option in salaryCompositionFormOptions.deductionType"
-                        :key="option.value" class="salary-composition-form__radio">
-                        <MsCheckbox :checked="deductionType === option.value" :disabled="isReadOnly"
-                            @change="checked => handleDeductionTypeChange(option.value, checked)" />
-                        <span>{{ option.label }}</span>
-                    </label>
-
-                    <span v-if="errors.compositionNature" class="text-error text-[13px]">
-                        {{ errors.compositionNature }}
+            <div class="salary-composition-form__row">
+                <label class="salary-composition-form__label" for="composition-name">
+                    Tên thành phần <span class="text-error">*</span>
+                </label>
+                <div class="salary-composition-form__control" data-validation-field="name">
+                    <MsInput ref="nameInputRef" v-model="name" id="composition-name"
+                        class="salary-composition-form__input"
+                        :class="{ 'salary-composition-form__input--invalid': errors.name }" :disabled="isReadOnly" />
+                    <span v-if="errors.name" class="text-error text-[13px]">
+                        {{ errors.name }}
                     </span>
                 </div>
             </div>
 
-            <label class="salary-composition-form__label" for="limit">Định mức</label>
-            <textarea id="description" class="salary-composition-form__textarea h-22" :readonly="isReadOnly"
-                v-model="description"></textarea>
-
-            <div></div>
-            <div class="flex h-7 items-center gap-2.5 text-[13px] text-[#001b44]">
-                <MsCheckbox :checked="allowToExceedQuota" :disabled="isReadOnly"
-                    @change="allowToExceedQuota = $event" />
-                <span>Cho phép giá trị tính vượt quá định mức</span>
-                <span class="inline-flex size-5 items-center justify-center rounded-full border border-[#7d8591]
-                         text-[13px] font-bold text-[#6b7280]">i</span>
-            </div>
-
-            <label class="salary-composition-form__label" for="value-type">Kiểu giá trị</label>
-            <div class="salary-composition-form__control" data-validation-field="valueType">
-                <MsSelect id="value-type" :model-value="valueType" :disabled="isReadOnly"
-                    :options="salaryCompositionFormOptions.valueType" class="salary-composition-form__select
-                    salary-composition-form__select--medium"
-                    :class="{ 'salary-composition-form__select--invalid': errors.valueType }"
-                    @update:model-value="handleValueTypeChange" />
-                <span v-if="errors.valueType" class="text-error text-[13px]">
-                    {{ errors.valueType }}
-                </span>
-            </div>
-
-            <label class="salary-composition-form__label">Giá trị</label>
-            <div class="flex flex-col gap-3">
-                <label class="salary-composition-form__radio">
-                    <input type="radio" name="value-method" :checked="isAutoSumEmployee" :disabled="isReadOnly"
-                        @change="isAutoSumEmployee = true" />
-                    <span>Tự động cộng tổng giá trị của các nhân viên</span>
+            <div class="salary-composition-form__row">
+                <label class="salary-composition-form__label" for="composition-code">
+                    Mã thành phần <span class="text-error">*</span>
                 </label>
-
-                <MsSelect :model-value="autoSumEmployeeType ?? null" :disabled="isReadOnly"
-                    :options="salaryCompositionFormOptions.autoSumEmployeeType" class="salary-composition-form__select
-                    salary-composition-form__select--medium" @update:model-value="handleAutoSumEmployeeTypeChange" />
-
-                <label class="salary-composition-form__radio">
-                    <input type="radio" name="value-method" :checked="!isAutoSumEmployee" :disabled="isReadOnly"
-                        @change="isAutoSumEmployee = false" />
-                    <span>Tính theo công thức tự đặt</span>
-                </label>
-
-                <div class="relative max-w-262">
-                    <textarea class="salary-composition-form__textarea h-22" :readonly="isReadOnly"
-                        placeholder="Tự động gợi ý công thức và tham số khi gõ"></textarea>
+                <div class="salary-composition-form__control" data-validation-field="code">
+                    <MsInput v-model="code" id="composition-code" class="salary-composition-form__input"
+                        :class="{ 'salary-composition-form__input--invalid': errors.code }" :disabled="isReadOnly"
+                        placeholder="Nhập mã viết liền" />
+                    <span v-if="errors.code" class="text-error text-[13px]">
+                        {{ errors.code }}
+                    </span>
                 </div>
             </div>
 
-            <label class="salary-composition-form__label" for="description">Mô tả</label>
-            <textarea id="description" class="salary-composition-form__textarea h-22" :readonly="isReadOnly"></textarea>
+            <div class="salary-composition-form__row">
+                <label class="salary-composition-form__label">
+                    Đơn vị áp dụng <span class="text-error">*</span>
+                </label>
 
-            <label class="salary-composition-form__label">Hiển thị trên phiếu lương</label>
-            <div class="salary-composition-form__control" data-validation-field="optionShowPaycheck">
-                <div class="flex flex-wrap items-center gap-6">
-                    <label v-for="option in salaryCompositionFormOptions.optionShowPaycheck" :key="option.value"
-                        class="salary-composition-form__radio">
-                        <input type="radio" name="show-on-payroll" :value="option.value"
-                            :checked="optionShowPaycheck === option.value" :disabled="isReadOnly"
-                            @change="optionShowPaycheck = option.value" />
-                        <span>{{ option.label }}</span>
+                <div class="salary-composition-form__control" data-validation-field="organizationUnitIds">
+                    <SalaryCompositionOrganization class="salary-composition-form__organization"
+                        :show-unfollowed-orgs="false" :selected-organization-ids="selectedOrganizationIds"
+                        :show-inactive-organizations="isShowInactiveOrganizations"
+                        :organization-items="organizationTreeItems" :is-open="isOrganizationDropdownOpen"
+                        :invalid="Boolean(errors.organizationUnitIds)"
+                        @update:selected-organization-ids="handleOrganizationIdsChange"
+                        @update:show-inactive-organizations="handleShowAllOrganization"
+                        @toggle="toggleOrganizationDropdown" @set-dropdown-el="setOrganizationDropdownElement" />
+
+                    <span v-if="errors.organizationUnitIds" class="text-error text-[13px]">
+                        {{ errors.organizationUnitIds }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="salary-composition-form__row">
+                <label class="salary-composition-form__label" for="composition-type">
+                    Loại thành phần <span class="text-error">*</span>
+                </label>
+                <div class="salary-composition-form__control" data-validation-field="compositionType">
+                    <MsSelect id="composition-type" :model-value="compositionType ?? null" :disabled="isReadOnly"
+                        :options="salaryCompositionFormOptions.compositionType" class="salary-composition-form__select
+                        salary-composition-form__select--medium"
+                        :class="{ 'salary-composition-form__select--invalid': errors.compositionType }"
+                        @update:model-value="handleCompositionTypeChange" />
+                    <span v-if="errors.compositionType" class="text-error text-[13px]">
+                        {{ errors.compositionType }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="salary-composition-form__row">
+                <label class="salary-composition-form__label" for="nature">
+                    Tính chất <span class="text-error">*</span>
+                </label>
+                <div class="salary-composition-form__control" data-validation-field="compositionNature">
+                    <div class="flex flex-wrap items-center gap-x-7 gap-y-2">
+                        <MsSelect id="nature" :model-value="compositionNature" :disabled="isReadOnly"
+                            :options="salaryCompositionFormOptions.compositionNature" class="salary-composition-form__select
+                            salary-composition-form__select--medium"
+                            :class="{ 'salary-composition-form__select--invalid': errors.compositionNature }"
+                            @update:model-value="handleCompositionNatureChange" />
+
+                        <label v-if="compositionNature === 1"
+                            v-for="option in salaryCompositionFormOptions.incomeTaxType" :key="option.value"
+                            class="salary-composition-form__radio">
+                            <input type="radio" name="tax-status" :value="option.value"
+                                :checked="incomeTaxType === option.value" :disabled="isReadOnly"
+                                @change="incomeTaxType = option.value" />
+                            <span>{{ option.label }}</span>
+                        </label>
+
+                        <label v-if="compositionNature === 2"
+                            v-for="option in salaryCompositionFormOptions.deductionType" :key="option.value"
+                            class="salary-composition-form__radio">
+                            <MsCheckbox :checked="deductionType === option.value" :disabled="isReadOnly"
+                                @change="checked => handleDeductionTypeChange(option.value, checked)" />
+                            <span>{{ option.label }}</span>
+                        </label>
+
+                        <span v-if="errors.compositionNature" class="text-error text-[13px]">
+                            {{ errors.compositionNature }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <template v-if="compositionNature !== 3">
+                <div class="salary-composition-form__row">
+                    <label class="salary-composition-form__label" for="quota-description">Định mức</label>
+                    <div class="salary-composition-form__control">
+                        <textarea id="quota-description" class="salary-composition-form__textarea h-22"
+                            :readonly="isReadOnly" v-model="description"></textarea>
+                    </div>
+                </div>
+
+                <div class="salary-composition-form__row">
+                    <span class="salary-composition-form__label" aria-hidden="true"></span>
+                    <div class="salary-composition-form__inline-control">
+                        <MsCheckbox :checked="allowToExceedQuota" :disabled="isReadOnly"
+                            @change="allowToExceedQuota = $event" />
+                        <span>Cho phép giá trị tính vượt quá định mức</span>
+                        <span class="inline-flex size-5 items-center justify-center rounded-full border border-[#7d8591]
+                                 text-[13px] font-bold text-[#6b7280]">i</span>
+                    </div>
+                </div>
+            </template>
+
+            <div class="salary-composition-form__row">
+                <label class="salary-composition-form__label" for="value-type">Kiểu giá trị</label>
+                <div class="salary-composition-form__control" data-validation-field="valueType">
+                    <MsSelect id="value-type" :model-value="valueType" :disabled="isReadOnly"
+                        :options="salaryCompositionFormOptions.valueType" class="salary-composition-form__select
+                        salary-composition-form__select--medium"
+                        :class="{ 'salary-composition-form__select--invalid': errors.valueType }"
+                        @update:model-value="handleValueTypeChange" />
+                    <span v-if="errors.valueType" class="text-error text-[13px]">
+                        {{ errors.valueType }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="salary-composition-form__row">
+                <label class="salary-composition-form__label">Giá trị</label>
+                <div class="salary-composition-form__control salary-composition-form__control--stacked">
+                    <label class="salary-composition-form__radio">
+                        <input type="radio" name="value-method" :checked="isAutoSumEmployee" :disabled="isReadOnly"
+                            @change="isAutoSumEmployee = true" />
+                        <span>Tự động cộng tổng giá trị của các nhân viên</span>
                     </label>
+
+                    <MsSelect :model-value="autoSumEmployeeType ?? null" :disabled="isReadOnly"
+                        :options="salaryCompositionFormOptions.autoSumEmployeeType" class="salary-composition-form__select
+                        salary-composition-form__select--medium" @update:model-value="handleAutoSumEmployeeTypeChange" />
+
+                    <label class="salary-composition-form__radio">
+                        <input type="radio" name="value-method" :checked="!isAutoSumEmployee" :disabled="isReadOnly"
+                            @change="isAutoSumEmployee = false" />
+                        <span>Tính theo công thức tự đặt</span>
+                    </label>
+
+                    <div class="relative max-w-262">
+                        <textarea class="salary-composition-form__textarea h-22" :readonly="isReadOnly"
+                            placeholder="Tự động gợi ý công thức và tham số khi gõ"></textarea>
+                    </div>
                 </div>
             </div>
 
-            <label class="salary-composition-form__label" for="source">Nguồn tạo</label>
-            <MsSelect id="source" :model-value="SourceType.UserAdded" :options="salaryCompositionFormOptions.sourceType"
-                disabled class="salary-composition-form__select
-                salary-composition-form__select--medium" />
+            <div class="salary-composition-form__row">
+                <label class="salary-composition-form__label" for="description">Mô tả</label>
+                <div class="salary-composition-form__control">
+                    <textarea id="description" class="salary-composition-form__textarea h-22"
+                        :readonly="isReadOnly"></textarea>
+                </div>
+            </div>
+
+            <div class="salary-composition-form__row">
+                <label class="salary-composition-form__label">Hiển thị trên phiếu lương</label>
+                <div class="salary-composition-form__control" data-validation-field="optionShowPaycheck">
+                    <div class="flex flex-wrap items-center gap-6">
+                        <label v-for="option in salaryCompositionFormOptions.optionShowPaycheck" :key="option.value"
+                            class="salary-composition-form__radio">
+                            <input type="radio" name="show-on-payroll" :value="option.value"
+                                :checked="optionShowPaycheck === option.value" :disabled="isReadOnly"
+                                @change="optionShowPaycheck = option.value" />
+                            <span>{{ option.label }}</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="salary-composition-form__row">
+                <label class="salary-composition-form__label" for="source">Nguồn tạo</label>
+                <div class="salary-composition-form__control">
+                    <MsSelect id="source" :model-value="SourceType.UserAdded"
+                        :options="salaryCompositionFormOptions.sourceType" disabled class="salary-composition-form__select
+                        salary-composition-form__select--medium" />
+                </div>
+            </div>
         </form>
     </div>
 </template>
 
 <style scoped>
 .salary-composition-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.salary-composition-form__row {
     display: grid;
     grid-template-columns: 220px minmax(320px, 1048px);
     column-gap: 30px;
-    row-gap: 14px;
     align-items: start;
 }
 
@@ -496,6 +537,21 @@ onMounted(async () => {
     min-width: 0;
     flex-direction: column;
     gap: 4px;
+}
+
+.salary-composition-form__control--stacked {
+    gap: 12px;
+}
+
+.salary-composition-form__inline-control {
+    display: flex;
+    min-height: 34px;
+    min-width: 0;
+    align-items: center;
+    gap: 10px;
+    color: #001b44;
+    font-size: 13px;
+    line-height: 18px;
 }
 
 .salary-composition-form__field,
@@ -613,7 +669,7 @@ onMounted(async () => {
 }
 
 @media (max-width: 900px) {
-    .salary-composition-form {
+    .salary-composition-form__row {
         grid-template-columns: 1fr;
         row-gap: 10px;
     }
@@ -623,6 +679,8 @@ onMounted(async () => {
         padding-top: 8px;
     }
 
+    .salary-composition-form__input,
+    .salary-composition-form__textarea,
     .salary-composition-form__organization {
         width: 100%;
     }
