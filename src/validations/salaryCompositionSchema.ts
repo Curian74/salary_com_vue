@@ -1,4 +1,12 @@
+import { CompositionNature, CompositionType } from '@/enums/salaryCompositionEnums';
 import * as yup from 'yup';
+
+// Lấy ra values của các enum
+// Vì enum ánh xạ cả key lẫn value, ex: [a,b,c, 1,2,3]
+// nên chỉ filter lấy ra type bằng number
+const validCompositionNatures = Object
+    .values(CompositionNature)
+    .filter((x): x is CompositionNature => typeof x === 'number');
 
 export const salaryCompositionSchema = yup.object({
     code: yup.string().trim().required('Không được để trống.'),
@@ -11,8 +19,10 @@ export const salaryCompositionSchema = yup.object({
         .required('Không được để trống.'),
 
     compositionNature: yup
-        .number()
-        .required('Không được để trống.'),
+        .mixed<CompositionNature>()
+        .oneOf(validCompositionNatures, 'Invalid')
+        .required('')
+    ,
 
     incomeTaxType: yup
         .number()

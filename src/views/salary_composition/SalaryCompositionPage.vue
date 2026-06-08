@@ -267,7 +267,8 @@ onBeforeUnmount(() => {
         @last-page="handleLastPage" @next-page="handleNextPage" @previous-page="handlePreviousPage"
         @update:page-size="handlePageSizeChange" />
 
-    <SalaryCompositionAdd v-else-if="activeView === 'add'" @back="showList" @saved="handleSaved" />
+    <SalaryCompositionAdd v-else-if="activeView === 'add'" :organization-items="organizationTreeItems"
+        @back="showList" @saved="handleSaved" />
 
     <section v-else class="flex h-[calc(100vh-48px)] flex-col bg-background px-4 pb-2.5 pt-3">
         <div class="text-[20px] font-bold leading-8 text-text-primary">

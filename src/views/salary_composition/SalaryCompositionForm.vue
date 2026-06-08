@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import organizationApi from '@/apis/organizationApi';
 import MsCheckbox from '@/components/base/MsCheckbox.vue';
 import MsInput from '@/components/base/MsInput.vue';
 import MsMenuSelect from '@/components/base/MsMenuSelect.vue';
@@ -11,7 +10,6 @@ import {
     IncomeTaxType,
     OptionShowPaycheck,
     SourceType,
-    TrackingStatus,
     ValueType,
 } from '@/enums/salaryCompositionEnums';
 import {
@@ -25,7 +23,7 @@ import {
     valueTypeText,
 } from '@/constants/salaryCompositionLabels';
 import type { GetOrganizationTreeResponse } from '@/types/organization';
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import SalaryCompositionOrganization from './SalaryCompositionOrganization.vue';
 import { useForm } from 'vee-validate';
 import type { CreateSalaryCompositionRequest } from '@/types/salaryComposition';
@@ -37,9 +35,12 @@ type FormMode = 'create' | 'edit' | 'view';
 type EnumLike = Record<string, string | number>;
 type SelectValue = string | number | null;
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
     mode: FormMode
-}>();
+    organizationItems?: GetOrganizationTreeResponse[]
+}>(), {
+    organizationItems: () => [],
+});
 
 const getEnumNumberValues = (enumObject: EnumLike) =>
     Object.values(enumObject).filter((value): value is number => typeof value === 'number');
@@ -73,13 +74,9 @@ const salaryCompositionFormOptions = {
 };
 
 // #region Organization picker logic
-const organizationTreeItems = ref<GetOrganizationTreeResponse[]>([]);
 const selectedOrganizationIds = ref<string[]>([]);
 const organizationDropdownRef = ref<HTMLElement | null>(null);
 const isOrganizationDropdownOpen = ref(false);
-const organizationTrackingStatus = ref<TrackingStatus | undefined>(TrackingStatus.Active);
-
-const isShowInactiveOrganizations = computed(() => organizationTrackingStatus.value === undefined);
 
 const toggleOrganizationDropdown = () => {
     if (isReadOnly.value) {
@@ -104,13 +101,6 @@ const handleOrganizationIdsChange = (organizationIds: string[]) => {
 
     selectedOrganizationIds.value = organizationIds;
     organizationUnitIds.value = organizationIds;
-};
-
-const handleShowAllOrganization = () => {
-    organizationTrackingStatus.value =
-        organizationTrackingStatus.value === TrackingStatus.Active ? undefined : TrackingStatus.Active;
-
-    fetchOrganizationTree();
 };
 
 const handleDocumentPointerDown = (event: PointerEvent) => {
@@ -146,20 +136,6 @@ const selectAllOrganizations = (items: GetOrganizationTreeResponse[]) => {
     organizationUnitIds.value = organizationIds;
 };
 
-const fetchOrganizationTree = async () => {
-    try {
-        const response = await organizationApi.fetchOrganizationTree({
-            trackingStatus: organizationTrackingStatus.value,
-        });
-
-        organizationTreeItems.value = response.value;
-        selectAllOrganizations(organizationTreeItems.value);
-    }
-    catch (err) {
-        console.log(err);
-        organizationTreeItems.value = [];
-    }
-};
 //#endregion
 
 const isReadOnly = computed(() => props.mode === 'view');
@@ -210,6 +186,18 @@ const [isAutoSumEmployee] = defineField('isAutoSumEmployee');
 const [autoSumEmployeeType] = defineField('autoSumEmployeeType');
 const [optionShowPaycheck] = defineField('optionShowPaycheck');
 const [organizationUnitIds] = defineField('organizationUnitIds');
+
+watch(
+    () => props.organizationItems,
+    (organizationItems) => {
+        if (selectedOrganizationIds.value.length > 0 || (organizationUnitIds.value?.length ?? 0) > 0) {
+            return;
+        }
+
+        selectAllOrganizations(organizationItems);
+    },
+    { immediate: true },
+);
 
 const isShowValueMethodOptions = computed(() => {
     return [
@@ -293,9 +281,7 @@ defineExpose({
     submitForm,
 });
 
-onMounted(async () => {
-    await fetchOrganizationTree();
-
+onMounted(() => {
     document.addEventListener('pointerdown', handleDocumentPointerDown);
     document.addEventListener('keydown', handleDocumentKeydown);
 });
@@ -355,11 +341,9 @@ onMounted(async () => {
                 <div class="salary-composition-form__control" data-validation-field="organizationUnitIds">
                     <SalaryCompositionOrganization class="salary-composition-form__organization"
                         :show-unfollowed-orgs="false" :selected-organization-ids="selectedOrganizationIds"
-                        :show-inactive-organizations="isShowInactiveOrganizations"
-                        :organization-items="organizationTreeItems" :is-open="isOrganizationDropdownOpen"
-                        :invalid="Boolean(errors.organizationUnitIds)"
+                        :show-inactive-organizations="false" :organization-items="organizationItems"
+                        :is-open="isOrganizationDropdownOpen" :invalid="Boolean(errors.organizationUnitIds)"
                         @update:selected-organization-ids="handleOrganizationIdsChange"
-                        @update:show-inactive-organizations="handleShowAllOrganization"
                         @toggle="toggleOrganizationDropdown" @set-dropdown-el="setOrganizationDropdownElement" />
 
                     <span v-if="errors.organizationUnitIds" class="text-error text-[13px]">
@@ -393,7 +377,7 @@ onMounted(async () => {
                             salary-composition-form__select--medium" :invalid="Boolean(errors.compositionNature)"
                             @update:model-value="handleCompositionNatureChange" />
 
-                        <label v-if="compositionNature === 1"
+                        <label v-if="compositionNature === CompositionNature.Income"
                             v-for="option in salaryCompositionFormOptions.incomeTaxType" :key="option.value"
                             class="salary-composition-form__radio">
                             <input type="radio" name="tax-status" :value="option.value"
@@ -402,7 +386,7 @@ onMounted(async () => {
                             <span>{{ option.label }}</span>
                         </label>
 
-                        <label v-if="compositionNature === 2"
+                        <label v-if="compositionNature === CompositionNature.Deduction"
                             v-for="option in salaryCompositionFormOptions.deductionType" :key="option.value"
                             class="salary-composition-form__radio">
                             <MsCheckbox :checked="deductionType === option.value" :disabled="isReadOnly"
@@ -465,10 +449,18 @@ onMounted(async () => {
                             <span>Tự động cộng tổng giá trị của các nhân viên</span>
                         </label>
 
-                        <MsMenuSelect :model-value="autoSumEmployeeType ?? null" :disabled="isReadOnly"
-                            :options="salaryCompositionFormOptions.autoSumEmployeeType" class="salary-composition-form__select
-                        salary-composition-form__select--medium"
-                            @update:model-value="handleAutoSumEmployeeTypeChange" />
+                        <MsMenuSelect :options="salaryCompositionFormOptions.autoSumEmployeeType"
+                            :model-value="autoSumEmployeeType ?? null" :disabled="isReadOnly || !isAutoSumEmployee"
+                            class="salary-composition-form__select
+                        salary-composition-form__select--medium" @update:model-value="handleAutoSumEmployeeTypeChange">
+
+                            <template #right="{ option }">
+                                <MsTooltip :show-arrow="true" content=''>
+                                    <MsIcon name="info-icon">{{ option.name }} aaa</MsIcon>
+                                </MsTooltip>
+                            </template>
+
+                        </MsMenuSelect>
 
                         <label class="salary-composition-form__radio">
                             <input type="radio" name="value-method" :checked="!isAutoSumEmployee" :disabled="isReadOnly"
@@ -477,7 +469,7 @@ onMounted(async () => {
                         </label>
                     </div>
 
-                    <div class="salary-composition-form__formula">
+                    <div v-if="!isAutoSumEmployee" class="salary-composition-form__formula">
                         <textarea class="salary-composition-form__textarea h-22" :readonly="isReadOnly"
                             placeholder="Tự động gợi ý công thức và tham số khi gõ"></textarea>
                     </div>

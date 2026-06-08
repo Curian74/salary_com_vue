@@ -175,6 +175,9 @@ onBeforeUnmount(() => {
                 ]" :disabled="option.disabled" role="option" :aria-selected="isSelected(option)"
                 @click="selectOption(option)">
                 <span class="truncate">{{ getOptionLabel(option) }}</span>
+                <div class="ml-auto">
+                    <slot :option="option" name="right" />
+                </div>
             </button>
         </div>
     </div>
