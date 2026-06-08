@@ -2,7 +2,7 @@
 import organizationApi from '@/apis/organizationApi';
 import MsCheckbox from '@/components/base/MsCheckbox.vue';
 import MsInput from '@/components/base/MsInput.vue';
-import MsSelect from '@/components/base/MsSelect.vue';
+import MsMenuSelect from '@/components/base/MsMenuSelect.vue';
 import {
     AutoSumEmployeeType,
     CompositionNature,
@@ -366,10 +366,9 @@ onMounted(async () => {
                     Loại thành phần <span class="text-error">*</span>
                 </label>
                 <div class="salary-composition-form__control" data-validation-field="compositionType">
-                    <MsSelect id="composition-type" :model-value="compositionType ?? null" :disabled="isReadOnly"
+                    <MsMenuSelect id="composition-type" :model-value="compositionType ?? null" :disabled="isReadOnly"
                         :options="salaryCompositionFormOptions.compositionType" class="salary-composition-form__select
-                        salary-composition-form__select--medium"
-                        :class="{ 'salary-composition-form__select--invalid': errors.compositionType }"
+                        salary-composition-form__select--medium" :invalid="Boolean(errors.compositionType)"
                         @update:model-value="handleCompositionTypeChange" />
                     <span v-if="errors.compositionType" class="text-error text-[13px]">
                         {{ errors.compositionType }}
@@ -383,10 +382,9 @@ onMounted(async () => {
                 </label>
                 <div class="salary-composition-form__control" data-validation-field="compositionNature">
                     <div class="flex flex-wrap items-center gap-x-7 gap-y-2">
-                        <MsSelect id="nature" :model-value="compositionNature" :disabled="isReadOnly"
+                        <MsMenuSelect id="nature" :model-value="compositionNature" :disabled="isReadOnly"
                             :options="salaryCompositionFormOptions.compositionNature" class="salary-composition-form__select
-                            salary-composition-form__select--medium"
-                            :class="{ 'salary-composition-form__select--invalid': errors.compositionNature }"
+                            salary-composition-form__select--medium" :invalid="Boolean(errors.compositionNature)"
                             @update:model-value="handleCompositionNatureChange" />
 
                         <label v-if="compositionNature === 1"
@@ -437,10 +435,9 @@ onMounted(async () => {
             <div class="salary-composition-form__row">
                 <label class="salary-composition-form__label" for="value-type">Kiểu giá trị</label>
                 <div class="salary-composition-form__control" data-validation-field="valueType">
-                    <MsSelect id="value-type" :model-value="valueType" :disabled="isReadOnly"
+                    <MsMenuSelect id="value-type" :model-value="valueType" :disabled="isReadOnly"
                         :options="salaryCompositionFormOptions.valueType" class="salary-composition-form__select
-                        salary-composition-form__select--medium"
-                        :class="{ 'salary-composition-form__select--invalid': errors.valueType }"
+                        salary-composition-form__select--medium" :invalid="Boolean(errors.valueType)"
                         @update:model-value="handleValueTypeChange" />
                     <span v-if="errors.valueType" class="text-error text-[13px]">
                         {{ errors.valueType }}
@@ -457,7 +454,7 @@ onMounted(async () => {
                         <span>Tự động cộng tổng giá trị của các nhân viên</span>
                     </label>
 
-                    <MsSelect :model-value="autoSumEmployeeType ?? null" :disabled="isReadOnly"
+                    <MsMenuSelect :model-value="autoSumEmployeeType ?? null" :disabled="isReadOnly"
                         :options="salaryCompositionFormOptions.autoSumEmployeeType" class="salary-composition-form__select
                         salary-composition-form__select--medium" @update:model-value="handleAutoSumEmployeeTypeChange" />
 
@@ -500,7 +497,7 @@ onMounted(async () => {
             <div class="salary-composition-form__row">
                 <label class="salary-composition-form__label" for="source">Nguồn tạo</label>
                 <div class="salary-composition-form__control">
-                    <MsSelect id="source" :model-value="SourceType.UserAdded"
+                    <MsMenuSelect id="source" :model-value="SourceType.UserAdded"
                         :options="salaryCompositionFormOptions.sourceType" disabled class="salary-composition-form__select
                         salary-composition-form__select--medium" />
                 </div>
@@ -626,25 +623,6 @@ onMounted(async () => {
 
 .salary-composition-form__select--medium {
     max-width: 394px;
-}
-
-.salary-composition-form__select :deep(select) {
-    width: 100%;
-    min-width: 0;
-    height: 34px;
-    border-color: #cfd4da;
-    font-size: 13px;
-    color: #001b44;
-}
-
-.salary-composition-form__select--invalid :deep(select),
-.salary-composition-form__select--invalid :deep(select:hover),
-.salary-composition-form__select--invalid :deep(select:focus) {
-    border-color: var(--app-color-error);
-}
-
-.salary-composition-form__select--invalid :deep(select:focus) {
-    box-shadow: 0 0 0 2px rgba(229, 72, 72, 0.12);
 }
 
 .salary-composition-form__radio {
