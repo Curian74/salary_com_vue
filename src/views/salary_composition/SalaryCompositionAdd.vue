@@ -1,72 +1,61 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from 'vue';
 import MsButton from '@/components/base/MsButton.vue';
 import SalaryCompositionForm from './SalaryCompositionForm.vue';
-import {
-    TrackingStatus,
-} from '@/enums/salaryCompositionEnums';
-import type { GetOrganizationTreeResponse } from '@/types/organization';
 import type { CreateSalaryCompositionRequest } from '@/types/salaryComposition.ts';
 import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
 
-const router = useRouter();
+type SubmitAction = 'save' | 'saveAndAdd';
 
-const organizationItems: GetOrganizationTreeResponse[] = [
-    {
-        id: 'phuc-lam',
-        parentId: '',
-        name: 'Công ty Phúc Lâm',
-        trackingStatus: TrackingStatus.Active,
-        hasChildren: true,
-        children: [
-            {
-                id: 'sales',
-                parentId: 'phuc-lam',
-                name: 'Phòng Kinh doanh',
-                trackingStatus: TrackingStatus.Active,
-                hasChildren: false,
-            },
-            {
-                id: 'accounting',
-                parentId: 'phuc-lam',
-                name: 'Phòng Kế toán',
-                trackingStatus: TrackingStatus.Active,
-                hasChildren: false,
-            },
-            {
-                id: 'hr',
-                parentId: 'phuc-lam',
-                name: 'Phòng Nhân sự',
-                trackingStatus: TrackingStatus.Active,
-                hasChildren: false,
-            },
-        ],
-    },
-];
+const emit = defineEmits<{
+    back: []
+    saved: []
+}>();
+
+const formRef = ref<InstanceType<typeof SalaryCompositionForm>>();
+const formKey = ref(0);
+const isSaving = ref(false);
+const submitAction = ref<SubmitAction>('save');
 
 const goBack = () => {
-    router.push({ name: 'SalaryCompositionList' });
+    emit('back');
 };
 
 const handleSubmit = async (payload: CreateSalaryCompositionRequest) => {
     console.log(payload);
+
     try {
+        isSaving.value = true;
+
         const data = await salaryCompositionApi.createSalaryComposition(payload);
         console.log(data);
-        alert("ngon");
-    }
+        alert('ngon');
 
+        if (submitAction.value === 'saveAndAdd') {
+            formKey.value++;
+            return;
+        }
+
+        emit('saved');
+    }
     catch (err) {
         console.log(err);
-        alert("haiz");
+        alert('haiz');
+    }
+    finally {
+        isSaving.value = false;
     }
 };
 
-// Ref để gọi phương thức submitForm của SalaryCompositionForm
-const formRef = ref<InstanceType<typeof SalaryCompositionForm>>();
+const handleSave = () => {
+    submitAction.value = 'save';
+    formRef.value?.submitForm();
+};
 
-
+const handleSaveAndAdd = () => {
+    submitAction.value = 'saveAndAdd';
+    formRef.value?.submitForm();
+};
 </script>
 
 <template>
@@ -86,17 +75,17 @@ const formRef = ref<InstanceType<typeof SalaryCompositionForm>>();
         </div>
 
         <div class="mx-5 min-h-0 flex-1 overflow-hidden bg-white">
-            <!-- Gắn ref cho form để có thể gọi phương thức submitForm -->
-            <SalaryCompositionForm ref="formRef" @submit="handleSubmit" @cancel="goBack" mode="create" />
+            <SalaryCompositionForm :key="formKey" ref="formRef" @submit="handleSubmit" mode="create" />
         </div>
 
         <div class="flex h-13 shrink-0 items-center justify-end gap-3 border-t border-border bg-background px-3">
-            <MsButton class="min-w-25" variant="secondary" @click="goBack">Hủy bỏ</MsButton>
+            <MsButton class="min-w-25" variant="secondary" :disabled="isSaving" @click="goBack">Hủy bỏ</MsButton>
             <MsButton class="min-w-32 border border-primary bg-white! text-primary! shadow-none! hover:bg-focus!"
-                variant="secondary">
+                variant="secondary" :loading="isSaving && submitAction === 'saveAndAdd'" @click="handleSaveAndAdd">
                 Lưu và thêm
             </MsButton>
-            <MsButton class="min-w-25" variant="primary" @click="formRef?.submitForm()">Lưu</MsButton>
+            <MsButton class="min-w-25" variant="primary" :loading="isSaving && submitAction === 'save'"
+                @click="handleSave">Lưu</MsButton>
         </div>
     </section>
 </template>

@@ -21,6 +21,10 @@ import type { GetOrganizationTreeRequest, GetOrganizationTreeResponse } from '@/
 import organizationApi from '@/apis/organizationApi.ts';
 import SalaryCompositionOrganization from './SalaryCompositionOrganization.vue';
 
+const emit = defineEmits<{
+    add: []
+}>();
+
 const columns = ref<GetGridConfigsResponse[]>([]);
 const isTableLoading = ref(false);
 const selectedStatus = ref<TrackingStatus | null>(null);
@@ -151,6 +155,10 @@ const handlePageSizeChange = (pageSize: number) => {
     queryObject.value.pageSize = pageSize;
 }
 
+const handleAdd = () => {
+    emit('add');
+}
+
 const pagedData = computed(() => {
     return salaryCompositions.value;
 })
@@ -259,7 +267,7 @@ onBeforeUnmount(() => {
     <section class="flex h-[calc(100vh-48px)] flex-col px-4 pb-2.5 pt-3">
         <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h2 class="text-[20px] font-bold leading-8 text-text-primary">Thành phần lương</h2>
-            <SalaryCompositionButtons />
+            <SalaryCompositionButtons @add="handleAdd" />
         </div>
 
         <div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-white">

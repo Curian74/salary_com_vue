@@ -2,9 +2,10 @@
 import MsButton from '@/components/base/MsButton.vue'
 import MsIcon from '@/components/base/MsIcon.vue';
 import MsMenu, { type MsMenuOption } from '@/components/base/MsMenu.vue';
-import { useRouter } from 'vue-router';
 
-const router = useRouter();
+const emit = defineEmits<{
+  add: []
+}>();
 
 const addMenuOptions: MsMenuOption[] = [
   {
@@ -14,7 +15,7 @@ const addMenuOptions: MsMenuOption[] = [
 ];
 
 const handleAddClick = () => {
-  router.push({ name: 'SalaryCompositionAdd' });
+  emit('add');
 };
 </script>
 
