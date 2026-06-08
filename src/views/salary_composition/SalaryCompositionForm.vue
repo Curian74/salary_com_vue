@@ -241,10 +241,6 @@ const focusFirstInvalidField = async (
     }
 };
 
-const handleCompositionTypeChange = (value: SelectValue) => {
-    compositionType.value = value as CompositionType;
-};
-
 const handleCompositionNatureChange = (value: SelectValue) => {
     const nextCompositionNature = value as CompositionNature;
 
@@ -261,10 +257,6 @@ const handleCompositionNatureChange = (value: SelectValue) => {
 
 const handleDeductionTypeChange = (value: DeductionType, checked: boolean) => {
     deductionType.value = checked ? value : undefined;
-};
-
-const handleValueTypeChange = (value: SelectValue) => {
-    valueType.value = value as ValueType;
 };
 
 const handleAutoSumEmployeeTypeChange = (value: SelectValue) => {
@@ -366,10 +358,9 @@ onMounted(async () => {
                     Loại thành phần <span class="text-error">*</span>
                 </label>
                 <div class="salary-composition-form__control" data-validation-field="compositionType">
-                    <MsMenuSelect id="composition-type" :model-value="compositionType ?? null" :disabled="isReadOnly"
+                    <MsMenuSelect id="composition-type" v-model="compositionType" :disabled="isReadOnly"
                         :options="salaryCompositionFormOptions.compositionType" class="salary-composition-form__select
-                        salary-composition-form__select--medium" :invalid="Boolean(errors.compositionType)"
-                        @update:model-value="handleCompositionTypeChange" />
+                        salary-composition-form__select--medium" :invalid="Boolean(errors.compositionType)" />
                     <span v-if="errors.compositionType" class="text-error text-[13px]">
                         {{ errors.compositionType }}
                     </span>
@@ -435,10 +426,9 @@ onMounted(async () => {
             <div class="salary-composition-form__row">
                 <label class="salary-composition-form__label" for="value-type">Kiểu giá trị</label>
                 <div class="salary-composition-form__control" data-validation-field="valueType">
-                    <MsMenuSelect id="value-type" :model-value="valueType" :disabled="isReadOnly"
+                    <MsMenuSelect id="value-type" v-model="valueType" :disabled="isReadOnly"
                         :options="salaryCompositionFormOptions.valueType" class="salary-composition-form__select
-                        salary-composition-form__select--medium" :invalid="Boolean(errors.valueType)"
-                        @update:model-value="handleValueTypeChange" />
+                        salary-composition-form__select--medium" :invalid="Boolean(errors.valueType)" />
                     <span v-if="errors.valueType" class="text-error text-[13px]">
                         {{ errors.valueType }}
                     </span>
@@ -456,7 +446,8 @@ onMounted(async () => {
 
                     <MsMenuSelect :model-value="autoSumEmployeeType ?? null" :disabled="isReadOnly"
                         :options="salaryCompositionFormOptions.autoSumEmployeeType" class="salary-composition-form__select
-                        salary-composition-form__select--medium" @update:model-value="handleAutoSumEmployeeTypeChange" />
+                        salary-composition-form__select--medium"
+                        @update:model-value="handleAutoSumEmployeeTypeChange" />
 
                     <label class="salary-composition-form__radio">
                         <input type="radio" name="value-method" :checked="!isAutoSumEmployee" :disabled="isReadOnly"

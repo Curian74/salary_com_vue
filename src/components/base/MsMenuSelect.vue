@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, useAttrs, watch } from 'vue';
 
 defineOptions({
+    // Không tự lấy hết attrs ngoài
     inheritAttrs: false,
 });
 
@@ -37,15 +38,18 @@ const emit = defineEmits<{
     change: [value: string | number | null]
 }>();
 
+// Cho phép dùng 1 vài attrs ngoài
 const attrs = useAttrs();
 const isOpen = ref(false);
 const selectRef = ref<HTMLElement | null>(null);
 const triggerRef = ref<HTMLButtonElement | null>(null);
 
+// Tim option dang duoc chon de hien thi label tren nut trigger.
 const selectedOption = computed(() =>
     props.options.find((option) => option.value === props.modelValue),
 );
 
+// Uu tien label/name, fallback ve value; khi chua co gia tri thi hien placeholder.
 const selectedLabel = computed(() => {
     const option = selectedOption.value;
 
@@ -62,6 +66,7 @@ function closeMenu() {
     isOpen.value = false;
 }
 
+// Khong cho mo dropdown khi component dang disabled.
 function openMenu() {
     if (props.disabled) {
         return;
@@ -79,6 +84,7 @@ function toggleMenu() {
     openMenu();
 }
 
+// Dong dropdown khi click ra ngoai component.
 function handleDocumentPointerDown(event: PointerEvent) {
     if (!isOpen.value) {
         return;
@@ -96,13 +102,6 @@ function handleDocumentPointerDown(event: PointerEvent) {
 function handleDocumentKeydown(event: KeyboardEvent) {
     if (event.key === 'Escape') {
         closeMenu();
-    }
-}
-
-function handleTriggerKeydown(event: KeyboardEvent) {
-    if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        openMenu();
     }
 }
 
@@ -125,6 +124,7 @@ function selectOption(option: MsMenuSelectOption) {
     triggerRef.value?.focus();
 }
 
+// Neu parent disable khi menu dang mo thi dong lai de tranh tuong tac tiep.
 watch(
     () => props.disabled,
     (disabled) => {
@@ -134,6 +134,7 @@ watch(
     },
 );
 
+// Lang nghe document de dong menu khi click outside hoac nhan Escape.
 onMounted(() => {
     document.addEventListener('pointerdown', handleDocumentPointerDown);
     document.addEventListener('keydown', handleDocumentKeydown);
@@ -143,6 +144,7 @@ onBeforeUnmount(() => {
     document.removeEventListener('pointerdown', handleDocumentPointerDown);
     document.removeEventListener('keydown', handleDocumentKeydown);
 });
+
 </script>
 
 <template>
@@ -150,8 +152,7 @@ onBeforeUnmount(() => {
         <button ref="triggerRef" :id="id" type="button" class="ms-menu-select__trigger" :class="{
             'ms-menu-select__trigger--invalid': invalid,
             'ms-menu-select__trigger--placeholder': !selectedOption,
-        }" :disabled="disabled" aria-haspopup="listbox" :aria-expanded="isOpen" @click="toggleMenu"
-            @keydown="handleTriggerKeydown">
+        }" :disabled="disabled" aria-haspopup="listbox" :aria-expanded="isOpen" @click="toggleMenu">
             <span class="truncate">{{ selectedLabel }}</span>
 
             <svg class="size-4 shrink-0 text-text-secondary transition" :class="{ 'rotate-180': isOpen }"
