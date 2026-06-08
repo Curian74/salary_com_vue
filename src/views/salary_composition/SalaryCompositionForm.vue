@@ -213,9 +213,8 @@ const [organizationUnitIds] = defineField('organizationUnitIds');
 
 const isShowValueMethodOptions = computed(() => {
     return [
-        ValueType.Percentage,
-        ValueType.Date,
-        ValueType.Text,
+        ValueType.Number,
+        ValueType.Currency,
     ].includes(valueType.value as ValueType);
 });
 
@@ -456,7 +455,9 @@ onMounted(async () => {
 
             <div class="salary-composition-form__row">
                 <label class="salary-composition-form__label">Giá trị</label>
+
                 <div class="salary-composition-form__control salary-composition-form__control--stacked">
+
                     <div v-if="isShowValueMethodOptions" class="salary-composition-form__value-methods">
                         <label class="salary-composition-form__radio">
                             <input type="radio" name="value-method" :checked="isAutoSumEmployee" :disabled="isReadOnly"
