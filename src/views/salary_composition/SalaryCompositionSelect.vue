@@ -29,7 +29,8 @@ const props = withDefaults(defineProps<SalaryCompositionSelectProps>(), {
 
 const emit = defineEmits<{
     'update:modelValue': [value: string | number | null]
-    change: [value: string | number | null]
+    change: [value: string | number | null],
+    loadMore: [],
 }>();
 
 // Map sang dạng options cho MsMenuSelect
@@ -53,12 +54,16 @@ const handleValueChange = (value: string | number | null) => {
     emit('change', value);
 };
 
+function loadMore() {
+    emit('loadMore');
+}
+
 </script>
 <template>
-    <MsMenuSelect :model-value="modelValue" :options="options" :disabled="disabled" :invalid="invalid"
-        :placeholder="isLoading ? 'Đang tải dữ liệu...' : placeholder"
+    <MsMenuSelect :allow-lazy-load="true" :model-value="modelValue" :options="options" :disabled="disabled"
+        :invalid="invalid" :placeholder="isLoading ? 'Đang tải dữ liệu...' : placeholder"
         :empty-text="isLoading ? 'Đang tải dữ liệu...' : 'Không có dữ liệu'" class="salary-composition-select"
-        @update:model-value="handleValueChange">
+        @update:model-value="handleValueChange" @scroll-end="loadMore">
         <template #option="{ option }">
             <span class="salary-composition-select__option-text">
                 {{ getSalaryCompositionName(option) }}

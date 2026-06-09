@@ -22,8 +22,6 @@ interface MsMenuSelectProps {
     placeholder?: string
     emptyText?: string
     align?: 'left' | 'right',
-    isLoading?: boolean,
-    hasMore?: boolean,
     allowLazyLoad?: boolean,
 }
 
@@ -34,14 +32,13 @@ const props = withDefaults(defineProps<MsMenuSelectProps>(), {
     placeholder: '',
     emptyText: 'Không có dữ liệu',
     align: 'left',
-    isLoading: false,
-    hasMore: false,
     allowLazyLoad: false,
 });
 
 const emit = defineEmits<{
     'update:modelValue': [value: string | number | null]
-    change: [value: string | number | null]
+    change: [value: string | number | null],
+    scrollEnd: []
 }>();
 
 // Cho phép dùng 1 vài attrs ngoài
@@ -130,6 +127,23 @@ function selectOption(option: MsMenuSelectOption) {
     triggerRef.value?.focus();
 }
 
+// Hàm emit sự kiện khi scroll xuống cuối menu
+// Chỉ cho phép khi props.allowLazyLoad = true
+function handleMenuScroll(event: Event) {
+    if (!props.allowLazyLoad) {
+        return;
+    }
+
+    const element = event.target as HTMLElement;
+
+    const isReachEnd = element.scrollTop + element.clientHeight
+        >= element.scrollHeight - 4;
+
+    if (isReachEnd) {
+        emit('scrollEnd');
+    }
+}
+
 // Neu parent disable khi menu dang mo thi dong lai de tranh tuong tac tiep.
 watch(
     () => props.disabled,
@@ -168,8 +182,8 @@ onBeforeUnmount(() => {
             </svg>
         </button>
 
-        <div v-if="isOpen" class="ms-menu-select__menu" :class="align === 'right' ? 'right-0' : 'left-0'"
-            role="listbox">
+        <div @scroll="handleMenuScroll" v-if="isOpen" class="ms-menu-select__menu"
+            :class="align === 'right' ? 'right-0' : 'left-0'" role="listbox">
             <div v-if="isEmpty" class="px-3 py-2 text-[14px] leading-5 text-text-placeholder">
                 {{ emptyText }}
             </div>

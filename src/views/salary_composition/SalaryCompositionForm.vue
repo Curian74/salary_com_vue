@@ -198,7 +198,6 @@ const queryObject = ref<GetSalaryCompositionsRequest>({
     pageIndex: 1,
     pageSize: 10,
     searchTerm: '',
-    organizationIds: null,
 });
 
 const salaryCompositions = ref<PagedResult<GetSalaryCompositionsResponse>>({
@@ -292,7 +291,6 @@ const handleAutoSumEmployeeTypeChange = (value: SelectValue) => {
     autoSumEmployeeType.value = value as AutoSumEmployeeType;
 };
 
-
 const submitForm = handleSubmit(
     (payload) => {
         emit('submit', payload);
@@ -315,6 +313,15 @@ async function fetchSalaryCompositions() {
         isSalaryCompositionsLoading.value = false;
     }
 }
+
+function handleLoadMore() {
+    queryObject.value.pageSize *= 2;
+}
+
+watch(
+    () => queryObject.value.pageSize,
+    fetchSalaryCompositions,
+);
 
 // Đẩy hàm submitForm ra ngoài để component cha có thể gọi khi click nút Lưu
 defineExpose({
@@ -507,7 +514,7 @@ onMounted(async () => {
 
                             <SalaryCompositionSelect v-if="isAutoSumEmployee" v-model="salaryCompositionId"
                                 :data="salaryCompositions.items" :is-loading="isSalaryCompositionsLoading"
-                                :disabled="isReadOnly || !isAutoSumEmployee"
+                                :disabled="isReadOnly || !isAutoSumEmployee" @load-more="handleLoadMore"
                                 placeholder="Chọn thành phần lương để hiển thị giá trị"
                                 class="salary-composition-form__salary-select" />
                         </div>
