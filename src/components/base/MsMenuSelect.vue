@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, useAttrs, watch } from 'vue';
+import MsLoading from './MsLoading.vue';
 
 defineOptions({
     // Không tự lấy hết attrs ngoài
@@ -22,6 +23,8 @@ interface MsMenuSelectProps {
     placeholder?: string
     emptyText?: string
     align?: 'left' | 'right',
+    isLoading?: boolean,
+    hasMore?: boolean,
     allowLazyLoad?: boolean,
 }
 
@@ -32,6 +35,8 @@ const props = withDefaults(defineProps<MsMenuSelectProps>(), {
     placeholder: '',
     emptyText: 'Không có dữ liệu',
     align: 'left',
+    isLoading: false,
+    hasMore: false,
     allowLazyLoad: false,
 });
 
@@ -130,7 +135,7 @@ function selectOption(option: MsMenuSelectOption) {
 // Hàm emit sự kiện khi scroll xuống cuối menu
 // Chỉ cho phép khi props.allowLazyLoad = true
 function handleMenuScroll(event: Event) {
-    if (!props.allowLazyLoad) {
+    if (!props.allowLazyLoad || props.isLoading || !props.hasMore) {
         return;
     }
 
@@ -184,7 +189,7 @@ onBeforeUnmount(() => {
 
         <div @scroll="handleMenuScroll" v-if="isOpen" class="ms-menu-select__menu"
             :class="align === 'right' ? 'right-0' : 'left-0'" role="listbox">
-            <div v-if="isEmpty" class="px-3 py-2 text-[14px] leading-5 text-text-placeholder">
+            <div v-if="isEmpty && !isLoading" class="px-3 py-2 text-[14px] leading-5 text-text-placeholder">
                 {{ emptyText }}
             </div>
 
@@ -201,6 +206,10 @@ onBeforeUnmount(() => {
                     <slot :option="option" name="right" />
                 </div>
             </button>
+
+            <div v-if="isLoading" class="ms-menu-select__loading">
+                <MsLoading size="sm" />
+            </div>
         </div>
     </div>
 </template>
@@ -283,5 +292,13 @@ onBeforeUnmount(() => {
     line-height: 20px;
     text-align: left;
     transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ms-menu-select__loading {
+    display: flex;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    color: var(--app-color-primary);
 }
 </style>

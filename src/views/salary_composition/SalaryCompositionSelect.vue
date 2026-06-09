@@ -1,10 +1,9 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import { computed } from 'vue';
 import MsMenuSelect from '@/components/base/MsMenuSelect.vue';
 import type { MsMenuSelectOption } from '@/components/base/MsMenuSelect.vue';
 import type { GetSalaryCompositionsResponse } from '@/types/salaryComposition';
 
-// Định nghĩa kiểu cho option của SalaryCompositionSelect, mở rộng từ MsMenuSelectOption
 interface SalaryCompositionOption extends MsMenuSelectOption {
     salaryComposition: GetSalaryCompositionsResponse
 }
@@ -16,6 +15,7 @@ interface SalaryCompositionSelectProps {
     invalid?: boolean
     placeholder?: string
     isLoading?: boolean
+    hasMore?: boolean
 }
 
 const props = withDefaults(defineProps<SalaryCompositionSelectProps>(), {
@@ -25,15 +25,15 @@ const props = withDefaults(defineProps<SalaryCompositionSelectProps>(), {
     invalid: false,
     placeholder: 'Chọn thành phần lương để hiển thị giá trị',
     isLoading: false,
+    hasMore: false,
 });
 
 const emit = defineEmits<{
     'update:modelValue': [value: string | number | null]
-    change: [value: string | number | null],
-    loadMore: [],
+    change: [value: string | number | null]
+    loadMore: []
 }>();
 
-// Map sang dạng options cho MsMenuSelect
 const options = computed<SalaryCompositionOption[]>(() =>
     props.data.map((salaryComposition) => ({
         value: salaryComposition.id,
@@ -42,7 +42,6 @@ const options = computed<SalaryCompositionOption[]>(() =>
     })),
 );
 
-// Hàm để lấy tên và mã của thành phần lương từ option
 const getSalaryCompositionName = (option: MsMenuSelectOption) =>
     (option as SalaryCompositionOption).salaryComposition.name;
 
@@ -53,17 +52,13 @@ const handleValueChange = (value: string | number | null) => {
     emit('update:modelValue', value);
     emit('change', value);
 };
-
-function loadMore() {
-    emit('loadMore');
-}
-
 </script>
+
 <template>
     <MsMenuSelect :allow-lazy-load="true" :model-value="modelValue" :options="options" :disabled="disabled"
-        :invalid="invalid" :placeholder="isLoading ? 'Đang tải dữ liệu...' : placeholder"
-        :empty-text="isLoading ? 'Đang tải dữ liệu...' : 'Không có dữ liệu'" class="salary-composition-select"
-        @update:model-value="handleValueChange" @scroll-end="loadMore">
+        :invalid="invalid" :placeholder="placeholder" empty-text="Không có dữ liệu" :is-loading="isLoading"
+        :has-more="hasMore" class="salary-composition-select" @update:model-value="handleValueChange"
+        @scroll-end="emit('loadMore')">
         <template #option="{ option }">
             <span class="salary-composition-select__option-text">
                 {{ getSalaryCompositionName(option) }}
@@ -72,6 +67,7 @@ function loadMore() {
         </template>
     </MsMenuSelect>
 </template>
+
 <style scoped>
 .salary-composition-select {
     width: 100%;

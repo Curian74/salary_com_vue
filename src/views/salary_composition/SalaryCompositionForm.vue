@@ -303,6 +303,7 @@ const submitForm = handleSubmit(
 async function fetchSalaryCompositions() {
     try {
         isSalaryCompositionsLoading.value = true;
+        await new Promise((resolve) => setTimeout(resolve, 2000)); // Giả lập delay để test loading state
         const salData = await salaryCompositionApi.fetchSalaryCompositions(queryObject.value);
         salaryCompositions.value = salData.value;
     }
@@ -514,8 +515,8 @@ onMounted(async () => {
 
                             <SalaryCompositionSelect v-if="isAutoSumEmployee" v-model="salaryCompositionId"
                                 :data="salaryCompositions.items" :is-loading="isSalaryCompositionsLoading"
-                                :disabled="isReadOnly || !isAutoSumEmployee" @load-more="handleLoadMore"
-                                placeholder="Chọn thành phần lương để hiển thị giá trị"
+                                :has-more="salaryCompositions.hasNextPage" :disabled="isReadOnly || !isAutoSumEmployee"
+                                @load-more="handleLoadMore" placeholder="Chọn thành phần lương để hiển thị giá trị"
                                 class="salary-composition-form__salary-select" />
                         </div>
 
