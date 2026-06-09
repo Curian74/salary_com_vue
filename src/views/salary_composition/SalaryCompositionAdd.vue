@@ -52,7 +52,6 @@ const handleSubmit = async (payload: CreateSalaryCompositionRequest) => {
         isSaving.value = true;
 
         const data = await salaryCompositionApi.createSalaryComposition(payload);
-        console.log(data);
         alert('ngon');
 
         if (submitAction.value === 'saveAndAdd') {
@@ -86,17 +85,18 @@ const handleSaveAndAdd = () => {
 <template>
     <section class="flex h-[calc(100vh-48px)] flex-col bg-background">
         <div class="flex h-15 shrink-0 items-center gap-3 px-7">
-            <button type="button" class="flex size-8 items-center justify-center rounded-lg text-[#6b7280]
-             transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20" aria-label="Quay lại"
+            <button type="button" class="flex size-8 cursor-pointer
+             items-center justify-center rounded-full text-[#6b7280]
+             transition hover:bg-[#dadce3] focus:outline-none focus:ring-2 focus:ring-primary/20" aria-label="Quay lại"
                 @click="goBack">
-                <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M19 12H5" />
                     <path d="m12 19-7-7 7-7" />
                 </svg>
             </button>
 
-            <h1 class="text-[22px] font-bold leading-7 text-text-primary">Thêm thành phần</h1>
+            <h1 class="text-[20px] font-bold leading-7 text-text-primary">Thêm thành phần</h1>
         </div>
 
         <div class="mx-5 min-h-0 flex-1 overflow-hidden bg-white">
@@ -105,13 +105,18 @@ const handleSaveAndAdd = () => {
         </div>
 
         <div class="flex h-13 shrink-0 items-center justify-end gap-3 border-t border-border bg-background px-3">
-            <MsButton class="min-w-25" variant="secondary" :disabled="isSaving" @click="goBack">Hủy bỏ</MsButton>
-            <MsButton class="min-w-32 border border-primary bg-white! text-primary! shadow-none! hover:bg-focus!"
+            <MsButton size="sm" class="min-w-20" variant="secondary" :disabled="isSaving" @click="goBack">
+                Hủy bỏ
+            </MsButton>
+            <MsButton size="sm"
+                class="min-w-28 border border-primary bg-white! text-primary! shadow-none! hover:bg-focus!"
                 variant="secondary" :loading="isSaving && submitAction === 'saveAndAdd'" @click="handleSaveAndAdd">
                 Lưu và thêm
             </MsButton>
-            <MsButton class="min-w-25" variant="primary" :loading="isSaving && submitAction === 'save'"
-                @click="handleSave">Lưu</MsButton>
+            <MsButton class="min-w-20" size="sm" variant="primary" :loading="isSaving && submitAction === 'save'"
+                @click="handleSave">
+                Lưu
+            </MsButton>
         </div>
 
         <MsPopup :open="isLeaveConfirmOpen" @close="closeLeaveConfirm">

@@ -32,7 +32,7 @@ const emit = defineEmits(['click']);
 const isDisabled = computed(() => props.disabled || props.loading)
 
 const baseClasses = [
-    'inline-flex items-center justify-center gap-2 rounded-lg transition',
+    'inline-flex items-center justify-center gap-2 font-medium rounded-lg transition',
     'focus:outline-none focus:ring-2 cursor-pointer',
     'disabled:cursor-not-allowed disabled:opacity-60',
 ]
