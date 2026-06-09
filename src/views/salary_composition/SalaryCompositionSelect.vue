@@ -37,7 +37,7 @@ const emit = defineEmits<{
 const options = computed<SalaryCompositionOption[]>(() =>
     props.data.map((salaryComposition) => ({
         value: salaryComposition.id,
-        label: `${salaryComposition.name} (${salaryComposition.code})`,
+        label: `${salaryComposition.name}`,
         salaryComposition,
     })),
 );

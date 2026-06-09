@@ -167,13 +167,12 @@ const { errors, defineField, handleSubmit, } =
             allowToExceedQuota: false,
 
             valueType: ValueType.Currency,
-            isAutoSumEmployee: true,
+            isAutoSumEmployee: false,
             autoSumEmployeeType: AutoSumEmployeeType.SameWorkingUnit,
             organizationalStructureLevel: undefined,
             salaryCompositionId: null,
 
             optionShowPaycheck: OptionShowPaycheck.Yes,
-
             organizationUnitIds: [],
         },
     });
@@ -193,6 +192,13 @@ const [autoSumEmployeeType] = defineField('autoSumEmployeeType');
 const [salaryCompositionId] = defineField('salaryCompositionId');
 const [optionShowPaycheck] = defineField('optionShowPaycheck');
 const [organizationUnitIds] = defineField('organizationUnitIds');
+
+// Khi tắt tự động cộng tổng thì reset lại các field liên quan
+watch(isAutoSumEmployee, (value) => {
+    if (!value) {
+        salaryCompositionId.value = null;
+    }
+});
 
 const queryObject = ref<GetSalaryCompositionsRequest>({
     pageIndex: 1,
@@ -289,6 +295,11 @@ const handleDeductionTypeChange = (value: DeductionType, checked: boolean) => {
 
 const handleAutoSumEmployeeTypeChange = (value: SelectValue) => {
     autoSumEmployeeType.value = value as AutoSumEmployeeType;
+
+    // Bỏ chọn thành phần lương khi không phải tự động cộng tổng
+    if (!isAutoSumEmployee.value) {
+        salaryCompositionId.value = null;
+    }
 };
 
 const submitForm = handleSubmit(
@@ -303,7 +314,6 @@ const submitForm = handleSubmit(
 async function fetchSalaryCompositions() {
     try {
         isSalaryCompositionsLoading.value = true;
-        await new Promise((resolve) => setTimeout(resolve, 2000)); // Giả lập delay để test loading state
         const salData = await salaryCompositionApi.fetchSalaryCompositions(queryObject.value);
         salaryCompositions.value = salData.value;
     }
