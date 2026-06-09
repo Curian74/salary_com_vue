@@ -51,7 +51,7 @@ export enum ValueType {
 }
 
 export enum OptionShowPaycheck {
-    No = 0,
-    Yes = 1,
+    Yes = 0,
+    No = 1,
     OnlyWhenNonZero = 2
 }
