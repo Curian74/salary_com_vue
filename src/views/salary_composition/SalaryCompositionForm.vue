@@ -26,10 +26,12 @@ import type { GetOrganizationTreeResponse } from '@/types/organization';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import SalaryCompositionOrganization from './SalaryCompositionOrganization.vue';
 import { useForm } from 'vee-validate';
-import type { CreateSalaryCompositionRequest, GetSalaryCompositionsResponse } from '@/types/salaryComposition';
+import type { CreateSalaryCompositionRequest, GetSalaryCompositionsRequest, GetSalaryCompositionsResponse } from '@/types/salaryComposition';
 import { salaryCompositionSchema } from '@/validations/salaryCompositionSchema';
 import MsIcon from '@/components/base/MsIcon.vue';
 import MsTooltip from '@/components/base/MsTooltip.vue';
+import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
+import type { PagedResult } from '@/types/apiResponse.ts';
 
 type FormMode = 'create' | 'edit' | 'view';
 type EnumLike = Record<string, string | number>;
@@ -38,12 +40,10 @@ type SelectValue = string | number | null;
 interface Props {
     mode: FormMode
     organizationItems?: GetOrganizationTreeResponse[],
-    salaryComposition?: GetSalaryCompositionsResponse[],
 }
 
 const props = withDefaults(defineProps<Props>(), {
     organizationItems: () => [],
-    salaryComposition: () => [],
 });
 
 const getEnumNumberValues = (enumObject: EnumLike) =>
@@ -191,6 +191,25 @@ const [autoSumEmployeeType] = defineField('autoSumEmployeeType');
 const [optionShowPaycheck] = defineField('optionShowPaycheck');
 const [organizationUnitIds] = defineField('organizationUnitIds');
 
+const queryObject = ref<GetSalaryCompositionsRequest>({
+    pageIndex: 1,
+    pageSize: 10,
+    searchTerm: '',
+    organizationIds: null,
+});
+
+const salaryCompositions = ref<PagedResult<GetSalaryCompositionsResponse>>({
+    items: [],
+    totalCount: 0,
+    pageSize: queryObject.value.pageSize,
+    pageIndex: queryObject.value.pageIndex,
+    totalPages: 0,
+    hasPreviousPage: false,
+    hasNextPage: false,
+});
+
+const isSalaryCompositionsLoading = ref(false);
+
 watch(
     () => props.organizationItems,
     (organizationItems) => {
@@ -280,14 +299,30 @@ const submitForm = handleSubmit(
     },
 );
 
+async function fetchSalaryCompositions() {
+    try {
+        isSalaryCompositionsLoading.value = true;
+        const salData = await salaryCompositionApi.fetchSalaryCompositions(queryObject.value);
+        salaryCompositions.value = salData.value;
+    }
+    catch (err) {
+        console.log(err);
+    }
+    finally {
+        isSalaryCompositionsLoading.value = false;
+    }
+}
+
 // Đẩy hàm submitForm ra ngoài để component cha có thể gọi khi click nút Lưu
 defineExpose({
     submitForm,
 });
 
-onMounted(() => {
+onMounted(async () => {
     document.addEventListener('pointerdown', handleDocumentPointerDown);
     document.addEventListener('keydown', handleDocumentKeydown);
+
+    await fetchSalaryCompositions();
 });
 
 onBeforeUnmount(() => {
@@ -298,8 +333,6 @@ onBeforeUnmount(() => {
 onMounted(async () => {
     // Chờ dom load xong mới auto focus
     await nextTick();
-
-    console.log('salaryComposition', props.salaryComposition);
 
     if (!isReadOnly.value) {
         nameInputRef.value?.focus();

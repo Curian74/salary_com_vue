@@ -21,7 +21,10 @@ interface MsMenuSelectProps {
     invalid?: boolean
     placeholder?: string
     emptyText?: string
-    align?: 'left' | 'right'
+    align?: 'left' | 'right',
+    isLoading?: boolean,
+    hasMore?: boolean,
+    allowLazyLoad?: boolean,
 }
 
 const props = withDefaults(defineProps<MsMenuSelectProps>(), {
@@ -31,6 +34,9 @@ const props = withDefaults(defineProps<MsMenuSelectProps>(), {
     placeholder: '',
     emptyText: 'Không có dữ liệu',
     align: 'left',
+    isLoading: false,
+    hasMore: false,
+    allowLazyLoad: false,
 });
 
 const emit = defineEmits<{
