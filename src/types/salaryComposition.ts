@@ -64,6 +64,7 @@ export interface CreateSalaryCompositionRequest {
     isAutoSumEmployee?: boolean;
     autoSumEmployeeType?: AutoSumEmployeeType;
     organizationalStructureLevel?: number;
+    salaryCompositionId?: string | null;
 
     valueFormula?: string;
     optionShowPaycheck: OptionShowPaycheck;

@@ -180,7 +180,9 @@ onBeforeUnmount(() => {
                     option.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
                 ]" :disabled="option.disabled" role="option" :aria-selected="isSelected(option)"
                 @click="selectOption(option)">
-                <span class="truncate">{{ getOptionLabel(option) }}</span>
+                <slot :option="option" name="option">
+                    <span class="truncate">{{ getOptionLabel(option) }}</span>
+                </slot>
                 <div class="ml-auto">
                     <slot :option="option" name="right" />
                 </div>

@@ -32,6 +32,7 @@ import MsIcon from '@/components/base/MsIcon.vue';
 import MsTooltip from '@/components/base/MsTooltip.vue';
 import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
 import type { PagedResult } from '@/types/apiResponse.ts';
+import SalaryCompositionSelect from './SalaryCompositionSelect.vue';
 
 type FormMode = 'create' | 'edit' | 'view';
 type EnumLike = Record<string, string | number>;
@@ -169,6 +170,7 @@ const { errors, defineField, handleSubmit, } =
             isAutoSumEmployee: true,
             autoSumEmployeeType: AutoSumEmployeeType.SameWorkingUnit,
             organizationalStructureLevel: undefined,
+            salaryCompositionId: null,
 
             optionShowPaycheck: OptionShowPaycheck.Yes,
 
@@ -188,6 +190,7 @@ const [allowToExceedQuota] = defineField('allowToExceedQuota');
 const [valueType] = defineField('valueType');
 const [isAutoSumEmployee] = defineField('isAutoSumEmployee');
 const [autoSumEmployeeType] = defineField('autoSumEmployeeType');
+const [salaryCompositionId] = defineField('salaryCompositionId');
 const [optionShowPaycheck] = defineField('optionShowPaycheck');
 const [organizationUnitIds] = defineField('organizationUnitIds');
 
@@ -488,18 +491,26 @@ onMounted(async () => {
                             <span>Tự động cộng tổng giá trị của các nhân viên</span>
                         </label>
 
-                        <MsMenuSelect :options="salaryCompositionFormOptions.autoSumEmployeeType"
-                            :model-value="autoSumEmployeeType ?? null" :disabled="isReadOnly || !isAutoSumEmployee"
-                            class="salary-composition-form__select
-                        salary-composition-form__select--medium" @update:model-value="handleAutoSumEmployeeTypeChange">
+                        <div class="salary-composition-form__auto-sum-row">
+                            <MsMenuSelect :options="salaryCompositionFormOptions.autoSumEmployeeType"
+                                :model-value="autoSumEmployeeType ?? null" :disabled="isReadOnly || !isAutoSumEmployee"
+                                class="salary-composition-form__select salary-composition-form__select--medium"
+                                @update:model-value="handleAutoSumEmployeeTypeChange">
 
-                            <template #right="{ option }">
-                                <MsTooltip :show-arrow="true" content=''>
-                                    <MsIcon name="info-icon">{{ option.name }} aaa</MsIcon>
-                                </MsTooltip>
-                            </template>
+                                <template #right="{ option }">
+                                    <MsTooltip :show-arrow="true" content=''>
+                                        <MsIcon name="info-icon">{{ option.name }} aaa</MsIcon>
+                                    </MsTooltip>
+                                </template>
 
-                        </MsMenuSelect>
+                            </MsMenuSelect>
+
+                            <SalaryCompositionSelect v-if="isAutoSumEmployee" v-model="salaryCompositionId"
+                                :data="salaryCompositions.items" :is-loading="isSalaryCompositionsLoading"
+                                :disabled="isReadOnly || !isAutoSumEmployee"
+                                placeholder="Chọn thành phần lương để hiển thị giá trị"
+                                class="salary-composition-form__salary-select" />
+                        </div>
 
                         <label class="salary-composition-form__radio">
                             <input type="radio" name="value-method" :checked="!isAutoSumEmployee" :disabled="isReadOnly"
@@ -688,9 +699,20 @@ onMounted(async () => {
 
 .salary-composition-form__value-methods {
     display: flex;
-    max-width: 394px;
+    max-width: 1048px;
     flex-direction: column;
     gap: 12px;
+}
+
+.salary-composition-form__auto-sum-row {
+    display: grid;
+    width: 100%;
+    grid-template-columns: minmax(260px, 394px) minmax(320px, 1fr);
+    gap: 10px;
+}
+
+.salary-composition-form__salary-select {
+    min-width: 0;
 }
 
 .salary-composition-form__formula {
@@ -717,6 +739,10 @@ onMounted(async () => {
     .salary-composition-form__textarea,
     .salary-composition-form__organization {
         width: 100%;
+    }
+
+    .salary-composition-form__auto-sum-row {
+        grid-template-columns: 1fr;
     }
 }
 </style>
