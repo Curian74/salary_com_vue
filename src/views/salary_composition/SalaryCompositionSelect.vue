@@ -80,7 +80,7 @@ const handleValueChange = (value: string | number | null) => {
 }
 
 :deep(.ms-menu-select__menu) {
-    max-height: 380px;
+    max-height: 280px;
 }
 
 :deep(.ms-menu-select__option) {

@@ -409,7 +409,7 @@ onMounted(async () => {
                 <div class="salary-composition-form__control" data-validation-field="compositionType">
                     <MsMenuSelect id="composition-type" v-model="compositionType" :disabled="isReadOnly"
                         :options="salaryCompositionFormOptions.compositionType" class="salary-composition-form__select
-                        salary-composition-form__select--medium" :invalid="Boolean(errors.compositionType)" />
+                        salary-composition-form__select--compact" :invalid="Boolean(errors.compositionType)" />
                     <span v-if="errors.compositionType" class="text-error text-[13px]">
                         {{ errors.compositionType }}
                     </span>
@@ -424,7 +424,7 @@ onMounted(async () => {
                     <div class="flex flex-wrap items-center gap-x-7 gap-y-2">
                         <MsMenuSelect id="nature" :model-value="compositionNature" :disabled="isReadOnly"
                             :options="salaryCompositionFormOptions.compositionNature" class="salary-composition-form__select
-                            salary-composition-form__select--medium" :invalid="Boolean(errors.compositionNature)"
+                            salary-composition-form__select--compact" :invalid="Boolean(errors.compositionNature)"
                             @update:model-value="handleCompositionNatureChange" />
 
                         <label v-if="compositionNature === CompositionNature.Income"
@@ -688,6 +688,10 @@ onMounted(async () => {
     max-width: 394px;
 }
 
+.salary-composition-form__select--compact {
+    max-width: 296px;
+}
+
 .salary-composition-form__radio {
     display: inline-flex;
     min-height: 20px;
@@ -714,8 +718,8 @@ onMounted(async () => {
 
 .salary-composition-form__auto-sum-row {
     display: grid;
-    width: 100%;
-    grid-template-columns: minmax(260px, 394px) minmax(320px, 1fr);
+    width: 80%;
+    grid-template-columns: minmax(220px, 296px) minmax(320px, 1fr);
     gap: 10px;
 }
 

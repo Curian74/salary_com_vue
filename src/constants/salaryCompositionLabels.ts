@@ -40,7 +40,7 @@ export const deductionTypeText: Record<DeductionType, string> = {
 
 export const incomeTaxTypeText: Record<IncomeTaxType, string> = {
     [IncomeTaxType.Taxable]: 'Chịu thuế',
-    [IncomeTaxType.TaxFree]: 'Không chịu thuế',
+    [IncomeTaxType.TaxFree]: 'Miễn thuế toàn phần',
     [IncomeTaxType.PartialTaxFree]: 'Miễn thuế một phần',
 }
 
