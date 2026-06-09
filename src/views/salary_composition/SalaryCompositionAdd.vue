@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import MsButton from '@/components/base/MsButton.vue';
+import MsPopup from '@/components/base/MsPopup.vue';
 import SalaryCompositionForm from './SalaryCompositionForm.vue';
 import type { GetOrganizationTreeResponse } from '@/types/organization.ts';
 import type { CreateSalaryCompositionRequest, GetSalaryCompositionsResponse } from '@/types/salaryComposition.ts';
@@ -23,9 +24,24 @@ const emit = defineEmits<{
 const formRef = ref<InstanceType<typeof SalaryCompositionForm>>();
 const formKey = ref(0);
 const isSaving = ref(false);
+const isLeaveConfirmOpen = ref(false);
 const submitAction = ref<SubmitAction>('save');
 
 const goBack = () => {
+    if (formRef.value?.checkFormDirty()) {
+        isLeaveConfirmOpen.value = true;
+        return;
+    }
+
+    emit('back');
+};
+
+const closeLeaveConfirm = () => {
+    isLeaveConfirmOpen.value = false;
+};
+
+const confirmLeave = () => {
+    isLeaveConfirmOpen.value = false;
     emit('back');
 };
 
@@ -97,5 +113,20 @@ const handleSaveAndAdd = () => {
             <MsButton class="min-w-25" variant="primary" :loading="isSaving && submitAction === 'save'"
                 @click="handleSave">Lưu</MsButton>
         </div>
+
+        <MsPopup :open="isLeaveConfirmOpen" @close="closeLeaveConfirm">
+            <template #title>Thoát và không lưu?</template>
+
+            <p>Nếu bạn thoát, các dữ liệu đang nhập liệu sẽ không được lưu lại.</p>
+
+            <template #footer>
+                <MsButton size="sm" variant="secondary" class="min-w-20 font-medium" @click="closeLeaveConfirm">
+                    Ở lại
+                </MsButton>
+                <MsButton size="sm" variant="primary" class="min-w-20 font-medium" @click="confirmLeave">
+                    Thoát, không lưu
+                </MsButton>
+            </template>
+        </MsPopup>
     </section>
 </template>

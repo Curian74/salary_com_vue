@@ -151,7 +151,7 @@ const emit = defineEmits<{
     submit: [payload: CreateSalaryCompositionRequest]
 }>();
 
-const { errors, defineField, handleSubmit, } =
+const { errors, defineField, handleSubmit, meta } =
     useForm<CreateSalaryCompositionRequest>({
         validationSchema: salaryCompositionSchema,
         validateOnMount: false,
@@ -329,6 +329,11 @@ function handleLoadMore() {
     queryObject.value.pageSize *= 2;
 }
 
+// Kiểm tra trạng thái dirty
+const checkFormDirty = () => {
+    return meta.value.dirty;
+};
+
 watch(
     () => queryObject.value.pageSize,
     fetchSalaryCompositions,
@@ -337,6 +342,7 @@ watch(
 // Đẩy hàm submitForm ra ngoài để component cha có thể gọi khi click nút Lưu
 defineExpose({
     submitForm,
+    checkFormDirty,
 });
 
 onMounted(async () => {
