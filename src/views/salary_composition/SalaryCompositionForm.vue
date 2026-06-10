@@ -71,6 +71,10 @@ const salaryCompositionFormOptions = {
         OptionShowPaycheck,
         optionShowPaycheckText,
     ),
+    organizationalStructureLevel: [1, 2, 3, 4].map((level) => ({
+        value: level,
+        label: `Cấp ${level}`,
+    })),
     sourceType: [
         {
             value: SourceType.UserAdded,
@@ -190,6 +194,7 @@ const [allowToExceedQuota] = defineField('allowToExceedQuota');
 const [valueType] = defineField('valueType');
 const [isAutoSumEmployee] = defineField('isAutoSumEmployee');
 const [autoSumEmployeeType] = defineField('autoSumEmployeeType');
+const [organizationalStructureLevel] = defineField('organizationalStructureLevel');
 const [salaryCompositionId] = defineField('salaryCompositionId');
 const [optionShowPaycheck] = defineField('optionShowPaycheck');
 const [organizationUnitIds] = defineField('organizationUnitIds');
@@ -220,6 +225,13 @@ watch(name, (value) => {
 watch(isAutoSumEmployee, (value) => {
     if (!value) {
         salaryCompositionId.value = null;
+        organizationalStructureLevel.value = undefined;
+        return;
+    }
+
+    if (autoSumEmployeeType.value === AutoSumEmployeeType.OrganizationStructure
+        && !organizationalStructureLevel.value) {
+        organizationalStructureLevel.value = 1;
     }
 });
 
@@ -259,6 +271,11 @@ const isShowValueMethodOptions = computed(() => {
         ValueType.Currency,
     ].includes(valueType.value as ValueType);
 });
+
+const isOrganizationStructureAutoSum = computed(() =>
+    isAutoSumEmployee.value
+    && autoSumEmployeeType.value === AutoSumEmployeeType.OrganizationStructure,
+);
 
 const focusFirstInvalidField = async (
     validationErrors: Partial<Record<keyof CreateSalaryCompositionRequest, string | undefined>>,
@@ -317,7 +334,16 @@ const handleDeductionTypeChange = (value: DeductionType, checked: boolean) => {
 };
 
 const handleAutoSumEmployeeTypeChange = (value: SelectValue) => {
-    autoSumEmployeeType.value = value as AutoSumEmployeeType;
+    const nextAutoSumEmployeeType = value as AutoSumEmployeeType;
+
+    autoSumEmployeeType.value = nextAutoSumEmployeeType;
+
+    if (nextAutoSumEmployeeType === AutoSumEmployeeType.OrganizationStructure) {
+        organizationalStructureLevel.value ??= 1;
+    }
+    else {
+        organizationalStructureLevel.value = undefined;
+    }
 
     // Bỏ chọn thành phần lương khi không phải tự động cộng tổng
     if (!isAutoSumEmployee.value) {
@@ -538,7 +564,9 @@ onMounted(async () => {
                             <span>Tự động cộng tổng giá trị của các nhân viên</span>
                         </label>
 
-                        <div class="salary-composition-form__auto-sum-row">
+                        <div class="salary-composition-form__auto-sum-row" :class="{
+                            'salary-composition-form__auto-sum-row--with-level': isOrganizationStructureAutoSum,
+                        }">
                             <MsMenuSelect :options="salaryCompositionFormOptions.autoSumEmployeeType"
                                 :model-value="autoSumEmployeeType ?? null" :disabled="isReadOnly || !isAutoSumEmployee"
                                 class="salary-composition-form__select salary-composition-form__select--medium"
@@ -552,11 +580,25 @@ onMounted(async () => {
 
                             </MsMenuSelect>
 
-                            <SalaryCompositionSelect v-if="isAutoSumEmployee" v-model="salaryCompositionId"
-                                :data="salaryCompositions.items" :is-loading="isSalaryCompositionsLoading"
-                                :has-more="salaryCompositions.hasNextPage" :disabled="isReadOnly || !isAutoSumEmployee"
-                                @load-more="handleLoadMore" placeholder="Chọn thành phần lương để hiển thị giá trị"
-                                class="salary-composition-form__salary-select" />
+                            <MsMenuSelect v-if="isOrganizationStructureAutoSum" v-model="organizationalStructureLevel"
+                                :options="salaryCompositionFormOptions.organizationalStructureLevel"
+                                :disabled="isReadOnly || !isAutoSumEmployee"
+                                :invalid="Boolean(errors.organizationalStructureLevel)"
+                                class="salary-composition-form__select salary-composition-form__select--level" />
+
+                            <div v-if="isAutoSumEmployee" class="salary-composition-form__salary-select-field"
+                                data-validation-field="salaryCompositionId">
+                                <SalaryCompositionSelect v-model="salaryCompositionId" :data="salaryCompositions.items"
+                                    :is-loading="isSalaryCompositionsLoading" :has-more="salaryCompositions.hasNextPage"
+                                    :disabled="isReadOnly || !isAutoSumEmployee"
+                                    :invalid="Boolean(errors.salaryCompositionId)" @load-more="handleLoadMore"
+                                    placeholder="Chọn thành phần lương để hiển thị giá trị"
+                                    class="salary-composition-form__salary-select" />
+
+                                <span v-if="errors.salaryCompositionId" class="text-error text-[13px]">
+                                    {{ errors.salaryCompositionId }}
+                                </span>
+                            </div>
                         </div>
 
                         <label class="salary-composition-form__radio">
@@ -762,6 +804,14 @@ onMounted(async () => {
     gap: 10px;
 }
 
+.salary-composition-form__auto-sum-row--with-level {
+    grid-template-columns: minmax(220px, 296px) minmax(120px, 150px) minmax(320px, 1fr);
+}
+
+.salary-composition-form__select--level {
+    max-width: 150px;
+}
+
 .salary-composition-form__salary-select {
     min-width: 0;
 }
@@ -794,6 +844,10 @@ onMounted(async () => {
 
     .salary-composition-form__auto-sum-row {
         grid-template-columns: 1fr;
+    }
+
+    .salary-composition-form__select--level {
+        max-width: none;
     }
 }
 </style>

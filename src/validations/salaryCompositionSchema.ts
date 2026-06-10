@@ -50,7 +50,14 @@ export const salaryCompositionSchema = yup.object({
         .number()
         .optional(),
 
-    salaryCompositionId: yup.string().nullable().optional(),
+    salaryCompositionId: yup
+        .string()
+        .nullable()
+        .when('isAutoSumEmployee', {
+            is: true,
+            then: (schema) => schema.required('Không được để trống.'),
+            otherwise: (schema) => schema.optional(),
+        }),
 
     valueFormula: yup.string().trim().optional(),
 
