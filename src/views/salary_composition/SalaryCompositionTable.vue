@@ -33,13 +33,21 @@ const formatters: Record<string, (value: any, row: GetSalaryCompositionsResponse
     compositionNature: (value: CompositionNature) => compositionNatureText[value] ?? '--',
     compositionType: (value: CompositionType) => compositionTypeText[value] ?? '--',
     deductionType: (value: DeductionType) => deductionTypeText[value] ?? '--',
-    taxDeduction: (_value: any, row: GetSalaryCompositionsResponse) => deductionTypeText[row.deductionType] ?? '--',
+    taxDeduction: (_value: DeductionType, row: GetSalaryCompositionsResponse) =>
+        row.isTaxDeduction === true ? 'Có' : 'Không',
     incomeTaxType: (value: IncomeTaxType) => incomeTaxTypeText[value] ?? '--',
     optionShowPaycheck: (value: OptionShowPaycheck) => optionShowPaycheckText[value] ?? '--',
     showOnPayroll: (_value: any, row: GetSalaryCompositionsResponse) =>
         optionShowPaycheckText[row.optionShowPaycheck] ?? '--',
     quota: (_value: any, row: GetSalaryCompositionsResponse) => row.quotaFormula ?? '--',
     quotaFormula: (value: string | null) => value ?? '--',
+    organizationUnitNames: (value: string | null, row: GetSalaryCompositionsResponse) =>
+        row.organizations
+            ?.map((organization) => organization.orgName)
+            .filter(Boolean)
+            .join(', ')
+        || value
+        || '--',
     sourceType: (value: SourceType) => sourceTypeText[value] ?? '--',
     status: (value: TrackingStatus) => trackingStatusText[value] ?? '--',
     valueType: (value: ValueType) => valueTypeText[value] ?? '--',
@@ -89,8 +97,7 @@ const props = defineProps<SalaryCompositionTableProps>();
 </script>
 <template>
     <MsTable class="border-separate border-spacing-0 text-left text-[14px]" :is-loading="isLoading" :columns="columns"
-        :rows="rows" :formatters="formatters" :column-widths="columnWidths"
-        :max-chars-by-column="maxCharsByColumn">
+        :rows="rows" :formatters="formatters" :column-widths="columnWidths" :max-chars-by-column="maxCharsByColumn">
 
         <template #status="{ row }">
             <MsStatus :text="trackingStatusText[row.status] ?? '--'"

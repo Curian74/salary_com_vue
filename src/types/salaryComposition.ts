@@ -11,16 +11,21 @@ import type {
 } from "@/enums/salaryCompositionEnums";
 import type { ApiRequest } from "./apiRequest";
 
+export interface SalaryCompositionOrganization {
+    orgId: string;
+    orgName: string;
+}
+
 export interface GetSalaryCompositionsResponse {
     id: string;
     code: string;
     name: string;
-    description: string;
-    systemCompositionId: string;
+    description: string | null;
+    systemCompositionId: string | null;
     compositionType: CompositionType;
     compositionNature: CompositionNature;
     incomeTaxType: IncomeTaxType;
-    deductionType: DeductionType;
+    deductionType: DeductionType | null;
     quotaFormula: string | null;
     allowToExceedQuota: boolean;
     valueType: ValueType;
@@ -28,12 +33,14 @@ export interface GetSalaryCompositionsResponse {
     autoSumEmployeeType: AutoSumEmployeeType;
     organizationalStructureLevel: number | null;
     salaryCompositionId: string | null;
-    valueFormula: string;
+    valueFormula: string | null;
     optionShowPaycheck: OptionShowPaycheck;
     sourceType: SourceType;
     status: TrackingStatus;
-    organizationUnitIds: string;
-    organizationUnitNames: string;
+    organizations?: SalaryCompositionOrganization[];
+    organizationUnitIds?: string;
+    organizationUnitNames?: string;
+    isTaxDeduction: boolean,
 }
 
 export interface GetSalaryCompositionsRequest extends ApiRequest {
