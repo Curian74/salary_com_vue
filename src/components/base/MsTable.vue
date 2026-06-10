@@ -18,10 +18,15 @@ interface MsTableProps {
 }
 
 const props = defineProps<MsTableProps>();
+const emit = defineEmits<{
+    'selection-count-change': [count: number]
+}>();
+
 const selectedRowKeys = ref(new Set<string>());
 const selectionColumnWidth = 48;
 const defaultColumnWidth = 140;
 const defaultMaxChars = 28;
+const selectedCount = computed(() => selectedRowKeys.value.size);
 
 const isAllSelected = computed(() => {
     // Kiểm tra xem selectedKeys có chứa tất cả row từ data gốc
@@ -139,9 +144,36 @@ const handleSelectRow = (row: T, checked: boolean) => {
     selectedRowKeys.value = newSet;
 }
 
-watch(selectedRowKeys, () => {
-    console.log("Đã chọn " + selectedRowKeys.value.size + " bản ghi")
-})
+const clearSelection = () => {
+    selectedRowKeys.value = new Set();
+}
+
+watch(
+    () => props.rows,
+    (rows) => {
+        const rowKeys = new Set(rows.map(getRowKey));
+        const nextSelectedRowKeys = new Set(
+            [...selectedRowKeys.value].filter((rowKey) => rowKeys.has(rowKey)),
+        );
+
+        if (nextSelectedRowKeys.size !== selectedRowKeys.value.size) {
+            selectedRowKeys.value = nextSelectedRowKeys;
+        }
+    },
+)
+
+watch(
+    selectedCount,
+    (count) => {
+        // Đẩy số dòng được chọn lên parent để đổi toolbar/filter bên ngoài table
+        emit('selection-count-change', count);
+    },
+    { immediate: true },
+)
+
+defineExpose({
+    clearSelection,
+});
 
 </script>
 <template>
@@ -186,7 +218,8 @@ watch(selectedRowKeys, () => {
 
         <tbody v-else>
             <tr v-if="rows.length > 0" v-for="row in rows" :key="getRowKey(row)"
-                class="bg-white hover:bg-[#cdeadf] hover:cursor-pointer">
+                class="hover:bg-[#cdeadf] hover:cursor-pointer"
+                :class="isRowSelected(row) ? 'bg-[#cdeadf]' : 'bg-white'">
                 <td class="h-10 border-b border-border px-4 text-center align-middle">
                     <ms-checkbox @change="checked => handleSelectRow(row, checked)" :checked="isRowSelected(row)">
                     </ms-checkbox>

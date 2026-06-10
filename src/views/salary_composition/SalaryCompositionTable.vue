@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import MsStatus from '@/components/base/MsStatus.vue';
 import MsTable from '@/components/base/MsTable.vue';
+import { ref } from 'vue';
 import {
     AutoSumEmployeeType, CompositionNature, CompositionType, DeductionType,
     IncomeTaxType, OptionShowPaycheck, SourceType, TrackingStatus, ValueType
@@ -93,11 +94,26 @@ const columnWidths = {
 }
 
 const props = defineProps<SalaryCompositionTableProps>();
+const emit = defineEmits<{
+    // Chuyển tiếp số dòng đang chọn từ MsTable để list điều khiển toolbar filter.
+    'selection-count-change': [count: number]
+}>();
+
+const tableRef = ref<{ clearSelection: () => void } | null>(null);
+
+const clearSelection = () => {
+    tableRef.value?.clearSelection();
+};
+
+defineExpose({
+    clearSelection,
+});
 
 </script>
 <template>
-    <MsTable class="border-separate border-spacing-0 text-left text-[14px]" :is-loading="isLoading" :columns="columns"
-        :rows="rows" :formatters="formatters" :column-widths="columnWidths" :max-chars-by-column="maxCharsByColumn">
+    <MsTable ref="tableRef" class="border-separate border-spacing-0 text-left text-[14px]" :is-loading="isLoading" :columns="columns"
+        :rows="rows" :formatters="formatters" :column-widths="columnWidths" :max-chars-by-column="maxCharsByColumn"
+        @selection-count-change="emit('selection-count-change', $event)">
 
         <template #status="{ row }">
             <MsStatus :text="trackingStatusText[row.status] ?? '--'"
