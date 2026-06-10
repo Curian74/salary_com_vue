@@ -6,6 +6,7 @@ import SalaryCompositionForm from './SalaryCompositionForm.vue';
 import type { GetOrganizationTreeResponse } from '@/types/organization.ts';
 import type { CreateSalaryCompositionRequest, GetSalaryCompositionsResponse } from '@/types/salaryComposition.ts';
 import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
+import { toast } from 'vue3-toastify';
 
 type SubmitAction = 'save' | 'saveAndAdd';
 
@@ -51,8 +52,11 @@ const handleSubmit = async (payload: CreateSalaryCompositionRequest) => {
     try {
         isSaving.value = true;
 
-        const data = await salaryCompositionApi.createSalaryComposition(payload);
-        alert('ngon');
+        await salaryCompositionApi.createSalaryComposition(payload);
+        toast('Thêm thành công', {
+            theme: 'colored',
+            type: 'success',
+        });
 
         if (submitAction.value === 'saveAndAdd') {
             formKey.value++;
