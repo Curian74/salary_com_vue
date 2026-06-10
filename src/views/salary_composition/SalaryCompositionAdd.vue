@@ -7,6 +7,9 @@ import type { GetOrganizationTreeResponse } from '@/types/organization.ts';
 import type { CreateSalaryCompositionRequest, GetSalaryCompositionsResponse } from '@/types/salaryComposition.ts';
 import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
 import { toast } from 'vue3-toastify';
+import axios from 'axios';
+import type { ApiErrorResponse } from '@/types/apiResponse.ts';
+import { getApiErrorMessage } from '@/helpers/apiResponseHelper.ts';
 
 type SubmitAction = 'save' | 'saveAndAdd';
 
@@ -66,8 +69,13 @@ const handleSubmit = async (payload: CreateSalaryCompositionRequest) => {
         emit('saved');
     }
     catch (err) {
-        console.log(err);
-        alert('haiz');
+        // Dùng helper để lấy message chuẩn từ backend
+        const msg = getApiErrorMessage(err);
+
+        toast(msg, {
+            theme: 'colored',
+            type: 'error',
+        });
     }
     finally {
         isSaving.value = false;

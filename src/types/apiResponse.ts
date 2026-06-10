@@ -32,3 +32,13 @@ export interface LookupResponse {
     value: number;
     name: string;
 }
+
+export interface ApiErrorResponse {
+    value: boolean;
+    isSuccess: boolean;
+    isFailure: boolean;
+    error: {
+        code: string;
+        message: string;
+    };
+}
