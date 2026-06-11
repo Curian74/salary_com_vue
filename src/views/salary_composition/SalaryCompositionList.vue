@@ -14,7 +14,7 @@ import SalaryCompositionPagination from './SalaryCompositionPagination.vue';
 import SalaryCompositionRightActions from './SalaryCompositionRightActions.vue';
 import SalaryCompositionSearch from './SalaryCompositionSearch.vue';
 import SalaryCompositionStatusFilter from './SalaryCompositionStatusFilter.vue';
-import SalaryCompositionTable from './SalaryCompositionTable.vue';
+import SalaryCompositionTable, { type SalaryCompositionRowActionKey } from './SalaryCompositionTable.vue';
 
 interface SalaryCompositionListProps {
     columns: GetGridConfigsResponse[]
@@ -60,7 +60,11 @@ const emit = defineEmits<{
     previousPage: []
     'update:pageSize': [pageSize: number]
     'update-status-many': [payload: { ids: string[], status: TrackingStatus }]
-    'delete-many': [ids: string[]]
+    'delete-many': [ids: string[]],
+    'row-action': [payload: {
+        action: SalaryCompositionRowActionKey,
+        row: GetSalaryCompositionsResponse
+    }]
 }>();
 
 const handleUpdateStatusMany = (status: TrackingStatus) => {
@@ -76,6 +80,13 @@ const handleDeleteMany = () => {
     if (selectedSalaryCompositionIds.value.length === 0) return;
 
     emit('delete-many', [...selectedSalaryCompositionIds.value]);
+}
+
+const handleRowAction = (payload: {
+    action: 'view' | 'edit' | 'delete' | 'activate' | 'deactivate'
+    row: GetSalaryCompositionsResponse
+}) => {
+    emit('row-action', payload);
 }
 
 defineExpose({
@@ -170,6 +181,7 @@ defineExpose({
 
             <div class="relative min-h-0 flex-1 overflow-auto">
                 <SalaryCompositionTable ref="tableRef" :is-loading="isTableLoading" :rows="rows" :columns="columns"
+                    @row-action="handleRowAction"
                     @update:selected-salary-composition-ids="selectedSalaryCompositionIds = $event" />
             </div>
 

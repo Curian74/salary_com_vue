@@ -18,6 +18,7 @@ import type { GetOrganizationTreeRequest, GetOrganizationTreeResponse } from '@/
 import type { DeleteRequest, GetSalaryCompositionsRequest, GetSalaryCompositionsResponse } from '@/types/salaryComposition.ts';
 import SalaryCompositionAdd from './SalaryCompositionAdd.vue';
 import SalaryCompositionList from './SalaryCompositionList.vue';
+import type { SalaryCompositionRowActionKey } from './SalaryCompositionTable.vue';
 import { toast } from 'vue3-toastify';
 
 type SalaryCompositionView = 'list' | 'add' | 'edit' | 'view';
@@ -25,6 +26,11 @@ type SalaryCompositionView = 'list' | 'add' | 'edit' | 'view';
 interface UpdateStatusManyPayload {
     ids: string[];
     status: TrackingStatus;
+}
+
+interface SalaryCompositionRowActionPayload {
+    action: SalaryCompositionRowActionKey;
+    row: GetSalaryCompositionsResponse;
 }
 
 const activeView = ref<SalaryCompositionView>('list');
@@ -267,6 +273,44 @@ const showAdd = () => {
     selectedSalaryCompositionId.value = null;
 };
 
+const showEdit = (id: string) => {
+    closeOrganizationDropdown();
+    activeView.value = 'edit';
+    selectedSalaryCompositionId.value = id;
+};
+
+const showView = (id: string) => {
+    closeOrganizationDropdown();
+    activeView.value = 'view';
+    selectedSalaryCompositionId.value = id;
+};
+
+const handleRowAction = (payload: SalaryCompositionRowActionPayload) => {
+    switch (payload.action) {
+        case 'view':
+            showView(payload.row.id);
+            break;
+        case 'edit':
+            showEdit(payload.row.id);
+            break;
+        case 'delete':
+            handleDeleteMany([payload.row.id]);
+            break;
+        case 'activate':
+            handleUpdateStatusMany({
+                ids: [payload.row.id],
+                status: TrackingStatus.Active,
+            });
+            break;
+        case 'deactivate':
+            handleUpdateStatusMany({
+                ids: [payload.row.id],
+                status: TrackingStatus.Inactive,
+            });
+            break;
+    }
+};
+
 const handleSaved = async () => {
     showList();
     await fetchSalaryCompositions();
@@ -366,7 +410,7 @@ onBeforeUnmount(() => {
         @set-organization-dropdown-el="setOrganizationDropdownElement" @first-page="handleFirstPage"
         @last-page="handleLastPage" @next-page="handleNextPage" @previous-page="handlePreviousPage"
         @update:page-size="handlePageSizeChange" @update-status-many="handleUpdateStatusMany"
-        @delete-many="handleDeleteMany" />
+        @delete-many="handleDeleteMany" @row-action="handleRowAction" />
 
     <SalaryCompositionAdd v-else-if="activeView === 'add'" :organization-items="organizationTreeItems" @back="showList"
         @saved="handleSaved" />

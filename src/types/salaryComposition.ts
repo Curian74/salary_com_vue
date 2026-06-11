@@ -11,6 +11,33 @@ import type {
 } from "@/enums/salaryCompositionEnums";
 import type { ApiRequest } from "./apiRequest";
 
+export interface SalaryCompositionDetail {
+    id: string;
+    code: string;
+    name: string;
+    description: string | null;
+    systemCompositionId: string | null;
+    compositionType: CompositionType;
+    compositionNature: CompositionNature;
+    incomeTaxType: IncomeTaxType;
+    deductionType: DeductionType | null;
+    quotaFormula: string | null;
+    allowToExceedQuota: boolean;
+    valueType: ValueType;
+    isAutoSumEmployee: boolean;
+    autoSumEmployeeType: AutoSumEmployeeType;
+    organizationalStructureLevel: number | null;
+    salaryCompositionId: string | null;
+    valueFormula: string | null;
+    optionShowPaycheck: OptionShowPaycheck;
+    sourceType: SourceType;
+    status: TrackingStatus;
+    organizations?: SalaryCompositionOrganization[];
+    organizationUnitIds?: string;
+    organizationUnitNames?: string;
+    isTaxDeduction: boolean,
+}
+
 export interface SalaryCompositionOrganization {
     orgId: string;
     orgName: string;

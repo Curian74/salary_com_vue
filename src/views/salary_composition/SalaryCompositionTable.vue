@@ -37,7 +37,12 @@ interface SalaryCompositionRowAction {
     tone?: 'default' | 'success' | 'warning' | 'danger'
 }
 
-type SalaryCompositionRowActionKey =
+interface SalaryCompositionRowActionPayload {
+    action: SalaryCompositionRowActionKey
+    row: GetSalaryCompositionsResponse
+}
+
+export type SalaryCompositionRowActionKey =
     | 'view'
     | 'edit'
     | 'delete'
@@ -114,7 +119,8 @@ const props = defineProps<SalaryCompositionTableProps>();
 const emit = defineEmits<{
     // Chuyển tiếp số dòng đang chọn từ MsTable để list điều khiển toolbar filter.
     'selection-count-change': [count: number]
-    'update:selectedSalaryCompositionIds': [ids: string[]]
+    'update:selectedSalaryCompositionIds': [ids: string[]],
+    'row-action': [payload: SalaryCompositionRowActionPayload]
 }>();
 
 const tableRef = ref<{ clearSelection: () => void } | null>(null);
@@ -170,6 +176,17 @@ const getStatusVariant = (row: GetSalaryCompositionsResponse) => {
     return row.status === TrackingStatus.Active ? 'success' : 'warning';
 }
 
+const handleRowAction = (
+    action: SalaryCompositionRowAction,
+    row: GetSalaryCompositionsResponse,
+) => {
+
+    emit('row-action', {
+        action: action.key,
+        row,
+    });
+}
+
 defineExpose({
     clearSelection,
 });
@@ -189,8 +206,8 @@ defineExpose({
         <template #row-actions="{ row }">
             <button v-for="action in getRowActions(row)" :key="action.key" type="button"
                 class="salary-composition-table__row-action"
-                :class="`salary-composition-table__row-action--${action.tone ?? 'default'}`"
-                :aria-label="action.label" :title="action.label" @click.stop>
+                :class="`salary-composition-table__row-action--${action.tone ?? 'default'}`" :aria-label="action.label"
+                :title="action.label" @click="handleRowAction(action, row)">
                 <MsIcon :name="action.icon" class="salary-composition-table__row-action-icon" />
             </button>
         </template>
