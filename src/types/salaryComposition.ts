@@ -83,3 +83,7 @@ export interface UpdateStatusRequest {
     salaryCompositionIds: string[],
     status: TrackingStatus,
 }
+
+export interface DeleteRequest {
+    salaryCompositionIds: string[],
+}

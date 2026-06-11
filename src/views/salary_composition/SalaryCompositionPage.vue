@@ -4,7 +4,9 @@ import gridConfigApi from '@/apis/gridConfigApi';
 import lookupApi from '@/apis/lookupApi.ts';
 import organizationApi from '@/apis/organizationApi.ts';
 import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
+import MsButton from '@/components/base/MsButton.vue';
 import type { MsMenuOption } from '@/components/base/MsMenu.vue';
+import MsPopup from '@/components/base/MsPopup.vue';
 import type { MsSelectOption } from '@/components/base/MsSelect.vue';
 import { trackingStatusLabels } from '@/constants/trackingStatusLabels.ts';
 import gridKeys from '@/constants/gridKeys.ts';
@@ -13,7 +15,7 @@ import { TrackingStatus } from '@/enums/salaryCompositionEnums';
 import type { LookupResponse, PagedResult } from '@/types/apiResponse.ts';
 import type { GetGridConfigsResponse } from '@/types/gridConfig';
 import type { GetOrganizationTreeRequest, GetOrganizationTreeResponse } from '@/types/organization.ts';
-import type { GetSalaryCompositionsRequest, GetSalaryCompositionsResponse } from '@/types/salaryComposition.ts';
+import type { DeleteRequest, GetSalaryCompositionsRequest, GetSalaryCompositionsResponse } from '@/types/salaryComposition.ts';
 import SalaryCompositionAdd from './SalaryCompositionAdd.vue';
 import SalaryCompositionList from './SalaryCompositionList.vue';
 import { toast } from 'vue3-toastify';
@@ -28,6 +30,8 @@ interface UpdateStatusManyPayload {
 const activeView = ref<SalaryCompositionView>('list');
 const selectedSalaryCompositionId = ref<string | null>(null);
 const salaryCompositionListRef = ref<InstanceType<typeof SalaryCompositionList> | null>(null);
+const pendingStatusPayload = ref<UpdateStatusManyPayload | null>(null);
+const pendingDeleteIds = ref<string[]>([]);
 
 const columns = ref<GetGridConfigsResponse[]>([]);
 const isTableLoading = ref(false);
@@ -70,6 +74,11 @@ const rows = computed(() => salaryCompositions.value.items);
 const totalCount = computed(() => salaryCompositions.value.totalCount);
 const pagedData = computed(() => salaryCompositions.value);
 const isShowInactiveOrganizations = computed(() => organizationQueryObject.value.trackingStatus === undefined);
+const isStatusConfirmOpen = computed(() => pendingStatusPayload.value !== null);
+const isDeleteConfirmOpen = computed(() => pendingDeleteIds.value.length > 0);
+const pendingStatusLabel = computed(() =>
+    pendingStatusPayload.value?.status === TrackingStatus.Active ? 'đang theo dõi' : 'ngừng theo dõi',
+);
 
 const statusMenuOptions = computed<MsMenuOption[]>(() => [
     {
@@ -145,16 +154,26 @@ const handleStatusChange = (status: string | number | null) => {
     queryObject.value.trackingStatus = selectedStatus.value;
 };
 
-const handleUpdateStatusMany = async ({ ids, status }: UpdateStatusManyPayload) => {
-    if (ids.length === 0) return;
+const handleUpdateStatusMany = (payload: UpdateStatusManyPayload) => {
+    if (payload.ids.length === 0) return;
+
+    pendingStatusPayload.value = payload;
+};
+
+const closeStatusConfirm = () => {
+    pendingStatusPayload.value = null;
+};
+
+const confirmUpdateStatusMany = async () => {
+    if (!pendingStatusPayload.value) return;
 
     try {
         isTableLoading.value = true;
 
         // Gọi batch API với danh sách id lấy từ các row đang chọn.
         await salaryCompositionApi.updateStatus({
-            salaryCompositionIds: ids,
-            status,
+            salaryCompositionIds: pendingStatusPayload.value.ids,
+            status: pendingStatusPayload.value.status,
         });
         toast('Cập nhật thành công', {
             theme: 'colored',
@@ -162,11 +181,12 @@ const handleUpdateStatusMany = async ({ ids, status }: UpdateStatusManyPayload) 
         });
         await fetchSalaryCompositions();
         salaryCompositionListRef.value?.clearTableSelection();
+        closeStatusConfirm();
     }
     catch (err) {
         toast('Cập nhật thất bại', {
             theme: 'colored',
-            type: 'success',
+            type: 'error',
         });
     }
     finally {
@@ -175,8 +195,47 @@ const handleUpdateStatusMany = async ({ ids, status }: UpdateStatusManyPayload) 
 };
 
 const handleDeleteMany = (ids: string[]) => {
-    // Chưa có API delete batch, tạm nối event lên page để bổ sung endpoint sau.
-    console.log(ids);
+    if (ids.length === 0) return;
+
+    pendingDeleteIds.value = ids;
+};
+
+const closeDeleteConfirm = () => {
+    pendingDeleteIds.value = [];
+};
+
+const confirmDeleteMany = async () => {
+    if (pendingDeleteIds.value.length === 0) return;
+
+    const request: DeleteRequest = {
+        salaryCompositionIds: pendingDeleteIds.value,
+    }
+
+    try {
+        isTableLoading.value = true;
+
+        await salaryCompositionApi.deleteMany(request);
+
+        toast('Xóa thành công', {
+            theme: 'colored',
+            type: 'success',
+        });
+
+        await fetchSalaryCompositions();
+        salaryCompositionListRef.value?.clearTableSelection();
+        closeDeleteConfirm();
+    }
+
+    catch (err) {
+        toast('Xóa thất bại', {
+            theme: 'colored',
+            type: 'error',
+        });
+    }
+
+    finally {
+        isTableLoading.value = false;
+    }
 };
 
 const handleOrganizationIdsChange = (organizationIds: string[]) => {
@@ -296,8 +355,8 @@ onBeforeUnmount(() => {
 
 <template>
     <SalaryCompositionList v-if="activeView === 'list'" ref="salaryCompositionListRef" :columns="columns"
-        :is-table-loading="isTableLoading" :rows="rows" :selected-status="selectedStatus" :status-menu-options="statusMenuOptions"
-        :selected-organization-ids="queryObject.organizationIds ?? []"
+        :is-table-loading="isTableLoading" :rows="rows" :selected-status="selectedStatus"
+        :status-menu-options="statusMenuOptions" :selected-organization-ids="queryObject.organizationIds ?? []"
         :show-inactive-organizations="isShowInactiveOrganizations" :organization-items="organizationTreeItems"
         :is-organization-dropdown-open="isOrganizationDropdownOpen" :total-count="totalCount" :paged-data="pagedData"
         :page-size="queryObject.pageSize" :page-size-options="pageSizeOptions" @add="showAdd" @search="handleSearch"
@@ -318,4 +377,43 @@ onBeforeUnmount(() => {
         </div>
         <span class="hidden">{{ selectedSalaryCompositionId }}</span>
     </section>
+
+    <MsPopup :open="isStatusConfirmOpen" width="420px" @close="closeStatusConfirm">
+        <template #title>Chuyển trạng thái</template>
+
+        <p class="text-[13px] leading-4.5">
+            Bạn có chắc chắn muốn chuyển trạng thái thành phần lương đã chọn sang {{ pendingStatusLabel }} không?
+        </p>
+
+        <template #footer>
+            <MsButton size="sm" variant="secondary" class="min-w-20 font-medium" :disabled="isTableLoading"
+                @click="closeStatusConfirm">
+                Hủy bỏ
+            </MsButton>
+            <MsButton size="sm" variant="primary" class="min-w-20 font-medium" :loading="isTableLoading"
+                @click="confirmUpdateStatusMany">
+                Đồng ý
+            </MsButton>
+
+        </template>
+    </MsPopup>
+
+    <MsPopup :open="isDeleteConfirmOpen" width="420px" @close="closeDeleteConfirm">
+        <template #title>Thông báo</template>
+
+        <p class="text-[13px] leading-4.5">
+            Bạn có chắc chắn muốn xóa thành phần lương đã chọn không?
+        </p>
+
+        <template #footer>
+            <MsButton size="sm" variant="secondary" class="min-w-20 font-medium" :disabled="isTableLoading"
+                @click="closeDeleteConfirm">
+                Hủy
+            </MsButton>
+            <MsButton size="sm" variant="primary" class="min-w-20 bg-[#f04438]! font-medium hover:bg-[#d92d20]!"
+                :loading="isTableLoading" @click="confirmDeleteMany">
+                Xóa
+            </MsButton>
+        </template>
+    </MsPopup>
 </template>
