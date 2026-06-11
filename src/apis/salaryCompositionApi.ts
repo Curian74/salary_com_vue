@@ -1,4 +1,4 @@
-import type { CreateSalaryCompositionRequest, GetSalaryCompositionsRequest, GetSalaryCompositionsResponse } from "@/types/salaryComposition";
+import type { CreateSalaryCompositionRequest, GetSalaryCompositionsRequest, GetSalaryCompositionsResponse, UpdateStatusRequest } from "@/types/salaryComposition";
 import { axiosClient } from "./axiosClient";
 import type { ApiResponse, PagedResult } from "@/types/apiResponse";
 
@@ -19,9 +19,17 @@ const createSalaryComposition = async (body: CreateSalaryCompositionRequest)
     return response.data;
 }
 
+const updateStatus = async (body: UpdateStatusRequest)
+    : Promise<ApiResponse<void>> => {
+    const response = await axiosClient.put('SalaryCompositions/status-batch', body);
+    return response.data;
+}
+
+
 const salaryCompositionApi = {
     fetchSalaryCompositions,
-    createSalaryComposition
+    createSalaryComposition,
+    updateStatus
 }
 
 export default salaryCompositionApi;

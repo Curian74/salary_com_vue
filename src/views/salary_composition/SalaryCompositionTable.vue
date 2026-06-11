@@ -93,10 +93,13 @@ const columnWidths = {
     autoSumEmployeeType: 160,
 }
 
+// Salary composition dùng id làm khóa cho batch update/delete.
+const salaryCompositionRowKey: keyof GetSalaryCompositionsResponse = 'id';
 const props = defineProps<SalaryCompositionTableProps>();
 const emit = defineEmits<{
     // Chuyển tiếp số dòng đang chọn từ MsTable để list điều khiển toolbar filter.
     'selection-count-change': [count: number]
+    'update:selectedSalaryCompositionIds': [ids: string[]]
 }>();
 
 const tableRef = ref<{ clearSelection: () => void } | null>(null);
@@ -111,9 +114,11 @@ defineExpose({
 
 </script>
 <template>
-    <MsTable ref="tableRef" class="border-separate border-spacing-0 text-left text-[14px]" :is-loading="isLoading" :columns="columns"
-        :rows="rows" :formatters="formatters" :column-widths="columnWidths" :max-chars-by-column="maxCharsByColumn"
-        @selection-count-change="emit('selection-count-change', $event)">
+    <MsTable ref="tableRef" class="border-separate border-spacing-0 text-left text-[14px]" :is-loading="isLoading"
+        :columns="columns" :rows="rows" :row-key="salaryCompositionRowKey" :formatters="formatters"
+        :column-widths="columnWidths" :max-chars-by-column="maxCharsByColumn"
+        @selection-count-change="emit('selection-count-change', $event)"
+        @selection-change="emit('update:selectedSalaryCompositionIds', $event)">
 
         <template #status="{ row }">
             <MsStatus :text="trackingStatusText[row.status] ?? '--'"

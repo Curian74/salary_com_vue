@@ -16,11 +16,18 @@ import type { GetOrganizationTreeRequest, GetOrganizationTreeResponse } from '@/
 import type { GetSalaryCompositionsRequest, GetSalaryCompositionsResponse } from '@/types/salaryComposition.ts';
 import SalaryCompositionAdd from './SalaryCompositionAdd.vue';
 import SalaryCompositionList from './SalaryCompositionList.vue';
+import { toast } from 'vue3-toastify';
 
 type SalaryCompositionView = 'list' | 'add' | 'edit' | 'view';
 
+interface UpdateStatusManyPayload {
+    ids: string[];
+    status: TrackingStatus;
+}
+
 const activeView = ref<SalaryCompositionView>('list');
 const selectedSalaryCompositionId = ref<string | null>(null);
+const salaryCompositionListRef = ref<InstanceType<typeof SalaryCompositionList> | null>(null);
 
 const columns = ref<GetGridConfigsResponse[]>([]);
 const isTableLoading = ref(false);
@@ -136,6 +143,40 @@ const handleStatusChange = (status: string | number | null) => {
     selectedStatus.value = typeof status === 'number' ? status : null;
     queryObject.value.pageIndex = 1;
     queryObject.value.trackingStatus = selectedStatus.value;
+};
+
+const handleUpdateStatusMany = async ({ ids, status }: UpdateStatusManyPayload) => {
+    if (ids.length === 0) return;
+
+    try {
+        isTableLoading.value = true;
+
+        // Gọi batch API với danh sách id lấy từ các row đang chọn.
+        await salaryCompositionApi.updateStatus({
+            salaryCompositionIds: ids,
+            status,
+        });
+        toast('Cập nhật thành công', {
+            theme: 'colored',
+            type: 'success',
+        });
+        await fetchSalaryCompositions();
+        salaryCompositionListRef.value?.clearTableSelection();
+    }
+    catch (err) {
+        toast('Cập nhật thất bại', {
+            theme: 'colored',
+            type: 'success',
+        });
+    }
+    finally {
+        isTableLoading.value = false;
+    }
+};
+
+const handleDeleteMany = (ids: string[]) => {
+    // Chưa có API delete batch, tạm nối event lên page để bổ sung endpoint sau.
+    console.log(ids);
 };
 
 const handleOrganizationIdsChange = (organizationIds: string[]) => {
@@ -254,8 +295,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <SalaryCompositionList v-if="activeView === 'list'" :columns="columns" :is-table-loading="isTableLoading"
-        :rows="rows" :selected-status="selectedStatus" :status-menu-options="statusMenuOptions"
+    <SalaryCompositionList v-if="activeView === 'list'" ref="salaryCompositionListRef" :columns="columns"
+        :is-table-loading="isTableLoading" :rows="rows" :selected-status="selectedStatus" :status-menu-options="statusMenuOptions"
         :selected-organization-ids="queryObject.organizationIds ?? []"
         :show-inactive-organizations="isShowInactiveOrganizations" :organization-items="organizationTreeItems"
         :is-organization-dropdown-open="isOrganizationDropdownOpen" :total-count="totalCount" :paged-data="pagedData"
@@ -265,7 +306,8 @@ onBeforeUnmount(() => {
         @toggle-organization-dropdown="toggleOrganizationDropdown"
         @set-organization-dropdown-el="setOrganizationDropdownElement" @first-page="handleFirstPage"
         @last-page="handleLastPage" @next-page="handleNextPage" @previous-page="handlePreviousPage"
-        @update:page-size="handlePageSizeChange" />
+        @update:page-size="handlePageSizeChange" @update-status-many="handleUpdateStatusMany"
+        @delete-many="handleDeleteMany" />
 
     <SalaryCompositionAdd v-else-if="activeView === 'add'" :organization-items="organizationTreeItems" @back="showList"
         @saved="handleSaved" />

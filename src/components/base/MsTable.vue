@@ -20,13 +20,13 @@ interface MsTableProps {
 const props = defineProps<MsTableProps>();
 const emit = defineEmits<{
     'selection-count-change': [count: number]
+    'selection-change': [selectedRowKeys: string[]]
 }>();
 
 const selectedRowKeys = ref(new Set<string>());
 const selectionColumnWidth = 48;
 const defaultColumnWidth = 140;
 const defaultMaxChars = 28;
-const selectedCount = computed(() => selectedRowKeys.value.size);
 
 const isAllSelected = computed(() => {
     // Kiểm tra xem selectedKeys có chứa tất cả row từ data gốc
@@ -75,7 +75,15 @@ const tableStyle = computed(() => {
 });
 
 const getRowKey = (row: T) => {
-    return props.rowKey ? row[props.rowKey] : row.code;
+    const rowKey = props.rowKey ? row[props.rowKey] : row.code;
+    return String(rowKey);
+}
+
+const emitSelectionChange = () => {
+    // Đồng bộ selection lên parent để toolbar/action dùng được ids.
+    const selectedKeys = Array.from(selectedRowKeys.value);
+    emit('selection-count-change', selectedKeys.length);
+    emit('selection-change', selectedKeys);
 }
 
 const getColumnWidth = (column: GridConfig) => {
@@ -128,6 +136,7 @@ const handleSelectAll = () => {
         });
     }
     selectedRowKeys.value = newSet;
+    emitSelectionChange();
 }
 
 const isRowSelected = (row: T) => {
@@ -142,10 +151,12 @@ const handleSelectRow = (row: T, checked: boolean) => {
     else newSet.delete(rowKey);
 
     selectedRowKeys.value = newSet;
+    emitSelectionChange();
 }
 
 const clearSelection = () => {
     selectedRowKeys.value = new Set();
+    emitSelectionChange();
 }
 
 watch(
@@ -158,17 +169,9 @@ watch(
 
         if (nextSelectedRowKeys.size !== selectedRowKeys.value.size) {
             selectedRowKeys.value = nextSelectedRowKeys;
+            emitSelectionChange();
         }
     },
-)
-
-watch(
-    selectedCount,
-    (count) => {
-        // Đẩy số dòng được chọn lên parent để đổi toolbar/filter bên ngoài table
-        emit('selection-count-change', count);
-    },
-    { immediate: true },
 )
 
 defineExpose({

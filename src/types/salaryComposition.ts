@@ -79,3 +79,7 @@ export interface CreateSalaryCompositionRequest {
     organizationUnitIds?: string[];
 }
 
+export interface UpdateStatusRequest {
+    salaryCompositionIds: string[],
+    status: TrackingStatus,
+}

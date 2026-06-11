@@ -7,7 +7,7 @@ import type { PagedResult } from '@/types/apiResponse.ts';
 import type { GetGridConfigsResponse } from '@/types/gridConfig';
 import type { GetOrganizationTreeResponse } from '@/types/organization.ts';
 import type { GetSalaryCompositionsResponse } from '@/types/salaryComposition.ts';
-import type { TrackingStatus } from '@/enums/salaryCompositionEnums';
+import { TrackingStatus } from '@/enums/salaryCompositionEnums';
 import SalaryCompositionButtons from './SalaryCompositionButtons.vue';
 import SalaryCompositionOrganization from './SalaryCompositionOrganization.vue';
 import SalaryCompositionPagination from './SalaryCompositionPagination.vue';
@@ -34,13 +34,16 @@ interface SalaryCompositionListProps {
 
 defineProps<SalaryCompositionListProps>();
 
-const selectedTableRowCount = ref(0);
+// Danh sách id đang chọn để gọi update/delete many.
+const selectedSalaryCompositionIds = ref<string[]>([]);
+const selectedTableRowCount = computed(() => selectedSalaryCompositionIds.value.length);
 const tableRef = ref<{ clearSelection: () => void } | null>(null);
 const hasSelectedTableRows = computed(() => selectedTableRowCount.value > 0);
 
 // Gọi method được expose từ SalaryCompositionTable để xóa selection nội bộ của MsTable.
 const clearTableSelection = () => {
     tableRef.value?.clearSelection();
+    selectedSalaryCompositionIds.value = [];
 };
 
 const emit = defineEmits<{
@@ -56,7 +59,29 @@ const emit = defineEmits<{
     nextPage: []
     previousPage: []
     'update:pageSize': [pageSize: number]
+    'update-status-many': [payload: { ids: string[], status: TrackingStatus }]
+    'delete-many': [ids: string[]]
 }>();
+
+const handleUpdateStatusMany = (status: TrackingStatus) => {
+    if (selectedSalaryCompositionIds.value.length === 0) return;
+
+    emit('update-status-many', {
+        ids: [...selectedSalaryCompositionIds.value],
+        status,
+    });
+}
+
+const handleDeleteMany = () => {
+    if (selectedSalaryCompositionIds.value.length === 0) return;
+
+    emit('delete-many', [...selectedSalaryCompositionIds.value]);
+}
+
+defineExpose({
+    clearTableSelection,
+});
+
 </script>
 
 <template>
@@ -81,8 +106,9 @@ const emit = defineEmits<{
                     </MsButton>
 
                     <div class="salary-composition-list__selection-actions">
-                        <MsButton variant="secondary" size="md"
-                            class="salary-composition-list__selection-action salary-composition-list__selection-action--warning">
+                        <MsButton variant="secondary" size="md" class="salary-composition-list__selection-action
+                             salary-composition-list__selection-action--warning"
+                            @click="handleUpdateStatusMany(TrackingStatus.Inactive)">
                             <template #prepend>
                                 <svg class="salary-composition-list__selection-action-icon" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -94,8 +120,9 @@ const emit = defineEmits<{
                             Ngừng theo dõi
                         </MsButton>
 
-                        <MsButton variant="secondary" size="md"
-                            class="salary-composition-list__selection-action salary-composition-list__selection-action--success">
+                        <MsButton variant="secondary" size="md" class="salary-composition-list__selection-action
+                             salary-composition-list__selection-action--success"
+                            @click="handleUpdateStatusMany(TrackingStatus.Active)">
                             <template #prepend>
                                 <svg class="salary-composition-list__selection-action-icon" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -107,8 +134,8 @@ const emit = defineEmits<{
                             Đang theo dõi
                         </MsButton>
 
-                        <MsButton variant="secondary" size="md"
-                            class="salary-composition-list__selection-action salary-composition-list__selection-action--danger">
+                        <MsButton variant="secondary" size="md" class="salary-composition-list__selection-action
+                             salary-composition-list__selection-action--danger" @click="handleDeleteMany">
                             <template #prepend>
                                 <svg class="salary-composition-list__selection-action-icon" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -143,7 +170,7 @@ const emit = defineEmits<{
 
             <div class="relative min-h-0 flex-1 overflow-auto">
                 <SalaryCompositionTable ref="tableRef" :is-loading="isTableLoading" :rows="rows" :columns="columns"
-                    @selection-count-change="selectedTableRowCount = $event" />
+                    @update:selected-salary-composition-ids="selectedSalaryCompositionIds = $event" />
             </div>
 
             <div class="flex min-h-12.5 flex-wrap items-center justify-between gap-2 border-t 
