@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import MsStatus from '@/components/base/MsStatus.vue';
 import MsTable from '@/components/base/MsTable.vue';
+import MsIcon from '@/components/base/MsIcon.vue';
 import { ref } from 'vue';
 import {
     AutoSumEmployeeType, CompositionNature, CompositionType, DeductionType,
@@ -28,6 +29,20 @@ interface SalaryCompositionTableProps {
     rows: GetSalaryCompositionsResponse[];
     isLoading?: boolean;
 }
+
+interface SalaryCompositionRowAction {
+    key: SalaryCompositionRowActionKey
+    label: string
+    icon: string
+    tone?: 'default' | 'success' | 'warning' | 'danger'
+}
+
+type SalaryCompositionRowActionKey =
+    | 'view'
+    | 'edit'
+    | 'delete'
+    | 'activate'
+    | 'deactivate';
 
 const formatters: Record<string, (value: any, row: GetSalaryCompositionsResponse) => string> = {
     autoSumEmployeeType: (value: AutoSumEmployeeType) => autoSumEmployeeTypeText[value] ?? '--',
@@ -108,6 +123,53 @@ const clearSelection = () => {
     tableRef.value?.clearSelection();
 };
 
+const getRowActions = (row: GetSalaryCompositionsResponse): SalaryCompositionRowAction[] => {
+    // Xét kiểu tracking status
+    const trackingAction: SalaryCompositionRowAction =
+        row.status === TrackingStatus.Active
+            ? {
+                key: 'deactivate',
+                label: 'Ngừng theo dõi',
+                icon: 'circle-minus',
+                tone: 'warning',
+            }
+            : {
+                key: 'activate',
+                label: 'Đang theo dõi',
+                icon: 'circle-check',
+                tone: 'success',
+            }
+
+    // Trả về action cho row
+    return [
+        {
+            key: 'view',
+            label: 'Xem',
+            icon: 'eye',
+        },
+        {
+            key: 'edit',
+            label: 'Sửa',
+            icon: 'pencil',
+        },
+        trackingAction,
+        {
+            key: 'delete',
+            label: 'Xóa',
+            icon: 'trash',
+            tone: 'danger',
+        },
+    ]
+}
+
+const getStatusText = (row: GetSalaryCompositionsResponse) => {
+    return trackingStatusText[row.status] ?? '--';
+}
+
+const getStatusVariant = (row: GetSalaryCompositionsResponse) => {
+    return row.status === TrackingStatus.Active ? 'success' : 'warning';
+}
+
 defineExpose({
     clearSelection,
 });
@@ -121,10 +183,52 @@ defineExpose({
         @selection-change="emit('update:selectedSalaryCompositionIds', $event)">
 
         <template #status="{ row }">
-            <MsStatus :text="trackingStatusText[row.status] ?? '--'"
-                :variant="row.status === TrackingStatus.Active ? 'success' : 'warning'" />
+            <MsStatus :text="getStatusText(row)" :variant="getStatusVariant(row)" />
+        </template>
+
+        <template #row-actions="{ row }">
+            <button v-for="action in getRowActions(row)" :key="action.key" type="button"
+                class="salary-composition-table__row-action"
+                :class="`salary-composition-table__row-action--${action.tone ?? 'default'}`"
+                :aria-label="action.label" :title="action.label" @click.stop>
+                <MsIcon :name="action.icon" class="salary-composition-table__row-action-icon" />
+            </button>
         </template>
 
     </MsTable>
 </template>
-<style scoped></style>
+<style scoped>
+.salary-composition-table__row-action {
+    display: inline-flex;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--app-color-icon);
+    cursor: pointer;
+    padding: 0;
+}
+
+.salary-composition-table__row-action:hover {
+    background: var(--app-color-icon-hover-bg);
+}
+
+.salary-composition-table__row-action--success {
+    color: var(--app-color-primary);
+}
+
+.salary-composition-table__row-action--warning {
+    color: #f58220;
+}
+
+.salary-composition-table__row-action--danger {
+    color: var(--app-color-error);
+}
+
+.salary-composition-table__row-action-icon {
+    cursor: inherit;
+}
+</style>

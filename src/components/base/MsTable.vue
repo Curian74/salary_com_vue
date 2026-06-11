@@ -17,6 +17,20 @@ interface MsTableProps {
     maxCharsByColumn?: Record<string, number>;
 }
 
+// Khai báo props và slots của component
+type RowActionsSlotProps<T> = {
+    row: T
+    rowKey: string
+    isSelected: boolean
+}
+
+type MsTableSlots<T> = {
+    'row-actions'?: (props: RowActionsSlotProps<T>) => any
+    [name: string]: ((props: any) => any) | undefined // Slot tùy biến
+}
+
+const slots = defineSlots<MsTableSlots<T>>()
+
 const props = defineProps<MsTableProps>();
 const emit = defineEmits<{
     'selection-count-change': [count: number]
@@ -25,8 +39,11 @@ const emit = defineEmits<{
 
 const selectedRowKeys = ref(new Set<string>());
 const selectionColumnWidth = 48;
+const rowActionsColumnWidth = 160;
 const defaultColumnWidth = 140;
 const defaultMaxChars = 28;
+
+const hasRowActionsSlot = computed(() => Boolean(slots['row-actions']));
 
 const isAllSelected = computed(() => {
     // Kiểm tra xem selectedKeys có chứa tất cả row từ data gốc
@@ -51,12 +68,14 @@ const visibleColumns = computed(() => {
         .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
 })
 
-const tableColspan = computed(() => visibleColumns.value.length + 1);
+const tableColspan = computed(() => visibleColumns.value.length + 1 + (hasRowActionsSlot.value ? 1 : 0));
 
 const tableMinWidth = computed(() => {
-    return visibleColumns.value.reduce((total, column) => {
+    const baseWidth = visibleColumns.value.reduce((total, column) => {
         return total + (getRenderedColumnWidth(column) ?? 0);
     }, selectionColumnWidth);
+
+    return baseWidth + (hasRowActionsSlot.value ? rowActionsColumnWidth : 0);
 });
 
 const hasColumnWidths = computed(() => {
@@ -185,6 +204,7 @@ defineExpose({
             <col :style="{ width: `${selectionColumnWidth}px` }">
             <col v-for="column in visibleColumns" :key="column.fieldKey"
                 :style="getRenderedColumnWidth(column) ? { width: `${getRenderedColumnWidth(column)}px` } : undefined">
+            <col v-if="hasRowActionsSlot" :style="{ width: `${rowActionsColumnWidth}px` }">
         </colgroup>
 
         <thead class="sticky top-0 z-10 bg-grid-header">
@@ -206,6 +226,9 @@ defineExpose({
                         <span class="min-w-0 truncate">{{ column.columnName }}</span>
                     </span>
                 </th>
+
+                <th v-if="hasRowActionsSlot" class="ms-table__actions-head-cell h-10 border-b border-border px-2">
+                </th>
             </tr>
         </thead>
 
@@ -221,7 +244,7 @@ defineExpose({
 
         <tbody v-else>
             <tr v-if="rows.length > 0" v-for="row in rows" :key="getRowKey(row)"
-                class="hover:bg-[#cdeadf] hover:cursor-pointer"
+                class="ms-table__row hover:bg-[#cdeadf] hover:cursor-pointer"
                 :class="isRowSelected(row) ? 'bg-[#cdeadf]' : 'bg-white'">
                 <td class="h-10 border-b border-border px-4 text-center align-middle">
                     <ms-checkbox @change="checked => handleSelectRow(row, checked)" :checked="isRowSelected(row)">
@@ -234,6 +257,15 @@ defineExpose({
                         :display-value="getCellText(row, column)">
                         <span class="ms-table__cell-content">{{ getCellText(row, column) }}</span>
                     </slot>
+                </td>
+
+                <!-- Action slot cho từng row -->
+                <td v-if="hasRowActionsSlot"
+                    class="ms-table__actions-cell h-10 border-b border-border px-2 text-right align-middle">
+                    <div class="ms-table__row-actions">
+                        <slot name="row-actions" :row="row" :row-key="getRowKey(row)"
+                            :is-selected="isRowSelected(row)" />
+                    </div>
                 </td>
             </tr>
 
@@ -284,5 +316,38 @@ defineExpose({
     max-width: 100%;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+.ms-table__actions-head-cell,
+.ms-table__actions-cell {
+    position: sticky;
+    right: 0;
+    box-sizing: border-box;
+    background: inherit;
+}
+
+.ms-table__actions-head-cell {
+    z-index: 11;
+}
+
+.ms-table__actions-cell {
+    z-index: 1;
+}
+
+.ms-table__row-actions {
+    display: flex;
+    min-height: 32px;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s ease;
+}
+
+.ms-table__row:hover .ms-table__row-actions,
+.ms-table__row:focus-within .ms-table__row-actions {
+    opacity: 1;
+    pointer-events: auto;
 }
 </style>
