@@ -8,6 +8,7 @@ import type { CreateSalaryCompositionRequest } from '@/types/salaryComposition.t
 import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
 import { toast } from 'vue3-toastify';
 import { getApiErrorMessage } from '@/helpers/apiResponseHelper.ts';
+import SalaryFormExitPopup from './popup/SalaryFormExitPopup.vue';
 
 type SubmitAction = 'save' | 'saveAndAdd';
 
@@ -128,19 +129,8 @@ const handleSaveAndAdd = () => {
             </MsButton>
         </div>
 
-        <MsPopup :open="isLeaveConfirmOpen" @close="closeLeaveConfirm">
-            <template #title>Thoát và không lưu?</template>
-
-            <p>Nếu bạn thoát, các dữ liệu đang nhập liệu sẽ không được lưu lại.</p>
-
-            <template #footer>
-                <MsButton size="sm" variant="secondary" class="min-w-20 font-medium" @click="closeLeaveConfirm">
-                    Ở lại
-                </MsButton>
-                <MsButton size="sm" variant="primary" class="min-w-20 font-medium" @click="confirmLeave">
-                    Thoát, không lưu
-                </MsButton>
-            </template>
-        </MsPopup>
+        <SalaryFormExitPopup :confirm-leave="confirmLeave" :open="isLeaveConfirmOpen"
+            :close-leave-confirm="closeLeaveConfirm">
+        </SalaryFormExitPopup>
     </section>
 </template>

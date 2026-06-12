@@ -41,6 +41,7 @@ const iconClasses: Record<string, string> = {
   'circle-minus': 'icon-sprite_sec row-action-circle-minus-icon',
   'circle-check': 'icon-mask row-action-circle-check-icon',
   'threedot': 'icon-sprite threedot-icon',
+  'arrow-left': 'icon-sprite_sec arrow-left-icon',
 }
 </script>
 

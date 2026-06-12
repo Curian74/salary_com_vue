@@ -8,6 +8,7 @@ import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
 import type { SalaryCompositionDetail } from '@/types/salaryComposition.ts';
 import { getApiErrorMessage } from '@/helpers/apiResponseHelper.ts';
 import MsTooltip from '@/components/base/MsTooltip.vue';
+import SalaryFormExitPopup from './popup/SalaryFormExitPopup.vue';
 
 interface Props {
     organizationItems?: GetOrganizationTreeResponse[],
@@ -15,6 +16,15 @@ interface Props {
 }
 
 const mode = ref<'edit' | 'view'>('view');
+const formRef = ref<InstanceType<typeof SalaryCompositionForm>>();
+const formKey = ref(0);
+const isSaving = ref(false);
+const isLeaveConfirmOpen = ref(false);
+
+const emit = defineEmits<{
+    back: []
+    saved: []
+}>();
 
 const props = withDefaults(defineProps<Props>(), {
     organizationItems: () => [],
@@ -35,15 +45,33 @@ const getById = async () => {
     }
 }
 
+const toggleEditMode = () => {
+    mode.value = mode.value === 'edit' ? 'view' : 'edit';
+}
+
+const goBack = () => {
+    if (formRef.value?.checkFormDirty()) {
+        isLeaveConfirmOpen.value = true;
+        return;
+    }
+
+    emit('back');
+};
+
+const closeLeaveConfirm = () => {
+    isLeaveConfirmOpen.value = false;
+};
+
+const confirmLeave = () => {
+    isLeaveConfirmOpen.value = false;
+    emit('back');
+};
+
 onMounted(async () => {
     if (props.salaryCompositionId) {
         await getById();
     }
 });
-
-const toggleEditMode = () => {
-    mode.value = mode.value === 'edit' ? 'view' : 'edit';
-}
 
 </script>
 
@@ -51,18 +79,18 @@ const toggleEditMode = () => {
     <section class="flex h-[calc(100vh-48px)] flex-col bg-background">
         <div class="flex h-15 shrink-0 items-center justify-between px-7">
             <div class="flex min-w-0 items-center gap-3">
-                <button type="button" class="flex size-8 cursor-pointer
-                 items-center justify-center rounded-full text-[#6b7280]
-                 transition hover:bg-[#dadce3] focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    aria-label="Quay lại">
-                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M19 12H5" />
-                        <path d="m12 19-7-7 7-7" />
-                    </svg>
-                </button>
+                <MsTooltip :show-arrow="true" content="Quay lại">
+                    <MsButton variant="ghost" @click="goBack" type="button" class="flex size-8 cursor-pointer
+                        items-center justify-center rounded-full text-[#6b7280]
+                        transition hover:bg-[#dadce3] focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        <MsIcon name="arrow-left">
+                        </MsIcon>
+                    </MsButton>
+                </MsTooltip>
 
-                <h1 class="truncate text-[20px] font-bold leading-7 text-text-primary">12A5</h1>
+                <h1 class="truncate text-[20px] font-bold leading-7 text-text-primary">
+                    {{ salaryComposition?.name }}
+                </h1>
             </div>
 
             <div class="flex shrink-0 items-center gap-2.5">
@@ -94,9 +122,14 @@ const toggleEditMode = () => {
         </div>
 
         <div class="mx-5 min-h-0 flex-1 overflow-hidden bg-white">
-            <SalaryCompositionForm :salary-composition="salaryComposition" :mode="mode"
+            <SalaryCompositionForm ref="formRef" :salary-composition="salaryComposition" :mode="mode"
                 :organization-items="organizationItems" />
         </div>
+
+        <SalaryFormExitPopup :confirm-leave="confirmLeave" :open="isLeaveConfirmOpen"
+            :close-leave-confirm="closeLeaveConfirm">
+        </SalaryFormExitPopup>
+
     </section>
 </template>
 
