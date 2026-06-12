@@ -151,7 +151,7 @@ const getRowActions = (row: GetSalaryCompositionsResponse): SalaryCompositionRow
         trackingAction,
         {
             key: 'view',
-            label: 'Xem',
+            label: 'Nhân bản',
             icon: 'copy',
         },
         {
