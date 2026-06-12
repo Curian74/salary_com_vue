@@ -15,26 +15,26 @@ export interface SalaryCompositionDetail {
     id: string;
     code: string;
     name: string;
-    description: string | null;
+    description?: string;
     systemCompositionId: string | null;
     compositionType: CompositionType;
     compositionNature: CompositionNature;
     incomeTaxType: IncomeTaxType;
-    deductionType: DeductionType | null;
+    deductionType?: DeductionType;
     quotaFormula: string | null;
     allowToExceedQuota: boolean;
     valueType: ValueType;
     isAutoSumEmployee: boolean;
     autoSumEmployeeType: AutoSumEmployeeType;
-    organizationalStructureLevel: number | null;
+    organizationalStructureLevel?: number;
     salaryCompositionId: string | null;
     valueFormula: string | null;
     optionShowPaycheck: OptionShowPaycheck;
     sourceType: SourceType;
     status: TrackingStatus;
     organizations?: SalaryCompositionOrganization[];
-    organizationUnitIds?: string;
-    organizationUnitNames?: string;
+    // organizationUnitIds?: string;
+    // organizationUnitNames?: string;
     isTaxDeduction: boolean,
 }
 

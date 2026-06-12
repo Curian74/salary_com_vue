@@ -17,6 +17,7 @@ import type { GetGridConfigsResponse } from '@/types/gridConfig';
 import type { GetOrganizationTreeRequest, GetOrganizationTreeResponse } from '@/types/organization.ts';
 import type { DeleteRequest, GetSalaryCompositionsRequest, GetSalaryCompositionsResponse } from '@/types/salaryComposition.ts';
 import SalaryCompositionAdd from './SalaryCompositionAdd.vue';
+import SalaryCompositionDetails from './SalaryCompositionDetails.vue';
 import SalaryCompositionList from './SalaryCompositionList.vue';
 import type { SalaryCompositionRowActionKey } from './SalaryCompositionTable.vue';
 import { toast } from 'vue3-toastify';
@@ -415,12 +416,8 @@ onBeforeUnmount(() => {
     <SalaryCompositionAdd v-else-if="activeView === 'add'" :organization-items="organizationTreeItems" @back="showList"
         @saved="handleSaved" />
 
-    <section v-else class="flex h-[calc(100vh-48px)] flex-col bg-background px-4 pb-2.5 pt-3">
-        <div class="text-[20px] font-bold leading-8 text-text-primary">
-            {{ activeView === 'edit' ? 'Sửa thành phần lương' : 'Chi tiết thành phần lương' }}
-        </div>
-        <span class="hidden">{{ selectedSalaryCompositionId }}</span>
-    </section>
+    <SalaryCompositionDetails :salary-composition-id="selectedSalaryCompositionId"
+        v-else-if="activeView === 'view' || activeView === 'edit'" />
 
     <MsPopup :open="isStatusConfirmOpen" width="420px" @close="closeStatusConfirm">
         <template #title>Chuyển trạng thái</template>
