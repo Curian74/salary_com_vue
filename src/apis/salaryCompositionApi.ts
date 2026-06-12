@@ -35,7 +35,7 @@ const deleteMany = async (data: DeleteRequest)
 
 const getById = async (id: string)
     : Promise<ApiResponse<SalaryCompositionDetail>> => {
-    const response = await axiosClient.get(`SalaryCompositions/batch${id}`);
+    const response = await axiosClient.get(`/SalaryCompositions/${id}`);
     return response.data;
 }
 
