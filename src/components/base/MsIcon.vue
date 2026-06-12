@@ -35,9 +35,10 @@ const iconClasses: Record<string, string> = {
   'table-not-found': 'icon-sprite table-not-found-icon',
   'info-icon': 'icon-sprite info-icon',
   eye: 'icon-mask row-action-eye-icon',
+  copy: 'icon-mask row-action-copy-icon',
   pencil: 'icon-mask row-action-pencil-icon',
   trash: 'icon-mask row-action-trash-icon',
-  'circle-minus': 'icon-mask row-action-circle-minus-icon',
+  'circle-minus': 'icon-sprite_sec row-action-circle-minus-icon',
   'circle-check': 'icon-mask row-action-circle-check-icon',
 }
 </script>

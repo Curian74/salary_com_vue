@@ -148,17 +148,17 @@ const getRowActions = (row: GetSalaryCompositionsResponse): SalaryCompositionRow
 
     // Trả về action cho row
     return [
+        trackingAction,
         {
             key: 'view',
             label: 'Xem',
-            icon: 'eye',
+            icon: 'copy',
         },
         {
             key: 'edit',
             label: 'Sửa',
             icon: 'pencil',
         },
-        trackingAction,
         {
             key: 'delete',
             label: 'Xóa',
@@ -221,16 +221,22 @@ defineExpose({
     height: 28px;
     align-items: center;
     justify-content: center;
-    border: 0;
-    border-radius: 4px;
-    background: transparent;
-    color: var(--app-color-icon);
+    border: 1px solid #d6dde4;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #6f7782;
     cursor: pointer;
     padding: 0;
+    transition:
+        border-color 0.12s ease,
+        background-color 0.12s ease,
+        box-shadow 0.12s ease;
 }
 
 .salary-composition-table__row-action:hover {
-    background: var(--app-color-icon-hover-bg);
+    border-color: #c6d0da;
+    background: #f8fafc;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 .salary-composition-table__row-action--success {
@@ -247,5 +253,13 @@ defineExpose({
 
 .salary-composition-table__row-action-icon {
     cursor: inherit;
+}
+
+:deep(.ms-table__row-actions) {
+    gap: 10px;
+}
+
+:deep(.ms-table__actions-cell) {
+    padding-right: 10px;
 }
 </style>
