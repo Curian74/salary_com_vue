@@ -7,6 +7,7 @@ import { onMounted, ref } from 'vue';
 import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
 import type { SalaryCompositionDetail } from '@/types/salaryComposition.ts';
 import { getApiErrorMessage } from '@/helpers/apiResponseHelper.ts';
+import MsTooltip from '@/components/base/MsTooltip.vue';
 
 interface Props {
     organizationItems?: GetOrganizationTreeResponse[],
@@ -40,6 +41,10 @@ onMounted(async () => {
     }
 });
 
+const toggleEditMode = () => {
+    mode.value = mode.value === 'edit' ? 'view' : 'edit';
+}
+
 </script>
 
 <template>
@@ -61,16 +66,30 @@ onMounted(async () => {
             </div>
 
             <div class="flex shrink-0 items-center gap-2.5">
-                <MsButton size="sm" variant="secondary" class="min-w-20">
-                    <template #prepend>
-                        <MsIcon name="pencil" class="text-[#6b7280]" />
-                    </template>
-                    Sửa
-                </MsButton>
+                <template v-if="mode === 'view'">
+                    <MsButton @click="toggleEditMode" size="sm" variant="secondary" class="min-w-20">
+                        <template #prepend>
+                            <MsIcon name="pencil" class="text-[#6b7280]" />
+                        </template>
+                        Sửa
+                    </MsButton>
+                </template>
 
-                <MsButton size="md" variant="icon" class="w-10 px-0!" aria-label="Thao tác khác">
-                    <MsIcon name="more" class="salary-composition-details__more-icon" />
-                </MsButton>
+                <template v-else>
+                    <MsButton @click="toggleEditMode" size="sm" variant="secondary" class="min-w-20">
+                        Hủy bỏ
+                    </MsButton>
+
+                    <MsButton size="sm" variant="primary" class="min-w-20">
+                        Lưu
+                    </MsButton>
+                </template>
+
+                <MsTooltip :show-arrow="true" content="Chức năng khác">
+                    <MsButton size="sm" variant="icon" class="w-10 px-0!" aria-label="Thao tác khác">
+                        <MsIcon name="threedot" class="salary-composition-details__more-icon" />
+                    </MsButton>
+                </MsTooltip>
             </div>
         </div>
 

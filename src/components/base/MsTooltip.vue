@@ -22,6 +22,8 @@ type MsTooltipDelay = number | {
   hide: number
 }
 
+type MsTooltipStrategy = 'absolute' | 'fixed'
+
 interface MsTooltipProps {
   content: string | number
   placement?: MsTooltipPlacement
@@ -30,6 +32,8 @@ interface MsTooltipProps {
   distance?: number
   triggers?: TriggerEvent[]
   showArrow?: boolean
+  strategy?: MsTooltipStrategy
+  container?: string | Element | false
 }
 
 const props = withDefaults(defineProps<MsTooltipProps>(), {
@@ -39,6 +43,9 @@ const props = withDefaults(defineProps<MsTooltipProps>(), {
   distance: 8,
   triggers: () => ['hover', 'focus'],
   showArrow: false,
+  // Fixed giúp tooltip không làm tăng vùng scroll của trang.
+  strategy: 'fixed',
+  container: 'body',
 })
 
 const isDisabled = computed(() => {
@@ -70,7 +77,7 @@ const popperClass = computed(() => {
 <template>
   <Tooltip ref="tooltipRef" class="contents" theme="ms-tooltip" :popper-class="popperClass"
     :reference-node="getReferenceNode" :placement="placement" :disabled="isDisabled" :delay="delay" :distance="distance"
-    :triggers="triggers">
+    :triggers="triggers" :strategy="strategy" :container="container">
     <slot />
 
     <template #popper>

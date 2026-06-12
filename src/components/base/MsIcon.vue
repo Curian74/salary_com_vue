@@ -36,10 +36,11 @@ const iconClasses: Record<string, string> = {
   'info-icon': 'icon-sprite info-icon',
   eye: 'icon-mask row-action-eye-icon',
   copy: 'icon-mask row-action-copy-icon',
-  pencil: 'icon-mask row-action-pencil-icon',
+  pencil: 'icon-sprite_sec pencil-icon',
   trash: 'icon-mask row-action-trash-icon',
   'circle-minus': 'icon-sprite_sec row-action-circle-minus-icon',
   'circle-check': 'icon-mask row-action-circle-check-icon',
+  'threedot': 'icon-sprite threedot-icon',
 }
 </script>
 
