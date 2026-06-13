@@ -431,7 +431,10 @@ const handleAutoSumEmployeeTypeChange = (value: SelectValue) => {
     else {
         organizationalStructureLevel.value = undefined;
     }
+};
 
+const handleAutoSumEmployeeChange = (value: boolean) => {
+    isAutoSumEmployee.value = value;
     // Bỏ chọn thành phần lương khi không phải tự động cộng tổng
     if (!isAutoSumEmployee.value) {
         salaryCompositionId.value = null;
@@ -439,7 +442,7 @@ const handleAutoSumEmployeeTypeChange = (value: SelectValue) => {
     else {
         valueFormula.value = undefined;
     }
-};
+}
 
 const submitForm = handleSubmit(
     (formValues) => {
@@ -460,6 +463,8 @@ async function fetchSalaryCompositions() {
         isSalaryCompositionsLoading.value = true;
         const salData = await salaryCompositionApi.fetchSalaryCompositions(queryObject.value);
         salaryCompositions.value = salData.value;
+        const nextSalaryCompositions = salaryCompositions.value.items.filter(x => x.id !== props.salaryComposition?.id);
+        salaryCompositions.value.items = nextSalaryCompositions;
     }
     catch (err) {
         console.log(err);
@@ -681,7 +686,7 @@ onMounted(async () => {
                     <div v-if="isShowValueMethodOptions" class="salary-composition-form__value-methods">
                         <label class="salary-composition-form__radio">
                             <input type="radio" name="value-method" :checked="isAutoSumEmployee" :disabled="isReadOnly"
-                                @change="isAutoSumEmployee = true" />
+                                @change="handleAutoSumEmployeeChange(true)" />
                             <span>Tự động cộng tổng giá trị của các nhân viên</span>
                         </label>
 
@@ -725,7 +730,7 @@ onMounted(async () => {
 
                         <label class="salary-composition-form__radio">
                             <input type="radio" name="value-method" :checked="!isAutoSumEmployee" :disabled="isReadOnly"
-                                @change="isAutoSumEmployee = false" />
+                                @change="handleAutoSumEmployeeChange(false)" />
                             <span>Tính theo công thức tự đặt</span>
                         </label>
                     </div>
