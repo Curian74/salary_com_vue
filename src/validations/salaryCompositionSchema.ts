@@ -1,3 +1,4 @@
+import regex from '@/constants/regex/regex';
 import { CompositionNature, CompositionType } from '@/enums/salaryCompositionEnums';
 import * as yup from 'yup';
 
@@ -9,8 +10,18 @@ const validCompositionNatures = Object
     .filter((x): x is CompositionNature => typeof x === 'number');
 
 export const salaryCompositionSchema = yup.object({
-    code: yup.string().trim().required('Không được để trống.'),
-    name: yup.string().trim().required('Không được để trống.'),
+    name: yup
+        .string()
+        .trim()
+        .required('Không được để trống.')
+        .max(255, 'Không vượt quá 255 kí tự'),
+    code: yup
+        .string()
+        .trim()
+        .required('Không được để trống.')
+        .max(255, 'Không vượt quá 255 kí tự')
+        .matches(regex.ONLY_NUMBER, 'Không được chỉ nhập mỗi số.'), // Báo lỗi nếu chỉ có số
+
     description: yup.string().trim().optional(),
     systemCompositionId: yup.string().trim().optional(),
 
