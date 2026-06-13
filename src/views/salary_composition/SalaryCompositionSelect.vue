@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import MsMenuSelect from '@/components/base/MsMenuSelect.vue';
-import type { MsMenuSelectOption } from '@/components/base/MsMenuSelect.vue';
+import MsCombobox from '@/components/base/MsCombobox.vue';
+import type { MsComboboxOption } from '@/components/base/MsCombobox.vue';
 import type { GetSalaryCompositionsResponse } from '@/types/salaryComposition';
 
-interface SalaryCompositionOption extends MsMenuSelectOption {
+interface SalaryCompositionOption extends MsComboboxOption {
     salaryComposition: GetSalaryCompositionsResponse
 }
 
@@ -32,6 +32,7 @@ const emit = defineEmits<{
     'update:modelValue': [value: string | number | null]
     change: [value: string | number | null]
     loadMore: []
+    search: [query: string]
 }>();
 
 const options = computed<SalaryCompositionOption[]>(() =>
@@ -42,10 +43,10 @@ const options = computed<SalaryCompositionOption[]>(() =>
     })),
 );
 
-const getSalaryCompositionName = (option: MsMenuSelectOption) =>
+const getSalaryCompositionName = (option: MsComboboxOption) =>
     (option as SalaryCompositionOption).salaryComposition.name;
 
-const getSalaryCompositionCode = (option: MsMenuSelectOption) =>
+const getSalaryCompositionCode = (option: MsComboboxOption) =>
     (option as SalaryCompositionOption).salaryComposition.code;
 
 const handleValueChange = (value: string | number | null) => {
@@ -55,17 +56,17 @@ const handleValueChange = (value: string | number | null) => {
 </script>
 
 <template>
-    <MsMenuSelect :allow-lazy-load="true" :model-value="modelValue" :options="options" :disabled="disabled"
+    <MsCombobox searchable :allow-lazy-load="true" :model-value="modelValue" :options="options" :disabled="disabled"
         :invalid="invalid" :placeholder="placeholder" empty-text="Không có dữ liệu" :is-loading="isLoading"
         :has-more="hasMore" class="salary-composition-select" @update:model-value="handleValueChange"
-        @scroll-end="emit('loadMore')">
+        @search="emit('search', $event)" @scroll-end="emit('loadMore')">
         <template #option="{ option }">
             <span class="salary-composition-select__option-text">
                 {{ getSalaryCompositionName(option) }}
                 <strong>({{ getSalaryCompositionCode(option) }})</strong>
             </span>
         </template>
-    </MsMenuSelect>
+    </MsCombobox>
 </template>
 
 <style scoped>
@@ -79,11 +80,11 @@ const handleValueChange = (value: string | number | null) => {
     word-break: break-word;
 }
 
-:deep(.ms-menu-select__menu) {
+:deep(.ms-combobox__menu) {
     max-height: 280px;
 }
 
-:deep(.ms-menu-select__option) {
+:deep(.ms-combobox__option) {
     min-height: 40px;
     align-items: flex-start;
     padding-bottom: 8px;

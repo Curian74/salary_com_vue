@@ -431,6 +431,12 @@ function handleLoadMore() {
     queryObject.value.pageSize *= 2;
 }
 
+const handleSalaryCompositionSearch = (term: string) => {
+    queryObject.value.searchTerm = term;
+    queryObject.value.pageIndex = 1;
+    queryObject.value.pageSize = 10;
+};
+
 // Kiểm tra trạng thái dirty
 const checkFormDirty = () => {
     return meta.value.dirty;
@@ -447,7 +453,7 @@ const handleResetForm = () => {
 };
 
 watch(
-    () => queryObject.value.pageSize,
+    () => [queryObject.value.pageSize, queryObject.value.searchTerm] as const,
     fetchSalaryCompositions,
 );
 
@@ -469,6 +475,10 @@ onBeforeUnmount(() => {
     document.removeEventListener('pointerdown', handleDocumentPointerDown);
     document.removeEventListener('keydown', handleDocumentKeydown);
 });
+
+watch(isAutoSumEmployee, (v) => {
+    console.log(v);
+})
 
 onMounted(async () => {
     // Chờ dom load xong mới auto focus
@@ -661,6 +671,7 @@ onMounted(async () => {
                                     :is-loading="isSalaryCompositionsLoading" :has-more="salaryCompositions.hasNextPage"
                                     :disabled="isReadOnly || !isAutoSumEmployee"
                                     :invalid="Boolean(errors.salaryCompositionId)" @load-more="handleLoadMore"
+                                    @search="handleSalaryCompositionSearch"
                                     placeholder="Chọn thành phần lương để hiển thị giá trị"
                                     class="salary-composition-form__salary-select" />
 
@@ -677,13 +688,13 @@ onMounted(async () => {
                         </label>
                     </div>
 
-                    <div v-if="!isAutoSumEmployee" class="salary-composition-form__formula">
-                        <textarea v-if="mode === 'edit'" v-model="valueFormula"
-                            class="salary-composition-form__textarea h-22" :readonly="isReadOnly"
-                            :placeholder="mode === 'edit' ? 'Tự động gợi ý công thức và tham số khi gõ' : ''"></textarea>
+                    <div class="salary-composition-form__formula">
+                        <textarea v-if="isAutoSumEmployee === false && (mode === 'create' || mode === 'edit')"
+                            v-model="valueFormula" class="salary-composition-form__textarea h-22" :readonly="isReadOnly"
+                            :placeholder="'Tự động gợi ý công thức và tham số khi gõ'"></textarea>
 
-                        <MsInput v-else v-model="valueFormula" class="salary-composition-form__input"
-                            :readonly="isReadOnly">
+                        <MsInput v-else-if="mode === 'view'" v-model="valueFormula"
+                            class="salary-composition-form__input" :readonly="isReadOnly">
                         </MsInput>
                     </div>
                 </div>
