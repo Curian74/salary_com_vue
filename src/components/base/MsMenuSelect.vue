@@ -196,7 +196,7 @@ onBeforeUnmount(() => {
             <button v-for="option in options" :key="String(option.value)" type="button" class="ms-menu-select__option"
                 :class="[
                     isSelected(option) ? 'bg-[#eafbf2] text-primary' : 'text-text-primary hover:bg-background',
-                    option.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
+                    option.disabled ? 'cursor-not-allowed opacity-50 bg-[#f5f5f5]' : 'cursor-pointer',
                 ]" :disabled="option.disabled" role="option" :aria-selected="isSelected(option)"
                 @click="selectOption(option)">
                 <slot :option="option" name="option">

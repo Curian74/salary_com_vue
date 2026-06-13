@@ -30,7 +30,8 @@ export const salaryCompositionSchema = yup.object({
 
     deductionType: yup
         .number()
-        .optional(),
+        .optional()
+        .nullable(),
 
     quotaFormula: yup.string().trim().optional(),
 
@@ -48,7 +49,8 @@ export const salaryCompositionSchema = yup.object({
 
     organizationalStructureLevel: yup
         .number()
-        .optional(),
+        .optional()
+        .nullable(),
 
     salaryCompositionId: yup
         .string()

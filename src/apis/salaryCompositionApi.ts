@@ -1,4 +1,4 @@
-import type { CreateSalaryCompositionRequest, DeleteRequest, GetSalaryCompositionsRequest, GetSalaryCompositionsResponse, SalaryCompositionDetail, UpdateStatusRequest } from "@/types/salaryComposition";
+import type { CreateSalaryCompositionRequest, DeleteRequest, GetSalaryCompositionsRequest, GetSalaryCompositionsResponse, SalaryCompositionDetail, UpdateSalaryCompositionRequest, UpdateStatusRequest } from "@/types/salaryComposition";
 import { axiosClient } from "./axiosClient";
 import type { ApiResponse, PagedResult } from "@/types/apiResponse";
 
@@ -39,12 +39,19 @@ const getById = async (id: string)
     return response.data;
 }
 
+const updateSalaryComposition = async (id: string, body: UpdateSalaryCompositionRequest)
+    : Promise<ApiResponse<boolean>> => {
+    const response = await axiosClient.put(`/SalaryCompositions/${id}`, body);
+    return response.data;
+}
+
 const salaryCompositionApi = {
     fetchSalaryCompositions,
     createSalaryComposition,
     updateStatus,
     deleteMany,
     getById,
+    updateSalaryComposition,
 }
 
 export default salaryCompositionApi;

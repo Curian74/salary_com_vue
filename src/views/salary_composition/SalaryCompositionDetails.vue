@@ -5,10 +5,11 @@ import type { GetOrganizationTreeResponse } from '@/types/organization.ts';
 import SalaryCompositionForm from './SalaryCompositionForm.vue';
 import { onMounted, ref } from 'vue';
 import salaryCompositionApi from '@/apis/salaryCompositionApi.ts';
-import type { SalaryCompositionDetail } from '@/types/salaryComposition.ts';
+import type { SalaryCompositionDetail, UpdateSalaryCompositionRequest } from '@/types/salaryComposition.ts';
 import { getApiErrorMessage } from '@/helpers/apiResponseHelper.ts';
 import MsTooltip from '@/components/base/MsTooltip.vue';
 import SalaryFormExitPopup from './popup/SalaryFormExitPopup.vue';
+import { toast } from 'vue3-toastify';
 
 interface Props {
     organizationItems?: GetOrganizationTreeResponse[],
@@ -40,7 +41,10 @@ const getById = async () => {
         }
         catch (err) {
             const errMsg = getApiErrorMessage(err);
-            alert(errMsg);
+            toast(errMsg, {
+                theme: 'colored',
+                type: 'error',
+            });
         }
     }
 }
@@ -65,6 +69,38 @@ const closeLeaveConfirm = () => {
 const confirmLeave = () => {
     isLeaveConfirmOpen.value = false;
     emit('back');
+};
+
+const handleSubmit = async (payload: UpdateSalaryCompositionRequest) => {
+    if (!props.salaryCompositionId) return;
+
+    try {
+        isSaving.value = true;
+
+        await salaryCompositionApi.updateSalaryComposition(props.salaryCompositionId, payload);
+        toast('Cập nhật thành công', {
+            theme: 'colored',
+            type: 'success',
+        });
+
+        emit('saved');
+    }
+    catch (err) {
+        // Dùng helper để lấy message chuẩn từ backend
+        const msg = getApiErrorMessage(err);
+
+        toast(msg, {
+            theme: 'colored',
+            type: 'error',
+        });
+    }
+    finally {
+        isSaving.value = false;
+    }
+};
+
+const handleSave = () => {
+    formRef.value?.submitForm();
 };
 
 onMounted(async () => {
@@ -108,7 +144,7 @@ onMounted(async () => {
                         Hủy bỏ
                     </MsButton>
 
-                    <MsButton size="sm" variant="primary" class="min-w-20">
+                    <MsButton @click="handleSave" size="sm" variant="primary" class="min-w-20">
                         Lưu
                     </MsButton>
                 </template>
@@ -122,8 +158,8 @@ onMounted(async () => {
         </div>
 
         <div class="mx-5 min-h-0 flex-1 overflow-hidden bg-white">
-            <SalaryCompositionForm ref="formRef" :salary-composition="salaryComposition" :mode="mode"
-                :organization-items="organizationItems" />
+            <SalaryCompositionForm @submit="handleSubmit" ref="formRef" :salary-composition="salaryComposition"
+                :mode="mode" :organization-items="organizationItems" />
         </div>
 
         <SalaryFormExitPopup :confirm-leave="confirmLeave" :open="isLeaveConfirmOpen"

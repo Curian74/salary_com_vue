@@ -29,6 +29,8 @@ defineExpose({
 </script>
 <template>
     <input ref="inputRef" @input="handleInput" :value="modelValue" :disabled="disabled" :placeholder="placeholder"
-        :required="required" type="text">
+        :required="required" type="text"
+        class="disabled:bg-[#f5f5f5] disabled:text-text-placeholder disabled:cursor-not-allowed">
 </template>
+
 <style scoped></style>

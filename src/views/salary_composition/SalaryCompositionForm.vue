@@ -356,7 +356,7 @@ const handleCompositionNatureChange = (value: SelectValue) => {
     compositionNature.value = nextCompositionNature;
 
     if (nextCompositionNature !== CompositionNature.Income) {
-        incomeTaxType.value = undefined;
+        incomeTaxType.value = IncomeTaxType.Taxable;
     }
 
     if (nextCompositionNature !== CompositionNature.Deduction) {
@@ -400,6 +400,7 @@ const submitForm = handleSubmit(
     (formValues) => {
         // Lấy ra errors từ form
         const { errors } = formValues;
+        console.log(errors);
         focusFirstInvalidField(errors);
     },
 );
@@ -484,8 +485,9 @@ onMounted(async () => {
                 </label>
                 <div class="salary-composition-form__control" data-validation-field="code">
                     <MsInput :model-value="code" id="composition-code" class="salary-composition-form__input"
-                        :class="{ 'salary-composition-form__input--invalid': errors.code }" :disabled="isReadOnly"
-                        @update:model-value="handleCodeChange" placeholder="Nhập mã viết liền" />
+                        :class="{ 'salary-composition-form__input--invalid': errors.code }"
+                        :disabled="isReadOnly || mode === 'edit'" @update:model-value="handleCodeChange"
+                        placeholder="Nhập mã viết liền" />
                     <span v-if="errors.code" class="text-error text-[13px]">
                         {{ errors.code }}
                     </span>
@@ -516,7 +518,8 @@ onMounted(async () => {
                     Loại thành phần <span class="text-error">*</span>
                 </label>
                 <div class="salary-composition-form__control" data-validation-field="compositionType">
-                    <MsMenuSelect id="composition-type" v-model="compositionType" :disabled="isReadOnly"
+                    <MsMenuSelect id="composition-type" v-model="compositionType"
+                        :disabled="isReadOnly || mode === 'edit'"
                         :options="salaryCompositionFormOptions.compositionType" class="salary-composition-form__select
                         salary-composition-form__select--compact" :invalid="Boolean(errors.compositionType)" />
                     <span v-if="errors.compositionType" class="text-error text-[13px]">
@@ -587,7 +590,8 @@ onMounted(async () => {
             <div class="salary-composition-form__row">
                 <label class="salary-composition-form__label" for="value-type">Kiểu giá trị</label>
                 <div class="salary-composition-form__control" data-validation-field="valueType">
-                    <MsMenuSelect id="value-type" v-model="valueType" :disabled="isReadOnly || compositionNature !== 3"
+                    <MsMenuSelect id="value-type" v-model="valueType"
+                        :disabled="isReadOnly || compositionNature !== 3 || mode === 'edit'"
                         :options="salaryCompositionFormOptions.valueType" class="salary-composition-form__select
                         salary-composition-form__select--medium" :invalid="Boolean(errors.valueType)" />
                     <span v-if="errors.valueType" class="text-error text-[13px]">
@@ -745,8 +749,6 @@ onMounted(async () => {
     min-height: 34px;
     border: 1px solid #cfd4da;
     border-radius: 8px;
-    background: #ffffff;
-    color: #001b44;
     font-size: 13px;
     line-height: 18px;
     outline: none;

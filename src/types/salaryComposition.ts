@@ -114,3 +114,24 @@ export interface UpdateStatusRequest {
 export interface DeleteRequest {
     salaryCompositionIds: string[],
 }
+
+export interface UpdateSalaryCompositionRequest {
+    name: string;
+    description?: string;
+    systemCompositionId?: string;
+
+    incomeTaxType?: IncomeTaxType;
+    deductionType?: DeductionType;
+
+    quotaFormula?: string;
+    allowToExceedQuota?: boolean;
+
+    isAutoSumEmployee?: boolean;
+    autoSumEmployeeType?: AutoSumEmployeeType;
+    organizationalStructureLevel?: number;
+    valueFormula?: string;
+    salaryCompositionId?: string | null;
+    optionShowPaycheck: OptionShowPaycheck;
+
+    organizationUnitIds?: string[];
+}
