@@ -35,7 +35,7 @@ import type { PagedResult } from '@/types/apiResponse.ts';
 import SalaryCompositionSelect from './SalaryCompositionSelect.vue';
 import codeHelper from '@/helpers/codeHelper.ts';
 
-type FormMode = 'create' | 'edit' | 'view';
+type FormMode = 'create' | 'edit' | 'view' | 'duplicate';
 type EnumLike = Record<string, string | number>;
 type SelectValue = string | number | null;
 
@@ -48,6 +48,7 @@ interface Props {
     mode: FormMode;
     organizationItems?: GetOrganizationTreeResponse[];
     salaryComposition?: SalaryCompositionDetail,
+    salaryCompositionDuplicate?: GetSalaryCompositionsResponse | null,
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -56,7 +57,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const getEnumNumberValues = (enumObject: EnumLike) => {
     return Object.values(enumObject)
-        .filter((value): value is number => typeof value === 'number');
+        .filter((x): x is number => typeof x === 'number');
 }
 
 const toSelectOptions = <T extends number>(enumObject: EnumLike, labels: Record<T, string>) =>
@@ -187,6 +188,85 @@ const { errors, defineField, handleSubmit, meta, resetForm } =
         },
     });
 
+// Dùng biến để lưu giá trị form update
+const updateFormValues = ref<SalaryCompositionFormValues | null>(null);
+
+watch(() => props.salaryComposition, (v) => {
+    if (!v) return;
+
+    const nextOrganizationIds = v.organizations?.map(x => x.orgId) ?? [];
+
+    const values: SalaryCompositionFormValues = {
+        code: v.code ?? '',
+        name: v.name ?? '',
+        compositionType: v.compositionType,
+        compositionNature: v.compositionNature,
+        incomeTaxType: v.incomeTaxType,
+        description: v.description ?? '',
+        deductionType: v.deductionType,
+        quotaFormula: v.quotaFormula ?? '',
+        allowToExceedQuota: v.allowToExceedQuota ?? false,
+        valueType: v.valueType,
+        isAutoSumEmployee: v.isAutoSumEmployee ?? false,
+        autoSumEmployeeType: v.autoSumEmployeeType,
+        organizationalStructureLevel: v.organizationalStructureLevel,
+        salaryCompositionId: v.salaryCompositionId ?? null,
+        valueFormula: v.valueFormula ?? '',
+        optionShowPaycheck: v.optionShowPaycheck,
+        sourceType: v.sourceType,
+        organizationUnitIds: nextOrganizationIds,
+    };
+
+    updateFormValues.value = structuredClone(values);
+
+    resetForm({
+        values,
+    });
+
+    selectedOrganizationIds.value = nextOrganizationIds;
+}, {
+    immediate: true,
+});
+
+const duplicateFormValues = ref<SalaryCompositionFormValues | null>(null);
+
+watch(() => props.salaryCompositionDuplicate, (v) => {
+    if (!v) return;
+
+    const nextOrganizationIds = v.organizations?.map(x => x.orgId) ?? [];
+
+    const values: SalaryCompositionFormValues = {
+        code: '',
+        name: '',
+        compositionType: v.compositionType,
+        compositionNature: v.compositionNature,
+        incomeTaxType: v.incomeTaxType,
+        description: v.description ?? '',
+        deductionType: v.deductionType,
+        quotaFormula: v.quotaFormula ?? '',
+        allowToExceedQuota: v.allowToExceedQuota ?? false,
+        valueType: v.valueType,
+        isAutoSumEmployee: v.isAutoSumEmployee ?? false,
+        autoSumEmployeeType: v.autoSumEmployeeType,
+        organizationalStructureLevel: v.organizationalStructureLevel,
+        salaryCompositionId: v.salaryCompositionId ?? null,
+        valueFormula: v.valueFormula ?? '',
+        optionShowPaycheck: v.optionShowPaycheck,
+        sourceType: v.sourceType,
+        organizationUnitIds: nextOrganizationIds,
+    };
+
+    duplicateFormValues.value = structuredClone(values);
+
+    resetForm({
+        values,
+    });
+
+    selectedOrganizationIds.value = nextOrganizationIds;
+}, {
+    immediate: true,
+});
+
 const [code] = defineField('code');
 const [name] = defineField('name');
 const [description] = defineField('description');
@@ -240,47 +320,6 @@ watch(isAutoSumEmployee, (value) => {
         && !organizationalStructureLevel.value) {
         organizationalStructureLevel.value = 1;
     }
-});
-
-// Dùng biến để lưu giá trị form update
-const updateFormValues = ref<SalaryCompositionFormValues | null>(null);
-
-watch(() => props.salaryComposition, (v) => {
-    if (!v) return;
-
-    const nextOrganizationIds =
-        v.organizations?.map(x => x.orgId) ?? [];
-
-    const values: SalaryCompositionFormValues = {
-        code: v.code ?? '',
-        name: v.name ?? '',
-        compositionType: v.compositionType,
-        compositionNature: v.compositionNature,
-        incomeTaxType: v.incomeTaxType,
-        description: v.description ?? '',
-        deductionType: v.deductionType,
-        quotaFormula: v.quotaFormula ?? '',
-        allowToExceedQuota: v.allowToExceedQuota ?? false,
-        valueType: v.valueType,
-        isAutoSumEmployee: v.isAutoSumEmployee ?? false,
-        autoSumEmployeeType: v.autoSumEmployeeType,
-        organizationalStructureLevel: v.organizationalStructureLevel,
-        salaryCompositionId: v.salaryCompositionId ?? null,
-        valueFormula: v.valueFormula ?? '',
-        optionShowPaycheck: v.optionShowPaycheck,
-        sourceType: v.sourceType,
-        organizationUnitIds: nextOrganizationIds,
-    };
-
-    updateFormValues.value = structuredClone(values);
-
-    resetForm({
-        values,
-    });
-
-    selectedOrganizationIds.value = nextOrganizationIds;
-}, {
-    immediate: true,
 });
 
 const queryObject = ref<GetSalaryCompositionsRequest>({
@@ -396,6 +435,9 @@ const handleAutoSumEmployeeTypeChange = (value: SelectValue) => {
     // Bỏ chọn thành phần lương khi không phải tự động cộng tổng
     if (!isAutoSumEmployee.value) {
         salaryCompositionId.value = null;
+    }
+    else {
+        valueFormula.value = undefined;
     }
 };
 

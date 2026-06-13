@@ -47,6 +47,7 @@ export type SalaryCompositionRowActionKey =
     | 'edit'
     | 'delete'
     | 'activate'
+    | 'duplicate'
     | 'deactivate';
 
 const formatters: Record<string, (value: any, row: GetSalaryCompositionsResponse) => string> = {
@@ -151,7 +152,7 @@ const getRowActions = (row: GetSalaryCompositionsResponse): SalaryCompositionRow
     return [
         trackingAction,
         {
-            key: 'view',
+            key: 'duplicate',
             label: 'Nhân bản',
             icon: 'duplicate',
         },

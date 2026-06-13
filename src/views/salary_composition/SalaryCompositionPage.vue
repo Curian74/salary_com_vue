@@ -36,6 +36,7 @@ interface SalaryCompositionRowActionPayload {
 
 const activeView = ref<SalaryCompositionView>('list');
 const selectedSalaryCompositionId = ref<string | null>(null);
+const selectedSalaryComposition = ref<GetSalaryCompositionsResponse | null>(null);
 const salaryCompositionListRef = ref<InstanceType<typeof SalaryCompositionList> | null>(null);
 const pendingStatusPayload = ref<UpdateStatusManyPayload | null>(null);
 const pendingDeleteIds = ref<string[]>([]);
@@ -272,6 +273,7 @@ const showAdd = () => {
     closeOrganizationDropdown();
     activeView.value = 'add';
     selectedSalaryCompositionId.value = null;
+    selectedSalaryComposition.value = null;
 };
 
 const showEdit = (id: string) => {
@@ -286,6 +288,11 @@ const showView = (id: string) => {
     selectedSalaryCompositionId.value = id;
 };
 
+const showDuplicate = (row: GetSalaryCompositionsResponse) => {
+    activeView.value = 'add';
+    selectedSalaryComposition.value = row;
+}
+
 const handleRowAction = (payload: SalaryCompositionRowActionPayload) => {
     switch (payload.action) {
         case 'view':
@@ -296,6 +303,9 @@ const handleRowAction = (payload: SalaryCompositionRowActionPayload) => {
             break;
         case 'delete':
             handleDeleteMany([payload.row.id]);
+            break;
+        case 'duplicate':
+            showDuplicate(payload.row);
             break;
         case 'activate':
             handleUpdateStatusMany({
@@ -308,6 +318,8 @@ const handleRowAction = (payload: SalaryCompositionRowActionPayload) => {
                 ids: [payload.row.id],
                 status: TrackingStatus.Inactive,
             });
+            break;
+        default:
             break;
     }
 };
@@ -413,8 +425,8 @@ onBeforeUnmount(() => {
         @update:page-size="handlePageSizeChange" @update-status-many="handleUpdateStatusMany"
         @delete-many="handleDeleteMany" @row-action="handleRowAction" />
 
-    <SalaryCompositionAdd v-else-if="activeView === 'add'" :organization-items="organizationTreeItems" @back="showList"
-        @saved="handleSaved" />
+    <SalaryCompositionAdd :salary-composition="selectedSalaryComposition" v-else-if="activeView === 'add'"
+        :organization-items="organizationTreeItems" @back="showList" @saved="handleSaved" />
 
     <SalaryCompositionDetails :active-mode="activeView" @saved="handleSaved" @back="showList"
         :organization-items="organizationTreeItems" :salary-composition-id="selectedSalaryCompositionId"

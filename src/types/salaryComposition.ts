@@ -52,13 +52,13 @@ export interface GetSalaryCompositionsResponse {
     compositionType: CompositionType;
     compositionNature: CompositionNature;
     incomeTaxType: IncomeTaxType;
-    deductionType: DeductionType | null;
+    deductionType: DeductionType;
     quotaFormula: string | null;
     allowToExceedQuota: boolean;
     valueType: ValueType;
     isAutoSumEmployee: boolean;
     autoSumEmployeeType: AutoSumEmployeeType;
-    organizationalStructureLevel: number | null;
+    organizationalStructureLevel?: number;
     salaryCompositionId: string | null;
     valueFormula: string | null;
     optionShowPaycheck: OptionShowPaycheck;

@@ -72,7 +72,7 @@ export const salaryCompositionSchema = yup.object({
             otherwise: (schema) => schema.optional(),
         }),
 
-    valueFormula: yup.string().trim().optional(),
+    valueFormula: yup.string().trim().optional().nullable(),
 
     optionShowPaycheck: yup
         .number()

@@ -248,14 +248,14 @@ defineExpose({
         </tbody>
 
         <tbody v-else>
-            <tr @click="handleRowClick(row)" v-if="rows.length > 0" v-for="row in rows" :key="getRowKey(row)"
+            <tr v-if="rows.length > 0" v-for="row in rows" :key="getRowKey(row)"
                 class="ms-table__row hover:bg-[#cdeadf] hover:cursor-pointer"
                 :class="isRowSelected(row) ? 'bg-[#cdeadf]' : 'bg-white'">
                 <td class="h-10 border-b border-border px-4 text-center align-middle">
                     <ms-checkbox @change="checked => handleSelectRow(row, checked)" :checked="isRowSelected(row)">
                     </ms-checkbox>
                 </td>
-                <td v-for="column in visibleColumns" :key="column.fieldKey"
+                <td @click="handleRowClick(row)" v-for="column in visibleColumns" :key="column.fieldKey"
                     class="ms-table__cell h-10 border-b border-border px-3 text-[#001b44]"
                     :title="getCellRawText(row, column)">
                     <slot :name="column.fieldKey" :row="row" :column="column" :value="getCellRawText(row, column)"
