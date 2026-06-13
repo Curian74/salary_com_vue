@@ -91,7 +91,7 @@ const handleRemoveKeydown = (event: KeyboardEvent, id: string) => {
 </script>
 
 <template>
-    <div :ref="setDropdownElement" class="relative min-w-65 flex-1 max-w-109.5">
+    <div :ref="setDropdownElement" class="relative flex-1 max-w-109.5">
         <MsButton variant="secondary" class="organization-filter-trigger w-full
          justify-between! gap-2! px-2! font-normal
              text-[13px] text-text-placeholder focus:border-primary"
@@ -112,7 +112,7 @@ const handleRemoveKeydown = (event: KeyboardEvent, id: string) => {
                     </span>
                 </template>
 
-                <span v-else class="truncate px-1 text-text-placeholder">Đơn vị áp dụng</span>
+                <span v-else class="truncate px-1 text-text-placeholder text-[13px]">Tất cả đơn vị</span>
             </div>
 
             <span class="flex shrink-0 items-center gap-1 text-text-secondary">

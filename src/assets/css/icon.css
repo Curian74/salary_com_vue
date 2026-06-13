@@ -211,7 +211,6 @@
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 6h18'/%3E%3Cpath d='M8 6V4h8v2'/%3E%3Cpath d='m19 6-1 14H6L5 6'/%3E%3Cpath d='M10 11v5'/%3E%3Cpath d='M14 11v5'/%3E%3C/svg%3E");
 }
 
-
 .row-action-circle-check-icon {
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='m8.5 12.5 2.5 2.5 4.5-5'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='m8.5 12.5 2.5 2.5 4.5-5'/%3E%3C/svg%3E");
@@ -225,6 +224,7 @@
     background-position: -181px -41px;
     width: 16px;
     height: 16px;
+    filter: invert(56%) sepia(91%) saturate(2200%) hue-rotate(15deg) brightness(101%) contrast(105%);
 }
 
 .table-col-filter-icon {
@@ -249,4 +249,16 @@
     background-position: -203px -4px;
     width: 14px;
     height: 12px;
+}
+
+.duplicate-icon {
+    background-position: -102px -2px;
+    width: 16px;
+    height: 16px;
+}
+
+.trash-icon {
+    background-position: -102px -21px;
+    width: 16px;
+    height: 18px;
 }

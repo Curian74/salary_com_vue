@@ -553,7 +553,8 @@ onMounted(async () => {
                 </label>
                 <div class="salary-composition-form__control" data-validation-field="compositionNature">
                     <div class="flex flex-wrap items-center gap-x-7 gap-y-2">
-                        <MsMenuSelect id="nature" :model-value="compositionNature" :disabled="isReadOnly"
+                        <MsMenuSelect id="nature" :model-value="compositionNature"
+                            :disabled="isReadOnly || mode === 'edit'"
                             :options="salaryCompositionFormOptions.compositionNature" class="salary-composition-form__select
                             salary-composition-form__select--compact" :invalid="Boolean(errors.compositionNature)"
                             @update:model-value="handleCompositionNatureChange" />
@@ -676,8 +677,12 @@ onMounted(async () => {
                     </div>
 
                     <div v-if="!isAutoSumEmployee" class="salary-composition-form__formula">
-                        <textarea v-model="valueFormula" class="salary-composition-form__textarea h-22"
-                            :readonly="isReadOnly" placeholder="Tự động gợi ý công thức và tham số khi gõ"></textarea>
+                        <textarea v-if="mode === 'edit'" v-model="valueFormula"
+                            class="salary-composition-form__textarea h-22" :readonly="isReadOnly"
+                            :placeholder="mode === 'edit' ? 'Tự động gợi ý công thức và tham số khi gõ' : ''"></textarea>
+
+                        <MsInput v-else v-model="valueFormula" class="h-22" :readonly="isReadOnly">
+                        </MsInput>
                     </div>
                 </div>
             </div>

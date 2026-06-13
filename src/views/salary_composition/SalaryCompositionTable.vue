@@ -152,7 +152,7 @@ const getRowActions = (row: GetSalaryCompositionsResponse): SalaryCompositionRow
         {
             key: 'view',
             label: 'Nhân bản',
-            icon: 'copy',
+            icon: 'duplicate',
         },
         {
             key: 'edit',
