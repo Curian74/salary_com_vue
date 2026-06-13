@@ -483,7 +483,8 @@ onMounted(async () => {
 
 <template>
     <div class="salary-composition-form-scroll h-full overflow-y-auto px-12 pb-22 pt-5">
-        <form ref="salaryCompositionFormRef" class="salary-composition-form" @submit.prevent="submitForm">
+        <form ref="salaryCompositionFormRef" class="salary-composition-form"
+            :class="{ 'salary-composition-form--view': isReadOnly }" @submit.prevent="submitForm">
             <div class="salary-composition-form__row">
                 <label class="salary-composition-form__label" for="composition-name">
                     Tên thành phần <span class="text-error">*</span>
@@ -491,7 +492,7 @@ onMounted(async () => {
                 <div class="salary-composition-form__control" data-validation-field="name">
                     <MsInput ref="nameInputRef" v-model="name" id="composition-name"
                         class="salary-composition-form__input"
-                        :class="{ 'salary-composition-form__input--invalid': errors.name }" :disabled="isReadOnly" />
+                        :class="{ 'salary-composition-form__input--invalid': errors.name }" :readonly="isReadOnly" />
                     <span v-if="errors.name" class="text-error text-[13px]">
                         {{ errors.name }}
                     </span>
@@ -505,8 +506,8 @@ onMounted(async () => {
                 <div class="salary-composition-form__control" data-validation-field="code">
                     <MsInput :model-value="code" id="composition-code" class="salary-composition-form__input"
                         :class="{ 'salary-composition-form__input--invalid': errors.code }"
-                        :disabled="isReadOnly || mode === 'edit'" @update:model-value="handleCodeChange"
-                        placeholder="Nhập mã viết liền" />
+                        :readonly="isReadOnly || mode === 'edit'" @update:model-value="handleCodeChange"
+                        :disabled="mode === 'edit'" placeholder="Nhập mã viết liền" />
                     <span v-if="errors.code" class="text-error text-[13px]">
                         {{ errors.code }}
                     </span>
@@ -681,7 +682,8 @@ onMounted(async () => {
                             class="salary-composition-form__textarea h-22" :readonly="isReadOnly"
                             :placeholder="mode === 'edit' ? 'Tự động gợi ý công thức và tham số khi gõ' : ''"></textarea>
 
-                        <MsInput v-else v-model="valueFormula" class="h-22" :readonly="isReadOnly">
+                        <MsInput v-else v-model="valueFormula" class="salary-composition-form__input"
+                            :readonly="isReadOnly">
                         </MsInput>
                     </div>
                 </div>
@@ -727,6 +729,10 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     gap: 14px;
+    /* Mau dung chung cho field bi khoa trong ca view/edit. */
+    --disabled-field-bg: #f5f5f5;
+    --disabled-field-border: #d7dde7;
+    --disabled-field-text: #001b44;
 }
 
 .salary-composition-form__row {
@@ -831,6 +837,25 @@ onMounted(async () => {
     box-shadow: 0 0 0 2px rgba(229, 72, 72, 0.12);
 }
 
+.salary-composition-form .salary-composition-form__input:disabled,
+.salary-composition-form :deep(.ms-menu-select__trigger:disabled) {
+    border-color: var(--disabled-field-border);
+    background-color: var(--disabled-field-bg);
+    color: var(--disabled-field-text);
+    cursor: not-allowed;
+    opacity: 1;
+    box-shadow: none;
+    -webkit-text-fill-color: var(--disabled-field-text);
+}
+
+.salary-composition-form .salary-composition-form__input:disabled:hover,
+.salary-composition-form .salary-composition-form__input:disabled:focus,
+.salary-composition-form :deep(.ms-menu-select__trigger:disabled:hover),
+.salary-composition-form :deep(.ms-menu-select__trigger:disabled:focus) {
+    border-color: var(--disabled-field-border);
+    box-shadow: none;
+}
+
 .salary-composition-form__select {
     width: 100%;
 }
@@ -889,6 +914,89 @@ onMounted(async () => {
 .salary-composition-form__formula {
     position: relative;
     max-width: 1048px;
+}
+
+.salary-composition-form--view {
+    /* Scope rieng cho layout chi doc de khong lam doi style edit/create. */
+    --view-field-bg: #e9ecf2;
+    --view-field-border: var(--disabled-field-border);
+    --view-field-text: var(--disabled-field-text);
+}
+
+.salary-composition-form--view .salary-composition-form__input,
+.salary-composition-form--view .salary-composition-form__textarea,
+.salary-composition-form--view :deep(.organization-filter-trigger) {
+    min-height: 34px;
+    border-width: 0 0 1px;
+    border-style: solid;
+    border-color: var(--view-field-border);
+    border-radius: 0;
+    background-color: #ffffff;
+    padding: 0 9px;
+    color: var(--view-field-text);
+    cursor: default;
+    opacity: 1;
+    box-shadow: none;
+}
+
+.salary-composition-form--view .salary-composition-form__textarea {
+    height: 34px;
+    resize: none;
+}
+
+.salary-composition-form--view :deep(.ms-menu-select__trigger) {
+    border: 0;
+    border-radius: 0;
+    background-color: var(--view-field-bg);
+    color: var(--view-field-text);
+    cursor: default;
+    opacity: 1;
+    box-shadow: none;
+}
+
+.salary-composition-form--view .salary-composition-form__input:disabled,
+.salary-composition-form--view .salary-composition-form__input[readonly],
+.salary-composition-form--view .salary-composition-form__textarea[readonly] {
+    -webkit-text-fill-color: var(--view-field-text);
+}
+
+.salary-composition-form--view .salary-composition-form__input:hover,
+.salary-composition-form--view .salary-composition-form__textarea:hover,
+.salary-composition-form--view :deep(.organization-filter-trigger:hover),
+.salary-composition-form--view .salary-composition-form__input:focus,
+.salary-composition-form--view .salary-composition-form__textarea:focus,
+.salary-composition-form--view :deep(.organization-filter-trigger:focus) {
+    border-width: 0 0 1px;
+    border-color: var(--view-field-border);
+    box-shadow: none;
+}
+
+.salary-composition-form--view :deep(.ms-menu-select__trigger:hover),
+.salary-composition-form--view :deep(.ms-menu-select__trigger:focus) {
+    border: 0;
+    box-shadow: none;
+}
+
+.salary-composition-form--view :deep(.organization-chip__remove),
+.salary-composition-form--view :deep(.organization-clear),
+.salary-composition-form--view :deep(.organization-count-chip),
+.salary-composition-form--view :deep(.organization-filter-trigger svg),
+.salary-composition-form--view :deep(.ms-menu-select__trigger svg) {
+    display: none;
+}
+
+.salary-composition-form--view :deep(.organization-chip) {
+    height: auto;
+    max-width: 100%;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    font-weight: 400;
+}
+
+.salary-composition-form--view .salary-composition-form__radio input:disabled {
+    cursor: default;
+    opacity: 1;
 }
 
 .salary-composition-form-scroll {

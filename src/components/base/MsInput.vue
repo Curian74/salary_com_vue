@@ -7,6 +7,7 @@ interface MsInputProps {
     modelValue?: string;
     disabled?: boolean,
     required?: boolean,
+    readonly?: boolean,
 }
 
 const props = defineProps<MsInputProps>();
@@ -28,8 +29,8 @@ defineExpose({
 
 </script>
 <template>
-    <input ref="inputRef" @input="handleInput" :value="modelValue" :disabled="disabled" :placeholder="placeholder"
-        :required="required" type="text"
+    <input :readonly="readonly" ref="inputRef" @input="handleInput" :value="modelValue" :disabled="disabled"
+        :placeholder="placeholder" :required="required" type="text"
         class="disabled:bg-[#f5f5f5] disabled:text-text-placeholder disabled:cursor-not-allowed">
 </template>
 

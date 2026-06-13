@@ -12,6 +12,7 @@ export interface MsMenuSelectOption {
     label?: string
     name?: string
     disabled?: boolean,
+    readonly?: boolean,
 }
 
 interface MsMenuSelectProps {
