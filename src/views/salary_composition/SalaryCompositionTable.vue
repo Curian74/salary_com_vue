@@ -37,7 +37,7 @@ interface SalaryCompositionRowAction {
     tone?: 'default' | 'success' | 'warning' | 'danger'
 }
 
-interface SalaryCompositionRowActionPayload {
+export interface SalaryCompositionRowActionPayload {
     action: SalaryCompositionRowActionKey
     row: GetSalaryCompositionsResponse
 }
@@ -121,6 +121,7 @@ const emit = defineEmits<{
     'selection-count-change': [count: number]
     'update:selectedSalaryCompositionIds': [ids: string[]],
     'row-action': [payload: SalaryCompositionRowActionPayload]
+    'row-click': [payload: SalaryCompositionRowActionPayload]
 }>();
 
 const tableRef = ref<{ clearSelection: () => void } | null>(null);
@@ -187,6 +188,17 @@ const handleRowAction = (
     });
 }
 
+const handleRowClick = (row: GetSalaryCompositionsResponse) => {
+    const action: SalaryCompositionRowActionKey = 'view';
+
+    const payload: SalaryCompositionRowActionPayload = {
+        row,
+        action: action,
+    }
+
+    emit('row-click', payload);
+}
+
 defineExpose({
     clearSelection,
 });
@@ -197,7 +209,7 @@ defineExpose({
         :columns="columns" :rows="rows" :row-key="salaryCompositionRowKey" :formatters="formatters"
         :column-widths="columnWidths" :max-chars-by-column="maxCharsByColumn"
         @selection-count-change="emit('selection-count-change', $event)"
-        @selection-change="emit('update:selectedSalaryCompositionIds', $event)">
+        @selection-change="emit('update:selectedSalaryCompositionIds', $event)" @row-click="handleRowClick($event)">
 
         <template #status="{ row }">
             <MsStatus :text="getStatusText(row)" :variant="getStatusVariant(row)" />

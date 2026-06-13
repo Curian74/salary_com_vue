@@ -35,6 +35,7 @@ const props = defineProps<MsTableProps>();
 const emit = defineEmits<{
     'selection-count-change': [count: number]
     'selection-change': [selectedRowKeys: string[]]
+    'row-click': [rowSelected: T]
 }>();
 
 const selectedRowKeys = ref(new Set<string>());
@@ -178,6 +179,10 @@ const clearSelection = () => {
     emitSelectionChange();
 }
 
+const handleRowClick = (rowSelected: T) => {
+    emit('row-click', rowSelected);
+}
+
 watch(
     () => props.rows,
     (rows) => {
@@ -243,7 +248,7 @@ defineExpose({
         </tbody>
 
         <tbody v-else>
-            <tr v-if="rows.length > 0" v-for="row in rows" :key="getRowKey(row)"
+            <tr @click="handleRowClick(row)" v-if="rows.length > 0" v-for="row in rows" :key="getRowKey(row)"
                 class="ms-table__row hover:bg-[#cdeadf] hover:cursor-pointer"
                 :class="isRowSelected(row) ? 'bg-[#cdeadf]' : 'bg-white'">
                 <td class="h-10 border-b border-border px-4 text-center align-middle">
