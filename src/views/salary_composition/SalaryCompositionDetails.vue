@@ -14,11 +14,11 @@ import { toast } from 'vue3-toastify';
 interface Props {
     organizationItems?: GetOrganizationTreeResponse[],
     salaryCompositionId?: string | null;
+    activeMode: 'edit' | 'view';
 }
 
 const mode = ref<'edit' | 'view'>('view');
 const formRef = ref<InstanceType<typeof SalaryCompositionForm>>();
-const formKey = ref(0);
 const isSaving = ref(false);
 const isLeaveConfirmOpen = ref(false);
 
@@ -51,6 +51,8 @@ const getById = async () => {
 
 const toggleEditMode = () => {
     mode.value = mode.value === 'edit' ? 'view' : 'edit';
+
+    if (mode.value === 'view') formRef.value?.handleResetForm();
 }
 
 const goBack = () => {
@@ -104,6 +106,7 @@ const handleSave = () => {
 };
 
 onMounted(async () => {
+    mode.value = props.activeMode;
     if (props.salaryCompositionId) {
         await getById();
     }

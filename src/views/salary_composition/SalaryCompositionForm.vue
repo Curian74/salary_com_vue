@@ -242,38 +242,46 @@ watch(isAutoSumEmployee, (value) => {
     }
 });
 
+// Dùng biến để lưu giá trị form update
+const updateFormValues = ref<SalaryCompositionFormValues | null>(null);
+
 watch(() => props.salaryComposition, (v) => {
-    if (v) {
-        const nextOrganizationIds = v.organizations?.map((organization) => organization.orgId) ?? [];
+    if (!v) return;
 
-        resetForm({
-            values: {
-                // Chỉ lấy chính xác các trường mà CreateSalaryCompositionRequest yêu cầu
-                code: v.code ?? '',
-                name: v.name ?? '',
-                compositionType: v.compositionType,
-                compositionNature: v.compositionNature,
-                incomeTaxType: v.incomeTaxType,
-                description: v.description ?? '',
-                deductionType: v.deductionType,
-                quotaFormula: v.quotaFormula ?? '',
-                allowToExceedQuota: v.allowToExceedQuota ?? false,
-                valueType: v.valueType,
-                isAutoSumEmployee: v.isAutoSumEmployee ?? false,
-                autoSumEmployeeType: v.autoSumEmployeeType,
-                organizationalStructureLevel: v.organizationalStructureLevel,
-                salaryCompositionId: v.salaryCompositionId ?? null,
-                valueFormula: v.valueFormula ?? '',
-                optionShowPaycheck: v.optionShowPaycheck,
-                sourceType: v.sourceType,
+    const nextOrganizationIds =
+        v.organizations?.map(x => x.orgId) ?? [];
 
-                organizationUnitIds: nextOrganizationIds,
-            }
-        });
+    const values: SalaryCompositionFormValues = {
+        code: v.code ?? '',
+        name: v.name ?? '',
+        compositionType: v.compositionType,
+        compositionNature: v.compositionNature,
+        incomeTaxType: v.incomeTaxType,
+        description: v.description ?? '',
+        deductionType: v.deductionType,
+        quotaFormula: v.quotaFormula ?? '',
+        allowToExceedQuota: v.allowToExceedQuota ?? false,
+        valueType: v.valueType,
+        isAutoSumEmployee: v.isAutoSumEmployee ?? false,
+        autoSumEmployeeType: v.autoSumEmployeeType,
+        organizationalStructureLevel: v.organizationalStructureLevel,
+        salaryCompositionId: v.salaryCompositionId ?? null,
+        valueFormula: v.valueFormula ?? '',
+        optionShowPaycheck: v.optionShowPaycheck,
+        sourceType: v.sourceType,
+        organizationUnitIds: nextOrganizationIds,
+    };
 
-        selectedOrganizationIds.value = nextOrganizationIds;
-    }
-}, { immediate: true, deep: true });
+    updateFormValues.value = structuredClone(values);
+
+    resetForm({
+        values,
+    });
+
+    selectedOrganizationIds.value = nextOrganizationIds;
+}, {
+    immediate: true,
+});
 
 const queryObject = ref<GetSalaryCompositionsRequest>({
     pageIndex: 1,
@@ -428,15 +436,26 @@ const checkFormDirty = () => {
     return meta.value.dirty;
 };
 
+const handleResetForm = () => {
+    // Gọi resetForm không tham số sẽ đưa form về giá trị của lần resetForm({ values }) gần nhất
+    resetForm();
+
+    // Đồng bộ lại các ref
+    if (props.salaryComposition) {
+        selectedOrganizationIds.value = props.salaryComposition.organizations?.map((org) => org.orgId) ?? [];
+    }
+};
+
 watch(
     () => queryObject.value.pageSize,
     fetchSalaryCompositions,
 );
 
-// Đẩy hàm submitForm ra ngoài để component cha có thể gọi khi click nút Lưu
+// Đẩy các hàm ra ngoài để component cha có thể gọi
 defineExpose({
     submitForm,
     checkFormDirty,
+    handleResetForm,
 });
 
 onMounted(async () => {

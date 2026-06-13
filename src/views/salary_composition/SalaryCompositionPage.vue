@@ -416,8 +416,8 @@ onBeforeUnmount(() => {
     <SalaryCompositionAdd v-else-if="activeView === 'add'" :organization-items="organizationTreeItems" @back="showList"
         @saved="handleSaved" />
 
-    <SalaryCompositionDetails @saved="handleSaved" @back="showList" :organization-items="organizationTreeItems"
-        :salary-composition-id="selectedSalaryCompositionId"
+    <SalaryCompositionDetails :active-mode="activeView" @saved="handleSaved" @back="showList"
+        :organization-items="organizationTreeItems" :salary-composition-id="selectedSalaryCompositionId"
         v-else-if="activeView === 'view' || activeView === 'edit'" />
 
     <MsPopup :open="isStatusConfirmOpen" width="420px" @close="closeStatusConfirm">
