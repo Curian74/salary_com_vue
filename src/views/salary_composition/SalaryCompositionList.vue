@@ -79,10 +79,7 @@ const handleDeleteMany = () => {
     emit('delete-many', [...selectedSalaryCompositionIds.value]);
 }
 
-const handleRowAction = (payload: {
-    action: 'view' | 'edit' | 'delete' | 'activate' | 'deactivate'
-    row: GetSalaryCompositionsResponse
-}) => {
+const handleRowAction = (payload: SalaryCompositionRowActionPayload) => {
     emit('row-action', payload);
 }
 

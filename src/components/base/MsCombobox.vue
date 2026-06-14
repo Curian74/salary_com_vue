@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, useAttrs, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useAttrs, watch } from 'vue';
 import configKeys from '@/constants/configs/configKeys';
 import MsLoading from './MsLoading.vue';
 
@@ -57,16 +57,20 @@ const emit = defineEmits<{
 const attrs = useAttrs();
 const isOpen = ref(false);
 const triggerRef = ref<HTMLButtonElement | null>(null);
+const selectRef = ref<HTMLDivElement | null>(null);
 const inputRef = ref<HTMLInputElement | null>(null);
 const query = ref('');
 const isSearching = ref(false);
+const isClosingBySelection = ref(false); // Flag để ngăn menu mở lại khi focus input sau khi chọn option
 
 let searchDebounceTimer: ReturnType<typeof setTimeout> | undefined;
 
+// Tìm option đang được chọn dựa theo modelValue
 const selectedOption = computed(() =>
     props.options.find((option) => option.value === props.modelValue),
 );
 
+// Lấy label hiển thị của option đang chọn (ưu tiên label > name > value)
 const selectedLabel = computed(() => {
     const option = selectedOption.value;
 
@@ -77,6 +81,7 @@ const selectedLabel = computed(() => {
     return option.label ?? option.name ?? String(option.value ?? '');
 });
 
+// Giá trị hiển thị trong input: khi đang search thì hiện query, còn lại hiện label đã chọn
 const inputDisplayValue = computed(() => {
     if (isSearching.value) {
         return query.value;
@@ -85,12 +90,15 @@ const inputDisplayValue = computed(() => {
     return selectedLabel.value;
 });
 
+// Kiểm tra có nên hiển thị placeholder không (chưa search và chưa chọn option nào)
 const showPlaceholder = computed(() =>
     !isSearching.value && !selectedOption.value,
 );
 
+// Kiểm tra danh sách options có rỗng không
 const isEmpty = computed(() => props.options.length === 0);
 
+// Kiểm tra trạng thái "không tìm thấy kết quả" khi đang search
 const isNoResults = computed(() =>
     props.searchable
     && query.value.trim().length > 0
@@ -98,12 +106,14 @@ const isNoResults = computed(() =>
     && !props.isLoading,
 );
 
+// Kiểm tra có nên hiện text "Không có dữ liệu" không
 const showEmptyText = computed(() =>
     isEmpty.value
     && !props.isLoading
     && !isNoResults.value,
 );
 
+// Đóng dropdown menu và reset trạng thái search nếu có
 const closeMenu = () => {
     isOpen.value = false;
 
@@ -113,6 +123,17 @@ const closeMenu = () => {
     }
 };
 
+// Xử lý click bên ngoài component: nếu menu đang mở và click nằm ngoài root element thì đóng menu
+const handleClickOutside = (event: MouseEvent) => {
+    if (!isOpen.value) return;
+
+    const target = event.target as Node;
+    if (selectRef.value && !selectRef.value.contains(target)) {
+        closeMenu();
+    }
+};
+
+// Mở dropdown menu, có thể reset query search khi mở lần đầu
 const openMenu = (resetQuery = true) => {
     if (props.disabled) {
         return;
@@ -128,6 +149,7 @@ const openMenu = (resetQuery = true) => {
     }
 };
 
+// Toggle mở/đóng dropdown menu
 const toggleMenu = () => {
     if (isOpen.value) {
         closeMenu();
@@ -137,6 +159,7 @@ const toggleMenu = () => {
     openMenu();
 };
 
+// Focus vào trigger element (input nếu searchable, button nếu không)
 const focusTrigger = () => {
     if (props.searchable) {
         inputRef.value?.focus();
@@ -146,12 +169,16 @@ const focusTrigger = () => {
     triggerRef.value?.focus();
 };
 
+// Kiểm tra option có đang được chọn không
 const isSelected = (option: MsComboboxOption) => option.value === props.modelValue;
 
+// Lấy label hiển thị của một option
 const getOptionLabel = (option: MsComboboxOption) => {
     return option.label;
 }
 
+// Chọn một option: emit giá trị mới, đóng menu và focus lại trigger
+// Dùng isClosingBySelection flag để ngăn handleInputFocus mở lại menu khi focus input
 const selectOption = (option: MsComboboxOption) => {
     if (option.disabled) {
         return;
@@ -160,9 +187,14 @@ const selectOption = (option: MsComboboxOption) => {
     emit('update:modelValue', option.value);
     emit('change', option.value);
     closeMenu();
+    isClosingBySelection.value = true;
     focusTrigger();
+    nextTick(() => {
+        isClosingBySelection.value = false;
+    });
 };
 
+// Debounce search: chờ một khoảng thời gian sau lần gõ cuối trước khi emit event search
 const scheduleSearch = (value: string) => {
     clearTimeout(searchDebounceTimer);
     searchDebounceTimer = setTimeout(() => {
@@ -170,6 +202,7 @@ const scheduleSearch = (value: string) => {
     }, props.debounceMs);
 };
 
+// Xử lý khi user gõ trong input search: cập nhật query và trigger search
 const handleInputChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
 
@@ -179,14 +212,16 @@ const handleInputChange = (event: Event) => {
     scheduleSearch(target.value);
 };
 
+// Xử lý khi input được focus: mở menu (bỏ qua nếu đang đóng do vừa chọn option)
 const handleInputFocus = () => {
-    if (props.disabled) {
+    if (props.disabled || isClosingBySelection.value) {
         return;
     }
 
     openMenu();
 };
 
+// Xử lý khi click vào input: mở menu
 const handleInputClick = () => {
     if (props.disabled) {
         return;
@@ -195,6 +230,7 @@ const handleInputClick = () => {
     openMenu();
 };
 
+// Xử lý scroll trong menu: khi cuộn tới cuối thì emit event để lazy load thêm dữ liệu
 const handleMenuScroll = (event: Event) => {
     if (!props.allowLazyLoad || props.isLoading || !props.hasMore) {
         return;
@@ -210,6 +246,7 @@ const handleMenuScroll = (event: Event) => {
     }
 };
 
+// Tự động đóng menu khi component bị disabled
 watch(
     () => props.disabled,
     (disabled) => {
@@ -218,6 +255,17 @@ watch(
         }
     },
 );
+
+// Gắn mousedown listener lên document để phát hiện click bên ngoài component
+onMounted(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+});
+
+// Gỡ listener và clear timer khi component bị unmount để tránh memory leak
+onBeforeUnmount(() => {
+    document.removeEventListener('mousedown', handleClickOutside);
+    clearTimeout(searchDebounceTimer);
+});
 
 </script>
 
