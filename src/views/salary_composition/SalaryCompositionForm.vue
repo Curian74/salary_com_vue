@@ -10,6 +10,7 @@ import {
     IncomeTaxType,
     OptionShowPaycheck,
     SourceType,
+    TrackingStatus,
     ValueType,
 } from '@/enums/salaryCompositionEnums';
 import {
@@ -20,6 +21,7 @@ import {
     incomeTaxTypeText,
     optionShowPaycheckText,
     sourceTypeText,
+    trackingStatusText,
     valueTypeText,
 } from '@/constants/salaryCompositionLabels';
 import type { GetOrganizationTreeResponse } from '@/types/organization';
@@ -79,6 +81,10 @@ const salaryCompositionFormOptions = {
     optionShowPaycheck: toSelectOptions<OptionShowPaycheck>(
         OptionShowPaycheck,
         optionShowPaycheckText,
+    ),
+    status: toSelectOptions<TrackingStatus>(
+        TrackingStatus,
+        trackingStatusText,
     ),
     organizationalStructureLevel: [1, 2, 3, 4].map((level) => ({
         value: level,
@@ -214,6 +220,7 @@ watch(() => props.salaryComposition, (v) => {
         valueFormula: v.valueFormula ?? '',
         optionShowPaycheck: v.optionShowPaycheck,
         sourceType: v.sourceType,
+        status: v.status,
         organizationUnitIds: nextOrganizationIds,
     };
 
@@ -283,6 +290,7 @@ const [organizationalStructureLevel] = defineField('organizationalStructureLevel
 const [salaryCompositionId] = defineField('salaryCompositionId');
 const [valueFormula] = defineField('valueFormula');
 const [optionShowPaycheck] = defineField('optionShowPaycheck');
+const [status] = defineField('status');
 const [sourceType] = defineField('sourceType');
 const [organizationUnitIds] = defineField('organizationUnitIds');
 
@@ -539,7 +547,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="salary-composition-form-scroll h-full overflow-y-auto px-12 pb-22 pt-5">
+    <div class="salary-composition-form-scroll h-full overflow-y-auto px-12 pb-10 pt-5">
         <form ref="salaryCompositionFormRef" class="salary-composition-form"
             :class="{ 'salary-composition-form--view': isReadOnly }" @submit.prevent="submitForm">
             <div class="salary-composition-form__row">
@@ -776,6 +784,32 @@ onMounted(async () => {
                     <MsMenuSelect id="source" v-model="sourceType" :options="salaryCompositionFormOptions.sourceType"
                         disabled class="salary-composition-form__select
                         salary-composition-form__select--medium" />
+                </div>
+            </div>
+
+            <div v-if="mode === 'edit'" class="salary-composition-form__row flex items-center">
+                <label class="salary-composition-form__label">
+                    Trạng thái
+                </label>
+                <div class="salary-composition-form__control" data-validation-field="status">
+                    <div class="flex flex-wrap items-center gap-6 mt-2">
+                        <label v-for="option in salaryCompositionFormOptions.status" :key="option.value"
+                            class="salary-composition-form__radio">
+                            <input type="radio" name="status" :value="option.value" :checked="status === option.value"
+                                :disabled="isReadOnly" @change="status = option.value" />
+                            <span>{{ option.label }}</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div v-else-if="mode === 'view'" class="salary-composition-form__row">
+                <label class="salary-composition-form__label" for="composition-type">
+                    Loại thành phần <span class="text-error">*</span>
+                </label>
+                <div class="salary-composition-form__control" data-validation-field="code">
+                    <MsInput :model-value="trackingStatusText[status ?? 0]" id="composition-code"
+                        class="salary-composition-form__input" readonly placeholder="Nhập mã viết liền" />
                 </div>
             </div>
         </form>

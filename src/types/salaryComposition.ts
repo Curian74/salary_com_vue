@@ -102,6 +102,7 @@ export interface CreateSalaryCompositionRequest {
 
     valueFormula?: string;
     optionShowPaycheck: OptionShowPaycheck;
+    status?: TrackingStatus | null;
 
     organizationUnitIds?: string[];
 }
@@ -132,6 +133,7 @@ export interface UpdateSalaryCompositionRequest {
     valueFormula?: string;
     salaryCompositionId?: string | null;
     optionShowPaycheck: OptionShowPaycheck;
+    status: TrackingStatus;
 
     organizationUnitIds?: string[];
 }
