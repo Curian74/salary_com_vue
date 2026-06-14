@@ -781,9 +781,9 @@ onMounted(async () => {
             <div class="salary-composition-form__row">
                 <label class="salary-composition-form__label" for="source">Nguồn tạo</label>
                 <div class="salary-composition-form__control">
-                    <MsMenuSelect id="source" v-model="sourceType" :options="salaryCompositionFormOptions.sourceType"
-                        disabled class="salary-composition-form__select
-                        salary-composition-form__select--medium" />
+                    <MsInput placeholder="Tự thêm" id="source" :options="salaryCompositionFormOptions.sourceType"
+                        disabled class="salary-composition-form__input
+                        salary-composition-form__input w-75!" />
                 </div>
             </div>
 
