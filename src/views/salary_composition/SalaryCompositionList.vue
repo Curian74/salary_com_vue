@@ -62,6 +62,8 @@ const emit = defineEmits<{
     'update-status-many': [payload: { ids: string[], status: TrackingStatus }]
     'delete-many': [ids: string[]],
     'row-action': [payload: SalaryCompositionRowActionPayload],
+    'save-columns': [columns: GetGridConfigsResponse[]],
+    searchChange: [string];
 }>();
 
 const handleUpdateStatusMany = (status: TrackingStatus) => {
@@ -82,6 +84,11 @@ const handleDeleteMany = () => {
 const handleRowAction = (payload: SalaryCompositionRowActionPayload) => {
     emit('row-action', payload);
 }
+
+const handleTableColSearchChange = (value: string) => {
+    emit('searchChange', value);
+}
+
 
 defineExpose({
     clearTableSelection,
@@ -169,8 +176,8 @@ defineExpose({
                     @toggle="emit('toggleOrganizationDropdown')"
                     @set-dropdown-el="emit('set-organization-dropdown-el', $event)" />
 
-                <SalaryCompositionRightActions v-if="!hasSelectedTableRows">
-                </SalaryCompositionRightActions>
+                <SalaryCompositionRightActions @search-change="handleTableColSearchChange($event)"
+                    v-if="!hasSelectedTableRows" :columns="columns" @save-columns="emit('save-columns', $event)" />
             </div>
 
             <div class="relative min-h-0 flex-1 overflow-auto">

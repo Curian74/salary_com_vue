@@ -42,6 +42,7 @@ const pendingStatusPayload = ref<UpdateStatusManyPayload | null>(null);
 const pendingDeleteIds = ref<string[]>([]);
 
 const columns = ref<GetGridConfigsResponse[]>([]);
+const columnSettings = ref<GetGridConfigsResponse[]>([]);
 const isTableLoading = ref(false);
 const selectedStatus = ref<TrackingStatus | null>(null);
 const trackingStatusOptions = ref<LookupResponse[]>([]);
@@ -404,6 +405,12 @@ onMounted(async () => {
     }
 });
 
+const handleTableColSearchChange = (value: string) => {
+    if (!value) return;
+    const nextCols = columns.value.filter(x => x.columnName.includes(value));
+    columnSettings.value = nextCols;
+}
+
 onBeforeUnmount(() => {
     document.removeEventListener('pointerdown', handleDocumentPointerDown);
     document.removeEventListener('keydown', handleDocumentKeydown);
@@ -423,7 +430,8 @@ onBeforeUnmount(() => {
         @set-organization-dropdown-el="setOrganizationDropdownElement" @first-page="handleFirstPage"
         @last-page="handleLastPage" @next-page="handleNextPage" @previous-page="handlePreviousPage"
         @update:page-size="handlePageSizeChange" @update-status-many="handleUpdateStatusMany"
-        @delete-many="handleDeleteMany" @row-action="handleRowAction" />
+        @delete-many="handleDeleteMany" @row-action="handleRowAction" @save-columns="columns = $event"
+        @search-change="handleTableColSearchChange($event)" />
 
     <SalaryCompositionAdd :salary-composition="selectedSalaryComposition" v-else-if="activeView === 'add'"
         :organization-items="organizationTreeItems" @back="showList" @saved="handleSaved" />
