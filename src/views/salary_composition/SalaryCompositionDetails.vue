@@ -161,7 +161,7 @@ onMounted(async () => {
         </div>
 
         <div class="mx-5 min-h-0 flex-1 overflow-hidden bg-white">
-            <SalaryCompositionForm @submit="handleSubmit" ref="formRef" :salary-composition="salaryComposition"
+            <SalaryCompositionForm @submit-update="handleSubmit" ref="formRef" :salary-composition="salaryComposition"
                 :mode="mode" :organization-items="organizationItems" />
         </div>
 

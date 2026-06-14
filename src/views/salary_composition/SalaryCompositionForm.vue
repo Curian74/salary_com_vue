@@ -28,7 +28,7 @@ import type { GetOrganizationTreeResponse } from '@/types/organization';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import SalaryCompositionOrganization from './SalaryCompositionOrganization.vue';
 import { useForm } from 'vee-validate';
-import type { CreateSalaryCompositionRequest, GetSalaryCompositionsRequest, GetSalaryCompositionsResponse, SalaryCompositionDetail } from '@/types/salaryComposition';
+import type { CreateSalaryCompositionRequest, GetSalaryCompositionsRequest, GetSalaryCompositionsResponse, SalaryCompositionDetail, UpdateSalaryCompositionRequest } from '@/types/salaryComposition';
 import { salaryCompositionSchema } from '@/validations/salaryCompositionSchema';
 import MsIcon from '@/components/base/MsIcon.vue';
 import MsTooltip from '@/components/base/MsTooltip.vue';
@@ -164,6 +164,7 @@ const nameInputRef = ref<InstanceType<typeof MsInput>>();
 
 const emit = defineEmits<{
     submit: [payload: CreateSalaryCompositionRequest]
+    submitUpdate: [payload: UpdateSalaryCompositionRequest]
 }>();
 
 const { errors, defineField, handleSubmit, meta, resetForm } =
@@ -507,6 +508,18 @@ const handleResetForm = () => {
     }
 };
 
+const orgNames = ref<string>();
+
+function renderOrgNames() {
+    const names = props.organizationItems.map(x => x.name);
+    const joinedNames = names.join(', ');
+    orgNames.value = joinedNames;
+}
+
+onMounted(() => {
+    renderOrgNames();
+})
+
 watch(
     () => [queryObject.value.pageSize, queryObject.value.searchTerm] as const,
     fetchSalaryCompositions,
@@ -595,6 +608,13 @@ onMounted(async () => {
                     <span v-if="errors.organizationUnitIds" class="text-error text-[13px]">
                         {{ errors.organizationUnitIds }}
                     </span>
+
+                    <div class="salary-composition-form__control" data-validation-field="code">
+                        <MsInput :model-value="orgNames" id="composition-code" class="salary-composition-form__input"
+                            :class="{ 'salary-composition-form__input--invalid': errors.code }"
+                            :readonly="isReadOnly || mode === 'edit'" @update:model-value="handleCodeChange"
+                            :disabled="mode === 'edit'" placeholder="Nhập mã viết liền" />
+                    </div>
                 </div>
             </div>
 
