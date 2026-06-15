@@ -104,8 +104,7 @@ const handleRemoveKeydown = (event: KeyboardEvent, id: string) => {
 
                     <span v-if="primaryOrganization" class="organization-chip">
                         <span class="truncate">{{ primaryOrganization.name }}</span>
-                        <span class="organization-chip__remove" role="button" tabindex="0"
-                            :aria-label="`Bỏ chọn ${primaryOrganization.name}`"
+                        <span class="organization-chip__remove" role="button"
                             @click.stop="removeOrganization(primaryOrganization.id)"
                             @keydown.stop="handleRemoveKeydown($event, primaryOrganization.id)">
                             <MsIcon name="x"></MsIcon>
@@ -183,9 +182,10 @@ const handleRemoveKeydown = (event: KeyboardEvent, id: string) => {
     justify-content: center;
     border: 1px solid #d7dce1;
     border-radius: 8px;
-    background: #f8fafc;
+    background: #F5F5F5;
     color: #001b44;
     font-weight: 600;
+    font-size: 13px;
     line-height: 1;
 }
 
@@ -195,7 +195,8 @@ const handleRemoveKeydown = (event: KeyboardEvent, id: string) => {
     justify-content: flex-start;
     gap: 6px;
     padding: 0 8px 0 10px;
-    background: #ffffff;
+    background: #F5F5F5;
+    font-size: 13px;
     font-weight: 500;
 }
 
