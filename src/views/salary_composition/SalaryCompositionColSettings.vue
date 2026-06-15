@@ -150,7 +150,7 @@ onBeforeUnmount(() => {
     right: 0;
     z-index: 100;
     display: flex;
-    width: 380px;
+    width: 400px;
     flex-direction: column;
     border: 1px solid #e2e6ea;
     border-radius: 8px;
@@ -166,14 +166,14 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px 8px;
+    padding: 18px 16px 12px;
 }
 
 .ms-column-customizer__title {
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 600;
     color: #001b44;
-    line-height: 20px;
+    line-height: 22px;
 }
 
 /* ── Search ─────────────────────────────── */
@@ -223,7 +223,7 @@ onBeforeUnmount(() => {
     max-height: 280px;
     flex-direction: column;
     margin: 0;
-    padding: 0 4px 4px;
+    padding: 0px 10px 4px;
     list-style: none;
     overflow-y: auto;
     overscroll-behavior: contain;
