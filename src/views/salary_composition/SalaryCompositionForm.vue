@@ -457,7 +457,10 @@ const submitForm = handleSubmit(
     (formValues) => {
         // Bỏ qua sourceType
         const { sourceType, ...payload } = formValues;
-        emit('submit', payload);
+        if (props.mode === 'create')
+            emit('submit', payload);
+        else if (props.mode === 'edit')
+            emit('submitUpdate', payload as UpdateSalaryCompositionRequest);
     },
     (formValues) => {
         // Lấy ra errors từ form
@@ -545,6 +548,10 @@ onBeforeUnmount(() => {
 });
 
 watch(isAutoSumEmployee, (v) => {
+    console.log(v);
+})
+
+watch(errors, (v) => {
     console.log(v);
 })
 

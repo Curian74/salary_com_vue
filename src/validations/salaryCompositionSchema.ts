@@ -37,7 +37,8 @@ export const salaryCompositionSchema = yup.object({
 
     incomeTaxType: yup
         .number()
-        .optional(),
+        .optional()
+        .nullable(),
 
     deductionType: yup
         .number()
