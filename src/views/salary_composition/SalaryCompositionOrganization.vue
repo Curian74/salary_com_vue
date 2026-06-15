@@ -5,6 +5,7 @@ import MsCheckbox from '@/components/base/MsCheckbox.vue';
 import MsTreeView from '@/components/base/tree_view/MsTreeView.vue';
 import type { GetOrganizationTreeResponse } from '@/types/organization.ts';
 import { TrackingStatus } from '@/enums/salaryCompositionEnums';
+import MsIcon from '@/components/base/MsIcon.vue';
 
 interface SalaryCompositionOrganizationFilterProps {
     organizationItems?: GetOrganizationTreeResponse[]
@@ -99,7 +100,7 @@ const handleRemoveKeydown = (event: KeyboardEvent, id: string) => {
             aria-haspopup="tree" @click="emit('toggle')">
             <div class="min-w-0 flex flex-1 items-center gap-1 overflow-hidden">
                 <template v-if="selectedCount > 0">
-                    <span class="organization-count-chip">{{ selectedCount }}</span>
+                    <span v-if="selectedCount > 1" class="organization-count-chip">{{ selectedCount }}</span>
 
                     <span v-if="primaryOrganization" class="organization-chip">
                         <span class="truncate">{{ primaryOrganization.name }}</span>
@@ -107,7 +108,7 @@ const handleRemoveKeydown = (event: KeyboardEvent, id: string) => {
                             :aria-label="`Bỏ chọn ${primaryOrganization.name}`"
                             @click.stop="removeOrganization(primaryOrganization.id)"
                             @keydown.stop="handleRemoveKeydown($event, primaryOrganization.id)">
-                            X
+                            <MsIcon name="x"></MsIcon>
                         </span>
                     </span>
                 </template>
@@ -119,11 +120,7 @@ const handleRemoveKeydown = (event: KeyboardEvent, id: string) => {
                 <span v-if="selectedCount > 0" class="organization-clear" role="button" tabindex="0"
                     aria-label="Bỏ chọn tất cả đơn vị" @click.stop="clearOrganizations"
                     @keydown.enter.stop.prevent="clearOrganizations" @keydown.space.stop.prevent="clearOrganizations">
-                    <svg class="size-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M18 6 6 18" />
-                        <path d="m6 6 12 12" />
-                    </svg>
+                    <MsIcon name="x"></MsIcon>
                 </span>
 
                 <svg class="size-4 transition-transform" :class="isOpen ? 'rotate-180' : ''" viewBox="0 0 24 24"
