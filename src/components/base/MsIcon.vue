@@ -43,6 +43,8 @@ const iconClasses: Record<string, string> = {
   'threedot': 'icon-sprite threedot-icon',
   'arrow-left': 'icon-sprite_sec arrow-left-icon',
   'duplicate': 'icon-sprite_sec duplicate-icon',
+  'chevron-right': 'icon-sprite_sec chevron-right-icon',
+  'chevron-down': 'icon-sprite_sec chevron-down-icon',
 }
 </script>
 

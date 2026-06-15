@@ -1,14 +1,13 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T">// 1. THÊM generic="T" ở đây để đồng bộ với TreeSelect
 import { computed } from 'vue';
-import type { Slot, VNodeChild } from 'vue';
 import MsCheckbox from '../MsCheckbox.vue';
 import type { TreeNodeItem } from '@/types/treeNode';
+import MsIcon from '../MsIcon.vue';
 
 const props = withDefaults(defineProps<{
-    node: TreeNodeItem;
+    node: TreeNodeItem<T>; // 2. THÊM <T> vào đây để báo định dạng dữ liệu mã hóa dữ liệu gốc
     modelValue: string[];
     expandedKeys: Set<string>;
-    itemSlot?: Slot<{ item: unknown }>;
     depth?: number;
     selectable?: boolean;
     multiple?: boolean;
@@ -24,16 +23,14 @@ const emit = defineEmits<{
     'toggle-expand': [string];
 }>();
 
-const TreeNodeItemContent = (contentProps: {
-    itemSlot?: Slot<{ item: unknown }>;
-    item: unknown;
-    name: string;
-}): VNodeChild => contentProps.itemSlot?.({ item: contentProps.item }) ?? contentProps.name;
+const slots = defineSlots<{
+    item?: (props: { item: T }) => any;
+}>();
 
 const hasChildren = computed(() => !!props.node.children?.length);
 const isExpanded = computed(() => props.expandedKeys.has(props.node.id));
 
-function getAllIds(node: TreeNodeItem): string[] {
+function getAllIds(node: TreeNodeItem<T>): string[] {
     return [
         node.id,
         ...(node.children ?? []).flatMap(getAllIds),
@@ -48,7 +45,6 @@ const isChecked = computed(() =>
 
 const isIndeterminate = computed(() => {
     const selectedCount = allIds.value.filter((id) => props.modelValue.includes(id)).length;
-
     return selectedCount > 0 && selectedCount < allIds.value.length;
 });
 
@@ -79,7 +75,8 @@ function onCheckboxChange(checked: boolean) {
             :style="{ paddingLeft: `${depth * 20}px` }">
             <button v-if="hasChildren" type="button" class="ms-tree-node__toggle"
                 @click="emit('toggle-expand', node.id)">
-                {{ isExpanded ? '▼' : '▶' }}
+                <MsIcon v-if="!isExpanded" name="chevron-right"></MsIcon>
+                <MsIcon class="ml-1.5" v-if="isExpanded" name="chevron-down"></MsIcon>
             </button>
 
             <span v-else class="ms-tree-node__toggle"></span>
@@ -88,15 +85,21 @@ function onCheckboxChange(checked: boolean) {
                 :indeterminate="isIndeterminate" @change="onCheckboxChange" />
 
             <div class="ms-tree-node__content">
-                <TreeNodeItemContent :item-slot="itemSlot" :item="node.raw" :name="node.name" />
+                <slot name="item" :item="node.raw">
+                    {{ node.name }}
+                </slot>
             </div>
         </div>
 
         <div v-if="hasChildren && isExpanded">
             <TreeNode v-for="child in node.children" :key="child.id" :node="child" :model-value="modelValue"
-                :expanded-keys="expandedKeys" :item-slot="itemSlot" :depth="depth + 1" :selectable="selectable"
-                :multiple="multiple" @update:model-value="emit('update:modelValue', $event)"
-                @toggle-expand="emit('toggle-expand', $event)" />
+                :expanded-keys="expandedKeys" :depth="depth + 1" :selectable="selectable" :multiple="multiple"
+                @update:model-value="emit('update:modelValue', $event)" @toggle-expand="emit('toggle-expand', $event)">
+
+                <template #item="{ item }">
+                    <slot name="item" :item="item" />
+                </template>
+            </TreeNode>
         </div>
     </div>
 </template>

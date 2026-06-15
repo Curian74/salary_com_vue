@@ -262,3 +262,15 @@
     width: 16px;
     height: 18px;
 }
+
+.chevron-right-icon {
+    background-position: -186px -4px;
+    width: 8px;
+    height: 12px;
+}
+
+.chevron-down-icon {
+    background-position: -124px -6px;
+    width: 12px;
+    height: 8px;
+}
