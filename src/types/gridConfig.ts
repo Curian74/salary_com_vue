@@ -7,6 +7,7 @@ export interface GridConfig {
 }
 
 export interface GetGridConfigsResponse {
+    id: string;
     fieldKey: string;
     columnName: string;
     displayOrder?: number;

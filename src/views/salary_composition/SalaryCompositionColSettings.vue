@@ -14,7 +14,7 @@ const props = defineProps<MsColumnCustomizerProps>();
 let debounceTimer: ReturnType<typeof setTimeout>;
 
 const emit = defineEmits<{
-    save: [columns: GetGridConfigsResponse[]];
+    save: [payload: { changedIds: string[], allColumns: GetGridConfigsResponse[] }];
     close: [];
     searchChange: [string]
 }>();
@@ -24,10 +24,13 @@ const panelRef = ref<HTMLElement | null>(null);
 
 // Trạng thái nội bộ để user toggle trước khi nhấn Lưu.
 const localColumns = ref<GetGridConfigsResponse[]>([]);
+// Snapshot ban đầu để so sánh khi lưu.
+const originalColumns = ref<GetGridConfigsResponse[]>([]);
 
 // Deep clone columns khi prop thay đổi.
 const syncColumns = () => {
     localColumns.value = props.columns.map((col) => ({ ...col }));
+    originalColumns.value = props.columns.map((col) => ({ ...col }));
 };
 
 watch(() => props.columns, syncColumns, { immediate: true });
@@ -48,7 +51,17 @@ const handleToggle = (column: GetGridConfigsResponse) => {
 };
 
 const handleSave = () => {
-    emit('save', localColumns.value.map((col) => ({ ...col })));
+    const changedIds = localColumns.value
+        .filter((col) => {
+            const original = originalColumns.value.find((o) => o.id === col.id);
+            return original && original.isDisplayed !== col.isDisplayed;
+        })
+        .map((col) => col.id);
+
+    emit('save', {
+        changedIds,
+        allColumns: localColumns.value.map((col) => ({ ...col })),
+    });
 };
 
 // Click outside → đóng.
@@ -108,7 +121,7 @@ onBeforeUnmount(() => {
         <ul class="ms-column-customizer__list">
             <li v-for="column in filteredColumns" :key="column.fieldKey" class="ms-column-customizer__item"
                 @click="handleToggle(column)">
-                <MsCheckbox :checked="column.isDisplayed ?? false" @change="handleToggle(column)" />
+                <MsCheckbox :checked="column.isDisplayed ?? false" @change="handleToggle(column)" @click.stop />
                 <span class="ms-column-customizer__label">{{ column.columnName }}</span>
             </li>
 

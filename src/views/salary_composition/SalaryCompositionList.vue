@@ -62,7 +62,7 @@ const emit = defineEmits<{
     'update-status-many': [payload: { ids: string[], status: TrackingStatus }]
     'delete-many': [ids: string[]],
     'row-action': [payload: SalaryCompositionRowActionPayload],
-    'save-columns': [columns: GetGridConfigsResponse[]],
+    'save-columns': [payload: { changedIds: string[], allColumns: GetGridConfigsResponse[] }],
     searchChange: [string];
 }>();
 

@@ -10,8 +10,15 @@ const fetchGridConfigs = async (gridName: string, params?: GetGridConfigsRequest
     return response.data;
 }
 
+const updateGridConfigs = async (gridName: string, ids: string[])
+    : Promise<ApiResponse<void>> => {
+    const response = await axiosClient.put(`/GridConfigs/${gridName}`, { ids });
+    return response.data;
+}
+
 const gridConfigApi = {
     fetchGridConfigs,
+    updateGridConfigs,
 }
 
 export default gridConfigApi;

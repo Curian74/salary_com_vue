@@ -405,6 +405,20 @@ onMounted(async () => {
     }
 });
 
+const handleSaveColumns = async (payload: { changedIds: string[], allColumns: GetGridConfigsResponse[] }) => {
+    columns.value = payload.allColumns;
+    if (payload.changedIds.length > 0) {
+        try {
+            await gridConfigApi.updateGridConfigs(
+                gridKeys.SALARY_COMPOSITION,
+                payload.changedIds,
+            );
+        } catch (err) {
+            console.error('Failed to update grid configs:', err);
+        }
+    }
+};
+
 const handleTableColSearchChange = (value: string) => {
     if (!value) return;
     const nextCols = columns.value.filter(x => x.columnName.includes(value));
@@ -430,7 +444,7 @@ onBeforeUnmount(() => {
         @set-organization-dropdown-el="setOrganizationDropdownElement" @first-page="handleFirstPage"
         @last-page="handleLastPage" @next-page="handleNextPage" @previous-page="handlePreviousPage"
         @update:page-size="handlePageSizeChange" @update-status-many="handleUpdateStatusMany"
-        @delete-many="handleDeleteMany" @row-action="handleRowAction" @save-columns="columns = $event"
+        @delete-many="handleDeleteMany" @row-action="handleRowAction" @save-columns="handleSaveColumns($event)"
         @search-change="handleTableColSearchChange($event)" />
 
     <SalaryCompositionAdd :salary-composition="selectedSalaryComposition" v-else-if="activeView === 'add'"

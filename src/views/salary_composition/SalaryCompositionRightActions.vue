@@ -12,7 +12,7 @@ interface SalaryCompositionRightActionsProps {
 defineProps<SalaryCompositionRightActionsProps>();
 
 const emit = defineEmits<{
-    'save-columns': [columns: GetGridConfigsResponse[]];
+    'save-columns': [payload: { changedIds: string[], allColumns: GetGridConfigsResponse[] }];
     searchChange: [string];
 }>();
 
@@ -26,8 +26,8 @@ const closeColumnCustomizer = () => {
     isColumnCustomizerOpen.value = false;
 };
 
-const handleSaveColumns = (columns: GetGridConfigsResponse[]) => {
-    emit('save-columns', columns);
+const handleSaveColumns = (payload: { changedIds: string[], allColumns: GetGridConfigsResponse[] }) => {
+    emit('save-columns', payload);
     closeColumnCustomizer();
 };
 
