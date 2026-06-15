@@ -1,11 +1,11 @@
-<script setup lang="ts" generic="T">// 1. THÊM generic="T" ở đây để đồng bộ với TreeSelect
+<script setup lang="ts" generic="T">
 import { computed } from 'vue';
 import MsCheckbox from '../MsCheckbox.vue';
 import type { TreeNodeItem } from '@/types/treeNode';
 import MsIcon from '../MsIcon.vue';
 
 const props = withDefaults(defineProps<{
-    node: TreeNodeItem<T>; // 2. THÊM <T> vào đây để báo định dạng dữ liệu mã hóa dữ liệu gốc
+    node: TreeNodeItem<T>;
     modelValue: string[];
     expandedKeys: Set<string>;
     depth?: number;

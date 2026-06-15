@@ -1,6 +1,4 @@
 <script setup lang="ts" generic="T">
-import { computed } from 'vue';
-import type { Slot } from 'vue';
 import TreeNode from './TreeNode.vue';
 import type { TreeNodeItem } from '@/types/treeNode';
 
