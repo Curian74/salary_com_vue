@@ -13,7 +13,7 @@ import gridKeys from '@/constants/gridKeys.ts';
 import localStorageKeys from '@/constants/localStorageKeys.ts';
 import { TrackingStatus } from '@/enums/salaryCompositionEnums';
 import type { LookupResponse, PagedResult } from '@/types/apiResponse.ts';
-import type { GetGridConfigsResponse } from '@/types/gridConfig';
+import type { GetGridConfigsResponse, UpdateGridConfigItem } from '@/types/gridConfig';
 import type { GetOrganizationTreeRequest, GetOrganizationTreeResponse } from '@/types/organization.ts';
 import type { DeleteRequest, GetSalaryCompositionsRequest, GetSalaryCompositionsResponse } from '@/types/salaryComposition.ts';
 import SalaryCompositionAdd from './SalaryCompositionAdd.vue';
@@ -405,13 +405,13 @@ onMounted(async () => {
     }
 });
 
-const handleSaveColumns = async (payload: { changedIds: string[], allColumns: GetGridConfigsResponse[] }) => {
+const handleSaveColumns = async (payload: { changedColumns: UpdateGridConfigItem[], allColumns: GetGridConfigsResponse[] }) => {
     columns.value = payload.allColumns;
-    if (payload.changedIds.length > 0) {
+    if (payload.changedColumns.length > 0) {
         try {
             await gridConfigApi.updateGridConfigs(
                 gridKeys.SALARY_COMPOSITION,
-                payload.changedIds,
+                payload.changedColumns,
             );
         } catch (err) {
             console.error('Failed to update grid configs:', err);

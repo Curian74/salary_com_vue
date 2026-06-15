@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import type { GetGridConfigsResponse } from '@/types/gridConfig';
+import type { GetGridConfigsResponse, UpdateGridConfigItem } from '@/types/gridConfig';
 import MsCheckbox from '@/components/base/MsCheckbox.vue';
 import MsButton from '@/components/base/MsButton.vue';
 import MsInput from '@/components/base/MsInput.vue';
@@ -14,7 +14,7 @@ const props = defineProps<MsColumnCustomizerProps>();
 let debounceTimer: ReturnType<typeof setTimeout>;
 
 const emit = defineEmits<{
-    save: [payload: { changedIds: string[], allColumns: GetGridConfigsResponse[] }];
+    save: [payload: { changedColumns: UpdateGridConfigItem[], allColumns: GetGridConfigsResponse[] }];
     close: [];
     searchChange: [string]
 }>();
@@ -51,15 +51,19 @@ const handleToggle = (column: GetGridConfigsResponse) => {
 };
 
 const handleSave = () => {
-    const changedIds = localColumns.value
+    const changedColumns: UpdateGridConfigItem[] = localColumns.value
         .filter((col) => {
             const original = originalColumns.value.find((o) => o.id === col.id);
             return original && original.isDisplayed !== col.isDisplayed;
         })
-        .map((col) => col.id);
+        .map((col) => ({
+            id: col.id,
+            isDisplayed: col.isDisplayed,
+            displayOrder: col.displayOrder,
+        }));
 
     emit('save', {
-        changedIds,
+        changedColumns,
         allColumns: localColumns.value.map((col) => ({ ...col })),
     });
 };

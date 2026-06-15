@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import MsButton from '@/components/base/MsButton.vue';
 import MsIcon from '@/components/base/MsIcon.vue';
-import type { GetGridConfigsResponse } from '@/types/gridConfig';
+import type { GetGridConfigsResponse, UpdateGridConfigItem } from '@/types/gridConfig';
 import SalaryCompositionColSettings from './SalaryCompositionColSettings.vue';
 
 interface SalaryCompositionRightActionsProps {
@@ -12,7 +12,7 @@ interface SalaryCompositionRightActionsProps {
 defineProps<SalaryCompositionRightActionsProps>();
 
 const emit = defineEmits<{
-    'save-columns': [payload: { changedIds: string[], allColumns: GetGridConfigsResponse[] }];
+    'save-columns': [payload: { changedColumns: UpdateGridConfigItem[], allColumns: GetGridConfigsResponse[] }];
     searchChange: [string];
 }>();
 
@@ -26,7 +26,7 @@ const closeColumnCustomizer = () => {
     isColumnCustomizerOpen.value = false;
 };
 
-const handleSaveColumns = (payload: { changedIds: string[], allColumns: GetGridConfigsResponse[] }) => {
+const handleSaveColumns = (payload: { changedColumns: UpdateGridConfigItem[], allColumns: GetGridConfigsResponse[] }) => {
     emit('save-columns', payload);
     closeColumnCustomizer();
 };

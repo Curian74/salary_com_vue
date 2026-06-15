@@ -4,7 +4,7 @@ import type { MsMenuOption } from '@/components/base/MsMenu.vue';
 import type { MsSelectOption } from '@/components/base/MsSelect.vue';
 import { computed, ref } from 'vue';
 import type { PagedResult } from '@/types/apiResponse.ts';
-import type { GetGridConfigsResponse } from '@/types/gridConfig';
+import type { GetGridConfigsResponse, UpdateGridConfigItem } from '@/types/gridConfig';
 import type { GetOrganizationTreeResponse } from '@/types/organization.ts';
 import type { GetSalaryCompositionsResponse } from '@/types/salaryComposition.ts';
 import { TrackingStatus } from '@/enums/salaryCompositionEnums';
@@ -62,7 +62,7 @@ const emit = defineEmits<{
     'update-status-many': [payload: { ids: string[], status: TrackingStatus }]
     'delete-many': [ids: string[]],
     'row-action': [payload: SalaryCompositionRowActionPayload],
-    'save-columns': [payload: { changedIds: string[], allColumns: GetGridConfigsResponse[] }],
+    'save-columns': [payload: { changedColumns: UpdateGridConfigItem[], allColumns: GetGridConfigsResponse[] }],
     searchChange: [string];
 }>();
 

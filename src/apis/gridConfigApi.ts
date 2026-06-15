@@ -1,4 +1,4 @@
-import type { GetGridConfigsRequest, GetGridConfigsResponse } from "@/types/gridConfig";
+import type { GetGridConfigsRequest, GetGridConfigsResponse, UpdateGridConfigItem } from "@/types/gridConfig";
 import { axiosClient } from "./axiosClient";
 import type { ApiResponse } from "@/types/apiResponse";
 
@@ -10,9 +10,9 @@ const fetchGridConfigs = async (gridName: string, params?: GetGridConfigsRequest
     return response.data;
 }
 
-const updateGridConfigs = async (gridName: string, ids: string[])
+const updateGridConfigs = async (gridName: string, columns: UpdateGridConfigItem[])
     : Promise<ApiResponse<void>> => {
-    const response = await axiosClient.put(`/GridConfigs/${gridName}`, { ids });
+    const response = await axiosClient.put(`/GridConfigs/${gridName}`, { columns });
     return response.data;
 }
 

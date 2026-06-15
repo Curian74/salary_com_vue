@@ -18,3 +18,14 @@ export interface GetGridConfigsResponse {
 export interface GetGridConfigsRequest {
     columnName?: string
 }
+
+export interface UpdateGridConfigItem {
+    id: string;
+    isDisplayed?: boolean;
+    displayOrder?: number;
+    isPinned?: boolean;
+}
+
+export interface UpdateGridConfigsRequest {
+    columns: UpdateGridConfigItem[];
+}
